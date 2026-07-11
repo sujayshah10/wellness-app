@@ -13,6 +13,9 @@ export default function Workout() {
   const workout =
     appData.workouts[selectedDay] || { focus: "", exercises: [] };
 
+  const mediaUrlFor = (exercise) =>
+    exercise.mediaUrl || `https://www.youtube.com/results?search_query=${encodeURIComponent(`${exercise.name} proper form`)}`;
+
   return (
     <div className="page">
 
@@ -35,18 +38,9 @@ export default function Workout() {
       {/* Exercises */}
 
       {workout.exercises.length === 0 && (
-        <div
-          style={{
-            background: "var(--app-surface)",
-            color: "var(--app-text)",
-            padding: "18px",
-            borderRadius: "12px",
-            marginBottom: "14px",
-            boxShadow: "var(--app-shadow)",
-            border: "1px solid var(--app-border)"
-          }}
-        >
-          {t("restDay")}
+        <div className="empty-state">
+          <strong>{t("restDay")}</strong>
+          <span>{t("noWorkoutData")}</span>
         </div>
       )}
 
@@ -69,6 +63,15 @@ export default function Workout() {
           <p style={{ color: "var(--app-muted)", marginTop: "6px" }}>
             {ex.sets} {t("sets")} x {ex.reps}
           </p>
+
+          <a
+            href={mediaUrlFor(ex)}
+            target="_blank"
+            rel="noreferrer"
+            className="media-link"
+          >
+            ▶ {t("watchForm")}
+          </a>
 
         </div>
 

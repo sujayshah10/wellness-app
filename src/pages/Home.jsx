@@ -13,7 +13,7 @@ export default function Home() {
   const { t, dayName } = useTranslation();
 
   const dietData = appData.dietPlan[selectedDay];
-  const intakeSlots = appData.intakeSlots || [];
+  const intakeSlots = (appData.intakeSlots || []).filter((slot) => slot.active !== false);
   const workout = appData.workouts[selectedDay] || { focus: "", exercises: [] };
 
   const totalCalories = dietData
@@ -128,7 +128,12 @@ export default function Home() {
           {t("nextMeals")}
         </h3>
 
-        {nextMeals.map((meal,index)=>(
+        {nextMeals.length === 0 ? (
+          <div className="empty-state compact">
+            <strong>{t("noMealData")}</strong>
+            <span>Open Menu → Intakes to add your next meals.</span>
+          </div>
+        ) : nextMeals.map((meal,index)=>(
 
           <div
             key={index}
@@ -199,16 +204,22 @@ export default function Home() {
         </h3>
 
         <p style={{color:"var(--app-muted)"}}>
-          {workout.focus}
+          {workout.focus || t("noWorkoutData")}
         </p>
 
-        <ul>
-          {workout.exercises.slice(0, 4).map((exercise) => (
-            <li key={exercise.name}>
-              {exercise.name} - {exercise.sets} x {exercise.reps}
-            </li>
-          ))}
-        </ul>
+        {workout.exercises.length === 0 ? (
+          <div className="empty-state compact" style={{ marginTop: "8px" }}>
+            <strong>{t("noWorkoutData")}</strong>
+          </div>
+        ) : (
+          <ul>
+            {workout.exercises.slice(0, 4).map((exercise) => (
+              <li key={exercise.name}>
+                {exercise.name} - {exercise.sets} x {exercise.reps}
+              </li>
+            ))}
+          </ul>
+        )}
 
       </div>
 

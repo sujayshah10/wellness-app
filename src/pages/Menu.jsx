@@ -5,12 +5,12 @@ import { DAYS, DEFAULT_INTAKE_SLOTS, LANGUAGES, THEMES, TIMEZONE_OPTIONS } from 
 import { useTranslation } from "../utils/useTranslation";
 
 const SECTIONS = [
-  { key: "Intakes", labelKey: "intakes", descriptionKey: "descIntakes" },
-  { key: "Exercises", labelKey: "exercises", descriptionKey: "descExercises" },
-  { key: "Targets", labelKey: "targets", descriptionKey: "descTargets" },
-  { key: "Settings", labelKey: "settings", descriptionKey: "descSettings" },
-  { key: "App Data", labelKey: "appData", descriptionKey: "descAppData" },
-  { key: "About", labelKey: "about", descriptionKey: "descAbout" }
+  { key: "Intakes", labelKey: "intakes", descriptionKey: "descIntakes", icon: "utensils" },
+  { key: "Exercises", labelKey: "exercises", descriptionKey: "descExercises", icon: "activity" },
+  { key: "Targets", labelKey: "targets", descriptionKey: "descTargets", icon: "target" },
+  { key: "Settings", labelKey: "settings", descriptionKey: "descSettings", icon: "settings" },
+  { key: "App Data", labelKey: "appData", descriptionKey: "descAppData", icon: "database" },
+  { key: "About", labelKey: "about", descriptionKey: "descAbout", icon: "info" }
 ];
 
 const emptyMeal = {
@@ -25,8 +25,31 @@ const emptyMeal = {
 const emptyExercise = {
   name: "",
   sets: 3,
-  reps: "10-12"
+  reps: "10-12",
+  mediaUrl: ""
 };
+
+function mediaSearchUrl(name) {
+  return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${name} proper form`)}`;
+}
+
+function Icon({ name }) {
+  const paths = {
+    utensils: "M7 3v8M4 3v8M10 3v8M4 7h6M7 11v10M16 3v18M16 3c3 2 4 6 0 9",
+    activity: "M3 12h4l3-7 4 14 3-7h4",
+    target: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z",
+    settings: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM4 12h2M18 12h2M12 4v2M12 18v2M6.6 6.6l1.4 1.4M16 16l1.4 1.4M17.4 6.6 16 8M8 16l-1.4 1.4",
+    database: "M5 6c0-2 14-2 14 0v12c0 2-14 2-14 0V6ZM5 6c0 2 14 2 14 0M5 12c0 2 14 2 14 0",
+    info: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 11v6M12 7h.01",
+    chevron: "M9 6l6 6-6 6"
+  };
+
+  return (
+    <svg className="menu-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d={paths[name]} />
+    </svg>
+  );
+}
 
 function fieldStyle() {
   return {
@@ -130,12 +153,14 @@ function DayPicker({ selectedDay, onSelect }) {
 function IntakesSection({ appData, setAppData, t }) {
   const [day, setDay] = useState("Mon");
   const intakeSlots = appData.intakeSlots || DEFAULT_INTAKE_SLOTS;
-  const [slot, setSlot] = useState(intakeSlots[0]?.key || "intake1");
+  const activeIntakeSlots = intakeSlots.filter((item) => item.active !== false);
+  const [slot, setSlot] = useState(activeIntakeSlots[0]?.key || "intake1");
   const [draft, setDraft] = useState(() => ({
     ...emptyMeal,
-    ...(appData.dietPlan.Mon?.[intakeSlots[0]?.key || "intake1"] || {})
+    ...(appData.dietPlan.Mon?.[activeIntakeSlots[0]?.key || "intake1"] || {})
   }));
   const [addDays, setAddDays] = useState(["Mon"]);
+  const [validationMessage, setValidationMessage] = useState("");
 
   const getIntakeDraft = (nextDay, nextSlot) => {
     const slotDefault = intakeSlots.find((item) => item.key === nextSlot);
@@ -172,26 +197,39 @@ function IntakesSection({ appData, setAppData, t }) {
   };
 
   const visibleIntakes = useMemo(() =>
-    intakeSlots.map((mealSlot) => ({
+    activeIntakeSlots.map((mealSlot) => ({
       day,
       slot: mealSlot.key,
       label: mealSlot.label,
       meal: appData.dietPlan[day]?.[mealSlot.key]
     })).filter((item) => item.meal),
-  [appData.dietPlan, day, intakeSlots]);
+  [appData.dietPlan, day, activeIntakeSlots]);
 
   const updateDraft = (key, value) => {
     setDraft((current) => ({ ...current, [key]: value }));
   };
 
   const saveIntake = () => {
+    if (!draft.name.trim()) {
+      setValidationMessage(t("nameRequired"));
+      return;
+    }
+
+    const cleanDraft = {
+      ...draft,
+      name: draft.name.trim(),
+      calories: Math.max(0, Number(draft.calories) || 0),
+      protein: Math.max(0, Number(draft.protein) || 0)
+    };
+    setValidationMessage("");
+
     setAppData((current) => ({
       ...current,
       dietPlan: {
         ...current.dietPlan,
         [day]: {
           ...current.dietPlan[day],
-          [slot]: draft
+          [slot]: cleanDraft
         }
       }
     }));
@@ -219,7 +257,8 @@ function IntakesSection({ appData, setAppData, t }) {
       const nextSlot = {
         key: nextKey,
         label: createdLabel,
-        time: ""
+        time: "",
+        active: true
       };
 
       const nextDietPlan = { ...current.dietPlan };
@@ -253,7 +292,8 @@ function IntakesSection({ appData, setAppData, t }) {
 
   const removeCurrentIntakeSlot = () => {
     if (intakeSlots.length <= 1) return;
-    const nextSlot = intakeSlots.find((item) => item.key !== slot)?.key || intakeSlots[0].key;
+    if (!window.confirm(t("confirmDeleteIntakeSlot"))) return;
+    const nextSlot = activeIntakeSlots.find((item) => item.key !== slot)?.key || intakeSlots[0].key;
 
     setAppData((current) => {
       const nextDietPlan = { ...current.dietPlan };
@@ -275,12 +315,25 @@ function IntakesSection({ appData, setAppData, t }) {
   };
 
   const addIntake = () => {
+    if (!draft.name.trim()) {
+      setValidationMessage(t("nameRequired"));
+      return;
+    }
+
+    const cleanDraft = {
+      ...draft,
+      name: draft.name.trim(),
+      calories: Math.max(0, Number(draft.calories) || 0),
+      protein: Math.max(0, Number(draft.protein) || 0)
+    };
+    setValidationMessage("");
+
     setAppData((current) => {
       const nextDietPlan = { ...current.dietPlan };
       addDays.forEach((selectedDay) => {
         nextDietPlan[selectedDay] = {
           ...nextDietPlan[selectedDay],
-          [slot]: draft
+          [slot]: cleanDraft
         };
       });
       return { ...current, dietPlan: nextDietPlan };
@@ -308,21 +361,27 @@ function IntakesSection({ appData, setAppData, t }) {
         <h3 style={{ marginTop: 0 }}>{t("intakeStructure")}</h3>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: "8px", alignItems: "end" }}>
-          <Field label={t("numberOfIntakeSlots")} type="number" value={intakeSlots.length} onChange={(value) => {
+          <Field label={t("numberOfIntakeSlots")} type="number" value={activeIntakeSlots.length} onChange={(value) => {
             const targetCount = Math.max(1, Math.min(12, Number(value) || 1));
-            if (targetCount > intakeSlots.length) {
+            if (targetCount > activeIntakeSlots.length) {
               setAppData((current) => {
                 const currentSlots = current.intakeSlots || DEFAULT_INTAKE_SLOTS;
-                const nextSlots = [...currentSlots];
+                const nextSlots = currentSlots.map((item) => ({ ...item }));
                 const nextDietPlan = { ...current.dietPlan };
 
-                while (nextSlots.length < targetCount) {
+                for (const item of nextSlots) {
+                  if (nextSlots.filter((slotItem) => slotItem.active !== false).length >= targetCount) break;
+                  item.active = true;
+                }
+
+                while (nextSlots.filter((item) => item.active !== false).length < targetCount) {
                   const nextNumber = nextSlots.length + 1;
                   const nextKey = `intake${Date.now()}${nextNumber}`;
                   nextSlots.push({
                     key: nextKey,
                     label: `${t("intake")} ${nextNumber}`,
-                    time: ""
+                    time: "",
+                    active: true
                   });
 
                   DAYS.forEach((item) => {
@@ -339,19 +398,19 @@ function IntakesSection({ appData, setAppData, t }) {
 
                 return { ...current, intakeSlots: nextSlots, dietPlan: nextDietPlan };
               });
-            } else if (targetCount < intakeSlots.length) {
+            } else if (targetCount < activeIntakeSlots.length) {
+              if (!window.confirm(t("confirmDeleteIntakeSlot"))) return;
               setAppData((current) => {
-                const keepSlots = (current.intakeSlots || DEFAULT_INTAKE_SLOTS).slice(0, targetCount);
-                const keepKeys = new Set(keepSlots.map((item) => item.key));
-                const nextDietPlan = { ...current.dietPlan };
-                DAYS.forEach((item) => {
-                  nextDietPlan[item] = Object.fromEntries(
-                    Object.entries(nextDietPlan[item] || {}).filter(([key]) => keepKeys.has(key))
-                  );
+                const nextSlots = (current.intakeSlots || DEFAULT_INTAKE_SLOTS).map((item) => ({ ...item }));
+                let activeSeen = 0;
+                nextSlots.forEach((item) => {
+                  if (item.active === false) return;
+                  activeSeen += 1;
+                  item.active = activeSeen <= targetCount;
                 });
-                return { ...current, intakeSlots: keepSlots, dietPlan: nextDietPlan };
+                return { ...current, intakeSlots: nextSlots };
               });
-              setSlot(intakeSlots[0]?.key || "intake1");
+              setSlot(activeIntakeSlots[0]?.key || "intake1");
             }
           }} />
           <button type="button" onClick={addIntakeSlot} style={{ ...buttonStyle("soft"), marginBottom: "12px" }}>{t("add")}</button>
@@ -363,6 +422,7 @@ function IntakesSection({ appData, setAppData, t }) {
           value={intakeSlots.find((item) => item.key === slot)?.label || ""}
           onChange={(value) => updateIntakeSlot("label", value)}
         />
+        <p style={{ margin: 0, color: "var(--app-muted)", fontSize: "12px" }}>{t("inactiveIntakesSaved")}</p>
       </div>
 
       <div style={cardStyle()}>
@@ -372,9 +432,11 @@ function IntakesSection({ appData, setAppData, t }) {
 
         <div style={{ marginBottom: "12px" }}>
           <select value={slot} onChange={(event) => selectSlot(event.target.value)} style={fieldStyle()}>
-            {intakeSlots.map((item) => <option key={item.key} value={item.key}>{item.label}</option>)}
+            {activeIntakeSlots.map((item) => <option key={item.key} value={item.key}>{item.label}</option>)}
           </select>
         </div>
+
+        {validationMessage && <div className="inline-error">{validationMessage}</div>}
 
         <Field label={t("dishName")} value={draft.name} onChange={(value) => updateDraft("name", value)} />
         <Field label={t("time")} value={draft.time} onChange={(value) => updateDraft("time", value)} />
@@ -413,6 +475,7 @@ function IntakesSection({ appData, setAppData, t }) {
 
       <div style={cardStyle()}>
         <h3 style={{ marginTop: 0 }}>{day} {t("intakes")}</h3>
+        {visibleIntakes.length === 0 && <div className="empty-state compact"><strong>{t("noActiveIntakes")}</strong><span>{t("addIntakesFromMenu")}</span></div>}
         {visibleIntakes.map((item) => (
           <button
             type="button"
@@ -498,6 +561,7 @@ function ExercisesSection({ appData, setAppData, t }) {
       {workout.exercises.map((exercise, index) => (
         <div key={`${exercise.name}-${index}`} style={{ borderTop: "1px solid var(--app-border)", paddingTop: "12px", marginTop: "12px" }}>
           <Field label={t("exercise")} value={exercise.name} onChange={(value) => updateExercise(index, "name", value)} />
+          <Field label={t("mediaLink")} value={exercise.mediaUrl || ""} onChange={(value) => updateExercise(index, "mediaUrl", value)} />
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
             <Field label={t("sets")} type="number" value={exercise.sets} onChange={(value) => updateExercise(index, "sets", value)} />
             <Field label={t("reps")} value={exercise.reps} onChange={(value) => updateExercise(index, "reps", value)} />
@@ -522,6 +586,7 @@ function ExercisesSection({ appData, setAppData, t }) {
       <div style={{ borderTop: "1px solid var(--app-border)", paddingTop: "12px", marginTop: "12px" }}>
         <h4>{t("addExercise")}</h4>
         <Field label={t("exercise")} value={newExercise.name} onChange={(value) => setNewExercise((current) => ({ ...current, name: value }))} />
+        <Field label={t("mediaLink")} value={newExercise.mediaUrl} onChange={(value) => setNewExercise((current) => ({ ...current, mediaUrl: value }))} />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
           <Field label={t("sets")} type="number" value={newExercise.sets} onChange={(value) => setNewExercise((current) => ({ ...current, sets: value }))} />
           <Field label={t("reps")} value={newExercise.reps} onChange={(value) => setNewExercise((current) => ({ ...current, reps: value }))} />
@@ -530,7 +595,16 @@ function ExercisesSection({ appData, setAppData, t }) {
           type="button"
           onClick={() => {
             if (!newExercise.name.trim()) return;
-            updateWorkout({ ...workout, exercises: [...workout.exercises, newExercise] });
+            updateWorkout({
+              ...workout,
+              exercises: [
+                ...workout.exercises,
+                {
+                  ...newExercise,
+                  mediaUrl: newExercise.mediaUrl || mediaSearchUrl(newExercise.name)
+                }
+              ]
+            });
             setNewExercise(emptyExercise);
           }}
           style={buttonStyle()}
@@ -592,6 +666,11 @@ function SettingsSection({ appData, setAppData, t }) {
   return (
     <div style={cardStyle()}>
       <h3 style={{ marginTop: 0 }}>{t("settings")}</h3>
+
+      <div className="empty-state compact" style={{ marginBottom: "12px" }}>
+        <strong>Smart defaults</strong>
+        <span>Theme, language, and time display all update instantly and stay saved offline.</span>
+      </div>
 
       <label style={{ display: "block", marginBottom: "12px", fontWeight: 600 }}>
         {t("language")}
@@ -720,16 +799,17 @@ function MenuList({ onOpen, t }) {
             textAlign: "left",
             cursor: "pointer",
             display: "grid",
-            gridTemplateColumns: "1fr auto",
+            gridTemplateColumns: "40px 1fr auto",
             alignItems: "center",
             gap: "12px"
           }}
         >
+          <span className="menu-icon-shell"><Icon name={item.icon} /></span>
           <span>
             <strong style={{ display: "block", fontSize: "17px", marginBottom: "4px", fontWeight: 650 }}>{t(item.labelKey)}</strong>
             <span style={{ color: "var(--app-muted)", fontSize: "13px" }}>{t(item.descriptionKey)}</span>
           </span>
-          <span style={{ color: "var(--app-primary)", fontWeight: 800, fontSize: "20px" }}>{">"}</span>
+          <span style={{ color: "var(--app-primary)", width: "24px", height: "24px" }}><Icon name="chevron" /></span>
         </button>
       ))}
     </div>

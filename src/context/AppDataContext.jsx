@@ -14,7 +14,8 @@ function normalizeIntakeSlots(slots = DEFAULT_INTAKE_SLOTS) {
     .map((slot, index) => ({
       key: slot.key,
       label: slot.label || `Intake ${index + 1}`,
-      time: slot.time || ""
+      time: slot.time || "",
+      active: slot.active !== false
     }));
 
   return normalized.length ? normalized : DEFAULT_INTAKE_SLOTS;
@@ -38,7 +39,9 @@ function normalizeDietPlan(dietPlan = {}, intakeSlots = DEFAULT_INTAKE_SLOTS) {
 }
 
 function normalizeAppData(data) {
-  const shouldRefreshSeedData = data?.dataVersion !== APP_DATA_VERSION;
+  const shouldRefreshSeedData = !data?.dataVersion
+    || data.dataVersion === "vadodara-seasonal-eating-v1"
+    || data.dataVersion === "vadodara-intake-full-body-v1";
   const intakeSlots = normalizeIntakeSlots(shouldRefreshSeedData ? DEFAULT_APP_DATA.intakeSlots : data?.intakeSlots || DEFAULT_APP_DATA.intakeSlots);
 
   return {

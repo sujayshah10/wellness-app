@@ -13,7 +13,7 @@ export default function Nutrition() {
   const { t } = useTranslation();
 
   const dietData = appData.dietPlan[selectedDay];
-  const intakeSlots = appData.intakeSlots || [];
+  const intakeSlots = (appData.intakeSlots || []).filter((slot) => slot.active !== false);
 
   return (
     <div className="page">
@@ -32,6 +32,13 @@ export default function Nutrition() {
 
       {dietData ? (
         <>
+          {intakeSlots.length === 0 && (
+            <div className="empty-state">
+              <strong>{t("noActiveIntakes")}</strong>
+              <span>{t("addIntakesFromMenu")}</span>
+            </div>
+          )}
+
           {intakeSlots.map((mealType) => {
             const meal = dietData[mealType.key];
             if (!meal) return null;

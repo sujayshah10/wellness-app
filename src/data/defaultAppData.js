@@ -3,14 +3,14 @@ import { foodDatabase } from "./foodDatabase";
 import { foodLibrary } from "./foodLibrary";
 import { WORKOUT_SPLIT } from "./workouts";
 
-export const APP_DATA_VERSION = "user-configurable-intakes-workouts-v1";
+export const APP_DATA_VERSION = "polished-configurable-wellness-v2";
 
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export const DEFAULT_INTAKE_SLOTS = [
-  { key: "intake1", label: "Intake 1", time: "4:30 PM" },
-  { key: "intake2", label: "Intake 2", time: "6:30 PM" },
-  { key: "intake3", label: "Intake 3", time: "4:00 AM" }
+  { key: "intake1", label: "Intake 1", time: "4:30 PM", active: true },
+  { key: "intake2", label: "Intake 2", time: "6:30 PM", active: true },
+  { key: "intake3", label: "Intake 3", time: "4:00 AM", active: true }
 ];
 
 export const DEFAULT_TARGETS = {
@@ -21,7 +21,7 @@ export const DEFAULT_TARGETS = {
 };
 
 export const DEFAULT_ABOUT = {
-  version: "0.1.0",
+  version: "0.3.0",
   ownerName: "Sujay Shah",
   tagline: "Three daily intakes, seasonal food, and full-body training."
 };
