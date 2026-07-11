@@ -1,7 +1,6 @@
 import { useDay } from "../context/useDay";
 import { useMeals } from "../context/useMeals";
 import { useAppData } from "../context/useAppData";
-import { MEAL_SLOTS } from "../data/defaultAppData";
 import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
 import { useTranslation } from "../utils/useTranslation";
@@ -14,6 +13,7 @@ export default function Nutrition() {
   const { t } = useTranslation();
 
   const dietData = appData.dietPlan[selectedDay];
+  const intakeSlots = appData.intakeSlots || [];
 
   return (
     <div className="page">
@@ -32,7 +32,7 @@ export default function Nutrition() {
 
       {dietData ? (
         <>
-          {MEAL_SLOTS.map((mealType) => {
+          {intakeSlots.map((mealType) => {
             const meal = dietData[mealType.key];
             if (!meal) return null;
 
@@ -68,7 +68,7 @@ export default function Nutrition() {
                         marginBottom: "4px"
                       }}
                     >
-                      {t(mealType.key)}
+                      {mealType.label}
                       {meal.time ? ` - ${meal.time}` : ""}
                     </div>
 

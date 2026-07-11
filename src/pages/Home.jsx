@@ -3,7 +3,6 @@ import { useDay } from "../context/useDay";
 import { useAppData } from "../context/useAppData";
 import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
-import { MEAL_SLOTS } from "../data/defaultAppData";
 import { findNextMeals } from "../utils/mealEngine";
 import { useTranslation } from "../utils/useTranslation";
 
@@ -14,14 +13,15 @@ export default function Home() {
   const { t, dayName } = useTranslation();
 
   const dietData = appData.dietPlan[selectedDay];
+  const intakeSlots = appData.intakeSlots || [];
   const workout = appData.workouts[selectedDay] || { focus: "", exercises: [] };
 
   const totalCalories = dietData
-    ? MEAL_SLOTS.reduce((total, slot) => total + (Number(dietData[slot.key]?.calories) || 0), 0)
+    ? intakeSlots.reduce((total, slot) => total + (Number(dietData[slot.key]?.calories) || 0), 0)
     : 0;
 
   const totalProtein = dietData
-    ? MEAL_SLOTS.reduce((total, slot) => total + (Number(dietData[slot.key]?.protein) || 0), 0)
+    ? intakeSlots.reduce((total, slot) => total + (Number(dietData[slot.key]?.protein) || 0), 0)
     : 0;
 
   const calorieTarget = Number(appData.targets.calories) || 0;

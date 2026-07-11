@@ -3,11 +3,11 @@ import { foodDatabase } from "./foodDatabase";
 import { foodLibrary } from "./foodLibrary";
 import { WORKOUT_SPLIT } from "./workouts";
 
-export const APP_DATA_VERSION = "vadodara-intake-full-body-v1";
+export const APP_DATA_VERSION = "user-configurable-intakes-workouts-v1";
 
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-export const MEAL_SLOTS = [
+export const DEFAULT_INTAKE_SLOTS = [
   { key: "intake1", label: "Intake 1", time: "4:30 PM" },
   { key: "intake2", label: "Intake 2", time: "6:30 PM" },
   { key: "intake3", label: "Intake 3", time: "4:00 AM" }
@@ -51,11 +51,11 @@ export const TIMEZONE_OPTIONS = [
   { key: "ist", label: "IST only" }
 ];
 
-function withIntakeTimes(dietPlan) {
+function withIntakeTimes(dietPlan, intakeSlots = DEFAULT_INTAKE_SLOTS) {
   return DAYS.reduce((plan, day) => {
     plan[day] = { ...(dietPlan[day] || {}) };
 
-    MEAL_SLOTS.forEach((slot) => {
+    intakeSlots.forEach((slot) => {
       if (plan[day][slot.key]) {
         plan[day][slot.key] = {
           time: slot.time,
@@ -70,6 +70,7 @@ function withIntakeTimes(dietPlan) {
 
 export const DEFAULT_APP_DATA = {
   dataVersion: APP_DATA_VERSION,
+  intakeSlots: DEFAULT_INTAKE_SLOTS,
   dietPlan: withIntakeTimes(DIET_PLAN),
   foodDatabase,
   foodLibrary,

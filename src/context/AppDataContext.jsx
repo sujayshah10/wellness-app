@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AppDataContext } from "./app-data-context";
-import { APP_DATA_VERSION, DEFAULT_APP_DATA, DEFAULT_ABOUT, DEFAULT_SETTINGS, DEFAULT_TARGETS, DAYS, MEAL_SLOTS } from "../data/defaultAppData";
+import { APP_DATA_VERSION, DEFAULT_APP_DATA, DEFAULT_ABOUT, DEFAULT_INTAKE_SLOTS, DEFAULT_SETTINGS, DEFAULT_TARGETS, DAYS } from "../data/defaultAppData";
 
 const STORAGE_KEY = "wellnessAppData";
 
@@ -8,11 +8,23 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function normalizeDietPlan(dietPlan = {}) {
+function normalizeIntakeSlots(slots = DEFAULT_INTAKE_SLOTS) {
+  const normalized = slots
+    .filter((slot) => slot?.key)
+    .map((slot, index) => ({
+      key: slot.key,
+      label: slot.label || `Intake ${index + 1}`,
+      time: slot.time || ""
+    }));
+
+  return normalized.length ? normalized : DEFAULT_INTAKE_SLOTS;
+}
+
+function normalizeDietPlan(dietPlan = {}, intakeSlots = DEFAULT_INTAKE_SLOTS) {
   return DAYS.reduce((plan, day) => {
     plan[day] = { ...(dietPlan[day] || {}) };
 
-    MEAL_SLOTS.forEach((slot) => {
+    intakeSlots.forEach((slot) => {
       if (plan[day][slot.key]) {
         plan[day][slot.key] = {
           time: slot.time,
@@ -27,12 +39,14 @@ function normalizeDietPlan(dietPlan = {}) {
 
 function normalizeAppData(data) {
   const shouldRefreshSeedData = data?.dataVersion !== APP_DATA_VERSION;
+  const intakeSlots = normalizeIntakeSlots(shouldRefreshSeedData ? DEFAULT_APP_DATA.intakeSlots : data?.intakeSlots || DEFAULT_APP_DATA.intakeSlots);
 
   return {
     ...clone(DEFAULT_APP_DATA),
     ...(data || {}),
     dataVersion: APP_DATA_VERSION,
-    dietPlan: normalizeDietPlan(shouldRefreshSeedData ? DEFAULT_APP_DATA.dietPlan : data?.dietPlan || DEFAULT_APP_DATA.dietPlan),
+    intakeSlots,
+    dietPlan: normalizeDietPlan(shouldRefreshSeedData ? DEFAULT_APP_DATA.dietPlan : data?.dietPlan || DEFAULT_APP_DATA.dietPlan, intakeSlots),
     foodDatabase: shouldRefreshSeedData ? DEFAULT_APP_DATA.foodDatabase : data?.foodDatabase || DEFAULT_APP_DATA.foodDatabase,
     foodLibrary: shouldRefreshSeedData ? DEFAULT_APP_DATA.foodLibrary : data?.foodLibrary || DEFAULT_APP_DATA.foodLibrary,
     workouts: shouldRefreshSeedData ? DEFAULT_APP_DATA.workouts : data?.workouts || DEFAULT_APP_DATA.workouts,

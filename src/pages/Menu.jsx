@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppData } from "../context/useAppData";
-import { DAYS, LANGUAGES, MEAL_SLOTS, THEMES, TIMEZONE_OPTIONS } from "../data/defaultAppData";
+import { DAYS, DEFAULT_INTAKE_SLOTS, LANGUAGES, THEMES, TIMEZONE_OPTIONS } from "../data/defaultAppData";
 import { useTranslation } from "../utils/useTranslation";
 
 const SECTIONS = [
@@ -129,15 +129,16 @@ function DayPicker({ selectedDay, onSelect }) {
 
 function IntakesSection({ appData, setAppData, t }) {
   const [day, setDay] = useState("Mon");
-  const [slot, setSlot] = useState("intake1");
+  const intakeSlots = appData.intakeSlots || DEFAULT_INTAKE_SLOTS;
+  const [slot, setSlot] = useState(intakeSlots[0]?.key || "intake1");
   const [draft, setDraft] = useState(() => ({
     ...emptyMeal,
-    ...(appData.dietPlan.Mon?.intake1 || {})
+    ...(appData.dietPlan.Mon?.[intakeSlots[0]?.key || "intake1"] || {})
   }));
   const [addDays, setAddDays] = useState(["Mon"]);
 
   const getIntakeDraft = (nextDay, nextSlot) => {
-    const slotDefault = MEAL_SLOTS.find((item) => item.key === nextSlot);
+    const slotDefault = intakeSlots.find((item) => item.key === nextSlot);
     return {
       ...emptyMeal,
       time: slotDefault?.time || "",
@@ -163,7 +164,7 @@ function IntakesSection({ appData, setAppData, t }) {
   };
 
   const clearDraft = () => {
-    const slotDefault = MEAL_SLOTS.find((item) => item.key === slot);
+    const slotDefault = intakeSlots.find((item) => item.key === slot);
     setDraft({
       ...emptyMeal,
       time: slotDefault?.time || ""
@@ -171,13 +172,13 @@ function IntakesSection({ appData, setAppData, t }) {
   };
 
   const visibleIntakes = useMemo(() =>
-    MEAL_SLOTS.map((mealSlot) => ({
+    intakeSlots.map((mealSlot) => ({
       day,
       slot: mealSlot.key,
       label: mealSlot.label,
       meal: appData.dietPlan[day]?.[mealSlot.key]
     })).filter((item) => item.meal),
-  [appData.dietPlan, day]);
+  [appData.dietPlan, day, intakeSlots]);
 
   const updateDraft = (key, value) => {
     setDraft((current) => ({ ...current, [key]: value }));
@@ -194,6 +195,83 @@ function IntakesSection({ appData, setAppData, t }) {
         }
       }
     }));
+  };
+
+  const updateIntakeSlot = (key, value) => {
+    setAppData((current) => ({
+      ...current,
+      intakeSlots: (current.intakeSlots || DEFAULT_INTAKE_SLOTS).map((item) =>
+        item.key === slot ? { ...item, [key]: value } : item
+      )
+    }));
+  };
+
+  const addIntakeSlot = () => {
+    let createdKey = "";
+    let createdLabel = "";
+
+    setAppData((current) => {
+      const currentSlots = current.intakeSlots || DEFAULT_INTAKE_SLOTS;
+      const nextNumber = currentSlots.length + 1;
+      const nextKey = `intake${Date.now()}${nextNumber}`;
+      createdKey = nextKey;
+      createdLabel = `${t("intake")} ${nextNumber}`;
+      const nextSlot = {
+        key: nextKey,
+        label: createdLabel,
+        time: ""
+      };
+
+      const nextDietPlan = { ...current.dietPlan };
+      DAYS.forEach((item) => {
+        nextDietPlan[item] = {
+          ...(nextDietPlan[item] || {}),
+          [nextKey]: {
+            ...emptyMeal,
+            name: `${t("intake")} ${nextNumber}`,
+            time: ""
+          }
+        };
+      });
+
+      return {
+        ...current,
+        intakeSlots: [...currentSlots, nextSlot],
+        dietPlan: nextDietPlan
+      };
+    });
+
+    if (createdKey) {
+      setSlot(createdKey);
+      setDraft({
+        ...emptyMeal,
+        name: createdLabel,
+        time: ""
+      });
+    }
+  };
+
+  const removeCurrentIntakeSlot = () => {
+    if (intakeSlots.length <= 1) return;
+    const nextSlot = intakeSlots.find((item) => item.key !== slot)?.key || intakeSlots[0].key;
+
+    setAppData((current) => {
+      const nextDietPlan = { ...current.dietPlan };
+      DAYS.forEach((item) => {
+        const dayIntakes = { ...(nextDietPlan[item] || {}) };
+        delete dayIntakes[slot];
+        nextDietPlan[item] = dayIntakes;
+      });
+
+      return {
+        ...current,
+        intakeSlots: (current.intakeSlots || DEFAULT_INTAKE_SLOTS).filter((item) => item.key !== slot),
+        dietPlan: nextDietPlan
+      };
+    });
+
+    setSlot(nextSlot);
+    setDraft(getIntakeDraft(day, nextSlot));
   };
 
   const addIntake = () => {
@@ -227,13 +305,74 @@ function IntakesSection({ appData, setAppData, t }) {
   return (
     <>
       <div style={cardStyle()}>
+        <h3 style={{ marginTop: 0 }}>{t("intakeStructure")}</h3>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: "8px", alignItems: "end" }}>
+          <Field label={t("numberOfIntakeSlots")} type="number" value={intakeSlots.length} onChange={(value) => {
+            const targetCount = Math.max(1, Math.min(12, Number(value) || 1));
+            if (targetCount > intakeSlots.length) {
+              setAppData((current) => {
+                const currentSlots = current.intakeSlots || DEFAULT_INTAKE_SLOTS;
+                const nextSlots = [...currentSlots];
+                const nextDietPlan = { ...current.dietPlan };
+
+                while (nextSlots.length < targetCount) {
+                  const nextNumber = nextSlots.length + 1;
+                  const nextKey = `intake${Date.now()}${nextNumber}`;
+                  nextSlots.push({
+                    key: nextKey,
+                    label: `${t("intake")} ${nextNumber}`,
+                    time: ""
+                  });
+
+                  DAYS.forEach((item) => {
+                    nextDietPlan[item] = {
+                      ...(nextDietPlan[item] || {}),
+                      [nextKey]: {
+                        ...emptyMeal,
+                        name: `${t("intake")} ${nextNumber}`,
+                        time: ""
+                      }
+                    };
+                  });
+                }
+
+                return { ...current, intakeSlots: nextSlots, dietPlan: nextDietPlan };
+              });
+            } else if (targetCount < intakeSlots.length) {
+              setAppData((current) => {
+                const keepSlots = (current.intakeSlots || DEFAULT_INTAKE_SLOTS).slice(0, targetCount);
+                const keepKeys = new Set(keepSlots.map((item) => item.key));
+                const nextDietPlan = { ...current.dietPlan };
+                DAYS.forEach((item) => {
+                  nextDietPlan[item] = Object.fromEntries(
+                    Object.entries(nextDietPlan[item] || {}).filter(([key]) => keepKeys.has(key))
+                  );
+                });
+                return { ...current, intakeSlots: keepSlots, dietPlan: nextDietPlan };
+              });
+              setSlot(intakeSlots[0]?.key || "intake1");
+            }
+          }} />
+          <button type="button" onClick={addIntakeSlot} style={{ ...buttonStyle("soft"), marginBottom: "12px" }}>{t("add")}</button>
+          <button type="button" onClick={removeCurrentIntakeSlot} style={{ ...buttonStyle("danger"), marginBottom: "12px" }}>{t("delete")}</button>
+        </div>
+
+        <Field
+          label={t("intakeSlotName")}
+          value={intakeSlots.find((item) => item.key === slot)?.label || ""}
+          onChange={(value) => updateIntakeSlot("label", value)}
+        />
+      </div>
+
+      <div style={cardStyle()}>
         <h3 style={{ marginTop: 0 }}>{t("addEditIntake")}</h3>
 
         <DayPicker selectedDay={day} onSelect={selectDay} />
 
         <div style={{ marginBottom: "12px" }}>
           <select value={slot} onChange={(event) => selectSlot(event.target.value)} style={fieldStyle()}>
-            {MEAL_SLOTS.map((item) => <option key={item.key} value={item.key}>{t(item.key)}</option>)}
+            {intakeSlots.map((item) => <option key={item.key} value={item.key}>{item.label}</option>)}
           </select>
         </div>
 
@@ -292,7 +431,7 @@ function IntakesSection({ appData, setAppData, t }) {
           >
             <strong>{item.meal.name}</strong>
             <div style={{ color: "var(--app-muted)", fontSize: "13px" }}>
-              {item.day} - {t(item.slot)} - {item.meal.time} - {item.meal.calories} cal - {item.meal.protein}g {t("protein")}
+              {item.day} - {item.label} - {item.meal.time} - {item.meal.calories} cal - {item.meal.protein}g {t("protein")}
             </div>
           </button>
         ))}
@@ -333,6 +472,20 @@ function ExercisesSection({ appData, setAppData, t }) {
     updateWorkout({ ...workout, exercises });
   };
 
+  const setExerciseCount = (value) => {
+    const targetCount = Math.max(0, Math.min(30, Number(value) || 0));
+    const exercises = [...workout.exercises];
+
+    while (exercises.length < targetCount) {
+      exercises.push({
+        ...emptyExercise,
+        name: `${t("exercise")} ${exercises.length + 1}`
+      });
+    }
+
+    updateWorkout({ ...workout, exercises: exercises.slice(0, targetCount) });
+  };
+
   return (
     <div style={cardStyle()}>
       <h3 style={{ marginTop: 0 }}>{t("exercises")}</h3>
@@ -340,6 +493,7 @@ function ExercisesSection({ appData, setAppData, t }) {
       <DayPicker selectedDay={day} onSelect={setDay} />
 
       <Field label={t("workoutFocus")} value={workout.focus} onChange={(value) => updateWorkout({ ...workout, focus: value })} />
+      <Field label={t("numberOfExercises")} type="number" value={workout.exercises.length} onChange={setExerciseCount} />
 
       {workout.exercises.map((exercise, index) => (
         <div key={`${exercise.name}-${index}`} style={{ borderTop: "1px solid var(--app-border)", paddingTop: "12px", marginTop: "12px" }}>
