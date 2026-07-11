@@ -360,7 +360,7 @@ function IntakesSection({ appData, setAppData, t }) {
       <div style={cardStyle()}>
         <h3 style={{ marginTop: 0 }}>{t("intakeStructure")}</h3>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: "8px", alignItems: "end" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto auto", gap: "8px", alignItems: "end" }}>
           <Field label={t("numberOfIntakeSlots")} type="number" value={activeIntakeSlots.length} onChange={(value) => {
             const targetCount = Math.max(1, Math.min(12, Number(value) || 1));
             if (targetCount > activeIntakeSlots.length) {
@@ -415,6 +415,30 @@ function IntakesSection({ appData, setAppData, t }) {
           }} />
           <button type="button" onClick={addIntakeSlot} style={{ ...buttonStyle("soft"), marginBottom: "12px" }}>{t("add")}</button>
           <button type="button" onClick={removeCurrentIntakeSlot} style={{ ...buttonStyle("danger"), marginBottom: "12px" }}>{t("delete")}</button>
+          <button type="button" onClick={() => {
+            if (!window.confirm(t("confirmRestoreDefaultIntakes"))) return;
+            setAppData((current) => {
+              const nextDietPlan = {};
+              DAYS.forEach((item) => {
+                const dayPlan = current.dietPlan[item] || {};
+                nextDietPlan[item] = {};
+                DEFAULT_INTAKE_SLOTS.forEach((slotDef) => {
+                  nextDietPlan[item][slotDef.key] = {
+                    ...emptyMeal,
+                    ...(dayPlan[slotDef.key] || {}),
+                    name: dayPlan[slotDef.key]?.name || slotDef.label,
+                    time: slotDef.time || dayPlan[slotDef.key]?.time || ""
+                  };
+                });
+              });
+              return {
+                ...current,
+                intakeSlots: DEFAULT_INTAKE_SLOTS,
+                dietPlan: nextDietPlan
+              };
+            });
+            setSlot(DEFAULT_INTAKE_SLOTS[0].key);
+          }} style={{ ...buttonStyle("primary"), marginBottom: "12px" }}>{t("restoreDefaultIntakes")}</button>
         </div>
 
         <Field

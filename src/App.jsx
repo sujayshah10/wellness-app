@@ -71,18 +71,30 @@ function App() {
 
       <nav className="bottom-nav">
         <NavLink to="/workout" className={({ isActive }) => `bottom-nav__item${isActive ? " active" : ""}`}>
-          <NavIcon name="workout" active />
-          <span>{t("workout")}</span>
+          {({ isActive }) => (
+            <>
+              <NavIcon name="workout" active={isActive} />
+              <span>{t("workout")}</span>
+            </>
+          )}
         </NavLink>
 
         <NavLink to="/" end className={({ isActive }) => `bottom-nav__item${isActive ? " active" : ""}`}>
-          <NavIcon name="home" active />
-          <span>{t("home")}</span>
+          {({ isActive }) => (
+            <>
+              <NavIcon name="home" active={isActive} />
+              <span>{t("home")}</span>
+            </>
+          )}
         </NavLink>
 
         <NavLink to="/nutrition" className={({ isActive }) => `bottom-nav__item${isActive ? " active" : ""}`}>
-          <NavIcon name="nutrition" active />
-          <span>{t("nutrition")}</span>
+          {({ isActive }) => (
+            <>
+              <NavIcon name="nutrition" active={isActive} />
+              <span>{t("nutrition")}</span>
+            </>
+          )}
         </NavLink>
       </nav>
     </div>
