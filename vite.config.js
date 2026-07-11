@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/wellness-app/',
   plugins: [
     react(),
     VitePWA({
@@ -10,10 +11,10 @@ export default defineConfig({
       manifest: {
         name: 'Wellness App',
         short_name: 'Wellness',
-        start_url: '/',
+        start_url: '/wellness-app/',
         display: 'standalone',
-        background_color: '#fdf6e3',
-        theme_color: '#b5541e',
+        background_color: '#030712',
+        theme_color: '#2F80FF',
         icons: [
           {
             src: '/icon-192.png',

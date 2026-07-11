@@ -1,117 +1,215 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useDay } from "../context/useDay";
+import { useAppData } from "../context/useAppData";
+import TimeHeader from "../components/TimeHeader";
+import DaySelector from "../components/DaySelector";
+import { findNextMeals } from "../utils/mealEngine";
+import { useTranslation } from "../utils/useTranslation";
 
 export default function Home() {
 
-  const [selectedDay, setSelectedDay] = useState("Wed");
+  const { selectedDay, setSelectedDay } = useDay();
+  const { appData } = useAppData();
+  const { t, dayName } = useTranslation();
+
+  const dietData = appData.dietPlan[selectedDay];
+  const workout = appData.workouts[selectedDay] || { focus: "", exercises: [] };
+
+  // Calculate stats dynamically from diet data
+  const totalCalories = dietData
+    ? dietData.meal1.calories + dietData.meal2.calories + dietData.snack.calories + dietData.meal3.calories
+    : 0;
+
+  const totalProtein = dietData
+    ? dietData.meal1.protein + dietData.meal2.protein + dietData.snack.protein + dietData.meal3.protein
+    : 0;
+
+  const calorieTarget = Number(appData.targets.calories) || 0;
+  const deficit = calorieTarget - totalCalories;
+
+  const { nextMeals, nextPrepMeal } = findNextMeals(appData.dietPlan, selectedDay);
 
   return (
     <div className="page">
 
       {/* Header */}
-      <h1 style={{color:"#0F172A"}}>My Wellness Plan</h1>
 
-      <p style={{color:"#64748B", marginBottom:"12px"}}>
-        Wednesday • Summer
-      </p>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+        <h1 style={{ color:"var(--app-text)" }}>
+          {t("myWellnessPlan")}
+        </h1>
 
-
-      {/* Day Selector */}
-      <div style={{
-        display:"flex",
-        justifyContent:"space-between",
-        marginBottom:"26px"
-      }}>
-        {["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((day) => (
-          <div
-            key={day}
-            onClick={() => setSelectedDay(day)}
-            style={{
-              flex:1,
-              textAlign:"center",
-              padding:"8px 0",
-              borderRadius:"10px",
-              margin:"0 3px",
-              background: selectedDay === day ? "#2563EB" : "#E2E8F0",
-              color: selectedDay === day ? "white" : "#0F172A",
-              fontWeight:"500",
-              fontSize:"14px",
-              cursor:"pointer",
-              transition:"0.2s"
-            }}
-          >
-            {day}
-          </div>
-        ))}
+        <Link
+          to="/menu"
+          aria-label="Open menu"
+          style={{
+            width: "42px",
+            height: "42px",
+            borderRadius: "12px",
+            background: "var(--app-surface)",
+            color: "var(--app-text)",
+            display: "grid",
+            placeItems: "center",
+            textDecoration: "none",
+            boxShadow: "var(--app-shadow)",
+            fontSize: "24px",
+            lineHeight: 1
+          }}
+        >
+          =
+        </Link>
       </div>
 
+      <TimeHeader />
+
+      {/* Day Selector */}
+
+      <DaySelector selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
 
       {/* Stats */}
+
       <div style={{
         display:"flex",
-        gap:"16px",
+        gap:"14px",
         marginBottom:"24px"
       }}>
 
         <div style={{
           flex:1,
-          background:"#3B82F6",
+          background:"linear-gradient(145deg, var(--app-primary), #1D4ED8)",
           color:"white",
-          padding:"20px",
-          borderRadius:"12px",
+          padding:"18px",
+          borderRadius:"14px",
           textAlign:"center"
         }}>
-          <h2 style={{margin:0}}>1140</h2>
-          <p style={{margin:0}}>Calories</p>
+          <h2 style={{margin:0}}>{totalCalories}</h2>
+          <p style={{margin:0,fontSize:"13px"}}>{t("calories")}</p>
         </div>
 
         <div style={{
           flex:1,
-          background:"#10B981",
+          background:"linear-gradient(145deg, var(--app-accent), #047857)",
           color:"white",
-          padding:"20px",
-          borderRadius:"12px",
+          padding:"18px",
+          borderRadius:"14px",
           textAlign:"center"
         }}>
-          <h2 style={{margin:0}}>63g</h2>
-          <p style={{margin:0}}>Protein</p>
+          <h2 style={{margin:0}}>{totalProtein}g</h2>
+          <p style={{margin:0,fontSize:"13px"}}>{t("protein")}</p>
+        </div>
+
+        <div style={{
+          flex:1,
+          background:"linear-gradient(145deg, #020617, #1E293B)",
+          color:"white",
+          padding:"18px",
+          borderRadius:"14px",
+          textAlign:"center"
+        }}>
+          <h2 style={{margin:0}}>~{deficit}</h2>
+          <p style={{margin:0,fontSize:"13px"}}>{t("deficit")}</p>
         </div>
 
       </div>
 
+      {/* Next Meals */}
 
-      {/* Workout */}
       <div style={{
-        background:"#F1F5F9",
+        background:"var(--app-surface)",
+        color:"var(--app-text)",
         padding:"20px",
-        borderRadius:"12px",
-        marginBottom:"20px"
+        borderRadius:"14px",
+        marginBottom:"20px",
+        boxShadow:"var(--app-shadow)",
+        border:"1px solid var(--app-border)"
       }}>
-        <h3 style={{color:"#2563EB"}}>Workout Focus</h3>
 
-        <p style={{color:"#64748B"}}>Back + Posture</p>
+        <h3 style={{ color:"var(--app-primary)", marginTop:0 }}>
+          {t("nextMeals")}
+        </h3>
 
-        <ul>
-          <li>Dumbbell rows — 3 × 12</li>
-          <li>Rear delt fly — 3 × 12</li>
-          <li>Superman hold — 3 × 20 sec</li>
-          <li>Wall angels — 2 × 10</li>
-        </ul>
+        {nextMeals.map((meal,index)=>(
+
+          <div
+            key={index}
+            style={{
+              padding:"10px 0",
+              borderBottom: index === nextMeals.length-1 ? "none" : "1px solid var(--app-border)"
+            }}
+          >
+
+            <div style={{
+              fontSize:"12px",
+              color:"var(--app-muted)",
+              marginBottom:"4px"
+            }}>
+              {meal.day ? `${dayName(meal.day)} - ${meal.time}` : meal.time}
+            </div>
+
+            <strong>{meal.meal || meal.name}</strong>
+
+          </div>
+
+        ))}
+
       </div>
 
+      {/* Prep Section */}
 
-      {/* Detox */}
       <div style={{
-        background:"#F1F5F9",
+        background:"var(--app-surface)",
+        color:"var(--app-text)",
         padding:"20px",
-        borderRadius:"12px"
+        borderRadius:"14px",
+        marginBottom:"20px",
+        border:"1px solid var(--app-border)",
+        boxShadow:"var(--app-shadow)"
       }}>
-        <h3 style={{color:"#10B981"}}>Detox Drink</h3>
 
-        <p>Sabja seeds + Lemon + Cold water</p>
+        <h3 style={{ color:"var(--app-text)", marginTop:0 }}>
+          {t("prepForNextMeal")}
+        </h3>
 
-        <p style={{color:"#64748B"}}>
-          Drink cold or room temperature.
+        <p style={{margin:"6px 0"}}>
+          {nextPrepMeal ? nextPrepMeal.prep.task || nextPrepMeal.prep : ""}
         </p>
+
+        <p style={{
+          color:"var(--app-muted)",
+          fontSize:"14px"
+        }}>
+          {nextPrepMeal?.prep?.start ? `${t("start")}: ${nextPrepMeal.prep.start} - ${nextPrepMeal.prep.ready}` : ""}
+        </p>
+
+      </div>
+
+      {/* Workout Focus */}
+
+      <div style={{
+        background:"var(--app-surface)",
+        color:"var(--app-text)",
+        padding:"20px",
+        borderRadius:"14px",
+        border:"1px solid var(--app-border)",
+        boxShadow:"var(--app-shadow)"
+      }}>
+
+        <h3 style={{ color:"var(--app-primary)" }}>
+          {t("workoutFocus")}
+        </h3>
+
+        <p style={{color:"var(--app-muted)"}}>
+          {workout.focus}
+        </p>
+
+        <ul>
+          {workout.exercises.slice(0, 4).map((exercise) => (
+            <li key={exercise.name}>
+              {exercise.name} - {exercise.sets} x {exercise.reps}
+            </li>
+          ))}
+        </ul>
+
       </div>
 
     </div>
