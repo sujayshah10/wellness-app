@@ -1,73 +1,97 @@
 export const foodLibrary = {
+  location: "Vadodara, Gujarat",
+  principles: [
+    "Easy to cook",
+    "Available locally",
+    "Seasonal when possible",
+    "Healthy without becoming a strict diet",
+    "Enough variety to avoid boredom"
+  ],
+  items: [
+    { name: "Pintola High Protein Oats + Milk", meal: "Meal 1", season: "All", protein: "High", prepTime: "10 min", calories: 360, region: "Gujarati-friendly" },
+    { name: "Banana", meal: "Meal 1 Add-on", season: "All", protein: "Low", prepTime: "0 min", calories: 105, region: "Common" },
+    { name: "Flaxseed Powder", meal: "Meal 1 Add-on", season: "All", protein: "Medium", prepTime: "0 min", calories: 55, region: "Common" },
+    { name: "Almonds", meal: "Meal 1 Add-on", season: "All", protein: "Medium", prepTime: "0 min", calories: 70, region: "Common" },
+    { name: "Apple + Cinnamon", meal: "Meal 1 Add-on", season: "All", protein: "Low", prepTime: "5 min", calories: 95, region: "Common" },
+    { name: "Chia Seeds", meal: "Meal 1 Add-on", season: "All", protein: "Medium", prepTime: "0 min", calories: 60, region: "Common" },
+    { name: "Raisins + Walnuts", meal: "Meal 1 Add-on", season: "All", protein: "Medium", prepTime: "0 min", calories: 120, region: "Common" },
+    { name: "Mango", meal: "Meal 1 Add-on/Fruit", season: "Summer", protein: "Low", prepTime: "5 min", calories: 150, region: "Gujarat seasonal" },
+    { name: "Dates", meal: "Meal 1 Add-on/Fruit", season: "Winter", protein: "Low", prepTime: "0 min", calories: 65, region: "Common" },
 
-  grains: {
+    { name: "Paneer Bhurji", meal: "Main Meal", season: "All", protein: "High", prepTime: "20 min", calories: 360, region: "Gujarati-friendly" },
+    { name: "Palak Paneer", meal: "Main Meal", season: "Winter", protein: "High", prepTime: "30 min", calories: 380, region: "Gujarati-friendly" },
+    { name: "Methi Paneer", meal: "Main Meal", season: "Winter", protein: "High", prepTime: "30 min", calories: 390, region: "Gujarati-friendly" },
+    { name: "Paneer Tikka", meal: "Main Meal", season: "All", protein: "High", prepTime: "30 min", calories: 340, region: "Gujarati-friendly" },
+    { name: "Paneer Capsicum", meal: "Main Meal", season: "All", protein: "High", prepTime: "25 min", calories: 360, region: "Gujarati-friendly" },
 
-    Rice: { unit: "100g", calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
-    BrownRice: { unit: "100g", calories: 111, protein: 2.6, carbs: 23, fat: 0.9 },
-    Oats: { unit: "100g", calories: 389, protein: 17, carbs: 66, fat: 7 },
-    Poha: { unit: "100g", calories: 130, protein: 2.5, carbs: 28, fat: 0.3 },
-    Rava: { unit: "100g", calories: 360, protein: 12, carbs: 73, fat: 1 },
-    WheatFlour: { unit: "100g", calories: 364, protein: 13, carbs: 76, fat: 1 },
-    Quinoa: { unit: "100g", calories: 120, protein: 4.4, carbs: 21, fat: 1.9 }
+    { name: "Mixed Dal", meal: "Main Meal", season: "All", protein: "Medium", prepTime: "25 min", calories: 260, region: "Gujarati-friendly" },
+    { name: "Dal Tadka", meal: "Main Meal", season: "All", protein: "Medium", prepTime: "25 min", calories: 250, region: "Gujarati-friendly" },
+    { name: "Gujarati Dal", meal: "Main Meal", season: "All", protein: "Medium", prepTime: "25 min", calories: 230, region: "Gujarati" },
+    { name: "Moong Dal", meal: "Main Meal", season: "Monsoon", protein: "Medium", prepTime: "20 min", calories: 220, region: "Gujarati-friendly" },
+    { name: "Masoor Dal", meal: "Main Meal", season: "All", protein: "Medium", prepTime: "20 min", calories: 230, region: "Gujarati-friendly" },
+    { name: "Urad Dal", meal: "Main Meal", season: "Winter", protein: "Medium", prepTime: "30 min", calories: 280, region: "Gujarati-friendly" },
 
+    { name: "Chole", meal: "Main Meal", season: "All", protein: "High", prepTime: "30 min", calories: 330, region: "Gujarati-friendly" },
+    { name: "Rajma", meal: "Main Meal", season: "All", protein: "High", prepTime: "35 min", calories: 340, region: "Gujarati-friendly" },
+    { name: "Black Chana", meal: "Main Meal", season: "All", protein: "High", prepTime: "30 min", calories: 320, region: "Gujarati-friendly" },
+    { name: "Kala Chana Masala", meal: "Main Meal", season: "All", protein: "High", prepTime: "30 min", calories: 330, region: "Gujarati-friendly" },
+    { name: "White Chickpeas in White Sauce", meal: "Main Meal", season: "All", protein: "High", prepTime: "30 min", calories: 350, region: "Gujarati-friendly" },
+
+    { name: "Soya Chunks Curry", meal: "Main Meal", season: "All", protein: "High", prepTime: "25 min", calories: 320, region: "Gujarati-friendly" },
+    { name: "Soya Keema", meal: "Main Meal", season: "All", protein: "High", prepTime: "25 min", calories: 310, region: "Gujarati-friendly" },
+    { name: "Soya-Peas Curry", meal: "Main Meal", season: "Winter", protein: "High", prepTime: "25 min", calories: 330, region: "Gujarati-friendly" },
+
+    { name: "Bhindi", meal: "Main Meal", season: "All", protein: "Low", prepTime: "20 min", calories: 160, region: "Gujarati-friendly" },
+    { name: "Cabbage Peas", meal: "Main Meal", season: "Winter", protein: "Medium", prepTime: "20 min", calories: 180, region: "Gujarati-friendly" },
+    { name: "Lauki Chana Dal", meal: "Main Meal", season: "Summer/Monsoon", protein: "Medium", prepTime: "25 min", calories: 240, region: "Gujarati-friendly" },
+    { name: "Tinda", meal: "Main Meal", season: "Summer", protein: "Low", prepTime: "20 min", calories: 150, region: "Gujarati-friendly" },
+    { name: "Turai", meal: "Main Meal", season: "Monsoon", protein: "Low", prepTime: "20 min", calories: 150, region: "Gujarati-friendly" },
+    { name: "Gawar", meal: "Main Meal", season: "Winter", protein: "Medium", prepTime: "25 min", calories: 180, region: "Gujarati-friendly" },
+    { name: "Pumpkin", meal: "Main Meal/Soup", season: "Monsoon/Winter", protein: "Low", prepTime: "20 min", calories: 130, region: "Gujarati-friendly" },
+    { name: "Cauliflower", meal: "Main Meal", season: "Winter", protein: "Low", prepTime: "25 min", calories: 160, region: "Gujarati-friendly" },
+    { name: "Mixed Veg", meal: "Main Meal", season: "All", protein: "Medium", prepTime: "25 min", calories: 220, region: "Gujarati-friendly" },
+
+    { name: "Cheese Sandwich", meal: "Light Dinner", season: "All", protein: "Medium", prepTime: "10 min", calories: 330, region: "Easy" },
+    { name: "Paneer Sandwich", meal: "Light Dinner", season: "All", protein: "High", prepTime: "15 min", calories: 380, region: "Easy" },
+    { name: "Peanut Butter Sandwich", meal: "Light Dinner", season: "All", protein: "Medium", prepTime: "5 min", calories: 360, region: "Easy" },
+    { name: "Vegetable Sandwich", meal: "Light Dinner", season: "All", protein: "Medium", prepTime: "10 min", calories: 280, region: "Easy" },
+    { name: "Avocado Toast", meal: "Light Dinner", season: "Occasional", protein: "Medium", prepTime: "10 min", calories: 320, region: "Occasional" },
+    { name: "Tomato Soup", meal: "Light Dinner", season: "All", protein: "Low", prepTime: "20 min", calories: 140, region: "Easy" },
+    { name: "Sweet Corn Soup", meal: "Light Dinner", season: "Monsoon", protein: "Medium", prepTime: "20 min", calories: 180, region: "Easy" },
+    { name: "Pumpkin Soup", meal: "Light Dinner", season: "Monsoon/Winter", protein: "Low", prepTime: "20 min", calories: 150, region: "Easy" },
+    { name: "Spinach Soup", meal: "Light Dinner", season: "Winter", protein: "Medium", prepTime: "20 min", calories: 160, region: "Easy" },
+    { name: "Vegetable Upma", meal: "Light Dinner", season: "All", protein: "Medium", prepTime: "20 min", calories: 300, region: "Easy" },
+    { name: "Vegetable Poha", meal: "Light Dinner", season: "All", protein: "Medium", prepTime: "15 min", calories: 300, region: "Easy" },
+    { name: "Vegetable Dalia", meal: "Light Dinner", season: "All", protein: "Medium", prepTime: "25 min", calories: 310, region: "Easy" },
+    { name: "Vegetable Khichdi", meal: "Light Dinner", season: "All", protein: "Medium", prepTime: "25 min", calories: 330, region: "Gujarati-friendly" },
+    { name: "Moong Chilla", meal: "Light Dinner", season: "All", protein: "High", prepTime: "25 min", calories: 320, region: "Gujarati-friendly" }
+  ],
+  seasonalFoods: {
+    Summer: ["Mango", "Watermelon", "Muskmelon", "Cucumber", "Bottle Gourd", "Lemon Water", "Kokum Sharbat", "Buttermilk"],
+    Monsoon: ["Corn", "Ridge Gourd", "Pumpkin", "Bottle Gourd", "Ginger Tea", "Moong Dal"],
+    Winter: ["Methi", "Spinach", "Green Peas", "Carrot", "Beetroot", "Fresh Turmeric", "Sesame", "Groundnuts", "Undhiyu occasionally"]
   },
-
-  legumes: {
-
-    Rajma: { unit: "100g", calories: 127, protein: 8.7, carbs: 22.8, fat: 0.5 },
-    Chickpeas: { unit: "100g", calories: 164, protein: 9, carbs: 27, fat: 2.6 },
-    Lentils: { unit: "100g", calories: 116, protein: 9, carbs: 20, fat: 0.4 },
-    MoongDal: { unit: "100g", calories: 105, protein: 7, carbs: 19, fat: 0.4 },
-    ToorDal: { unit: "100g", calories: 116, protein: 9, carbs: 20, fat: 0.4 }
-
-  },
-
-  proteins: {
-
-    Chicken: { unit: "100g", calories: 239, protein: 27, carbs: 0, fat: 14 },
-    Egg: { unit: "piece", calories: 72, protein: 6, carbs: 0.4, fat: 5 },
-    Paneer: { unit: "100g", calories: 265, protein: 18, carbs: 3, fat: 20 },
-    Tofu: { unit: "100g", calories: 76, protein: 8, carbs: 2, fat: 4 },
-    Fish: { unit: "100g", calories: 206, protein: 22, carbs: 0, fat: 12 }
-
-  },
-
-  dairy: {
-
-    Milk: { unit: "100ml", calories: 42, protein: 3.4, carbs: 5, fat: 1 },
-    Curd: { unit: "100g", calories: 98, protein: 11, carbs: 3.4, fat: 4 },
-    Cheese: { unit: "100g", calories: 402, protein: 25, carbs: 1.3, fat: 33 },
-    Butter: { unit: "100g", calories: 717, protein: 1, carbs: 0.1, fat: 81 }
-
-  },
-
-  fruits: {
-
-    Apple: { unit: "piece", calories: 95, protein: 0.5, carbs: 25, fat: 0.3 },
-    Banana: { unit: "piece", calories: 105, protein: 1.3, carbs: 27, fat: 0.4 },
-    Orange: { unit: "piece", calories: 62, protein: 1.2, carbs: 15, fat: 0.2 },
-    Mango: { unit: "piece", calories: 150, protein: 1.4, carbs: 38, fat: 0.6 },
-    Papaya: { unit: "100g", calories: 43, protein: 0.5, carbs: 11, fat: 0.3 }
-
-  },
-
-  vegetables: {
-
-    Potato: { unit: "100g", calories: 77, protein: 2, carbs: 17, fat: 0.1 },
-    Onion: { unit: "100g", calories: 40, protein: 1.1, carbs: 9, fat: 0.1 },
-    Tomato: { unit: "100g", calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2 },
-    Spinach: { unit: "100g", calories: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
-    Broccoli: { unit: "100g", calories: 55, protein: 3.7, carbs: 11, fat: 0.6 }
-
-  },
-
-  fats: {
-
-    OliveOil: { unit: "100g", calories: 884, protein: 0, carbs: 0, fat: 100 },
-    Ghee: { unit: "100g", calories: 900, protein: 0, carbs: 0, fat: 100 },
-    Peanuts: { unit: "100g", calories: 567, protein: 26, carbs: 16, fat: 49 },
-    Almonds: { unit: "100g", calories: 579, protein: 21, carbs: 22, fat: 50 }
-
-  }
-
+  kitchenStaples: [
+    "Oats",
+    "Milk",
+    "Paneer",
+    "Curd",
+    "Buttermilk",
+    "Seasonal fruits",
+    "Spinach",
+    "Tomatoes",
+    "Onions",
+    "Capsicum",
+    "Carrots",
+    "Cucumber",
+    "Mixed dals",
+    "Chickpeas",
+    "Rajma",
+    "Soya chunks",
+    "Peanut butter",
+    "Flaxseed",
+    "Chia seeds",
+    "Almonds",
+    "Walnuts"
+  ]
 };

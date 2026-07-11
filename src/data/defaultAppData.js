@@ -1,6 +1,9 @@
 import { DIET_PLAN } from "./diet";
 import { foodDatabase } from "./foodDatabase";
+import { foodLibrary } from "./foodLibrary";
 import { WORKOUT_SPLIT } from "./workouts";
+
+export const APP_DATA_VERSION = "vadodara-seasonal-eating-v1";
 
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -21,7 +24,7 @@ export const DEFAULT_TARGETS = {
 export const DEFAULT_ABOUT = {
   version: "0.1.0",
   ownerName: "Sujay Shah",
-  tagline: "Daily wellness, built around real life."
+  tagline: "Seasonal healthy eating for Vadodara."
 };
 
 export const DEFAULT_SETTINGS = {
@@ -32,8 +35,8 @@ export const DEFAULT_SETTINGS = {
 
 export const LANGUAGES = [
   { key: "en", label: "English" },
-  { key: "gu", label: "ગુજરાતી" },
-  { key: "hi", label: "हिंदी" }
+  { key: "gu", label: "Gujarati" },
+  { key: "hi", label: "Hindi" }
 ];
 
 export const THEMES = [
@@ -48,10 +51,6 @@ export const TIMEZONE_OPTIONS = [
   { key: "est", label: "EST only" },
   { key: "ist", label: "IST only" }
 ];
-
-export const LEGACY_ABOUT = {
-  timezoneDisplay: "both"
-};
 
 function withMealTimes(dietPlan) {
   return DAYS.reduce((plan, day) => {
@@ -71,8 +70,10 @@ function withMealTimes(dietPlan) {
 }
 
 export const DEFAULT_APP_DATA = {
+  dataVersion: APP_DATA_VERSION,
   dietPlan: withMealTimes(DIET_PLAN),
   foodDatabase,
+  foodLibrary,
   workouts: WORKOUT_SPLIT,
   targets: DEFAULT_TARGETS,
   about: DEFAULT_ABOUT,

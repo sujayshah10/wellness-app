@@ -1,218 +1,206 @@
+const fixedOats = (addon, seasonalNote = "All seasons") => ({
+  name: `Pintola High Protein Oats + Milk + ${addon}`,
+  time: "4:30 PM",
+  calories: 430,
+  protein: 24,
+  prep: "Cook 50 g Pintola High Protein Oats with 220 ml milk. Add the day's topping after cooking.",
+  tip: `Fixed base for consistency. Add-on: ${addon}. Season: ${seasonalNote}.`
+});
+
 export const DIET_PLAN = {
   Mon: {
-    meal1: {
-      name: "Moong Dal Chilla + Mint Chutney",
-      calories: 420,
-      protein: 34,
-      prep: "Soak moong dal overnight",
-      tip: "Biggest protein meal of the day. Eat slowly.",
-    },
+    meal1: fixedOats("1 banana"),
     meal2: {
-      name: "Soya Chunks Curry + 1 Roti",
-      calories: 380,
-      protein: 32,
-      prep: "Soak soya in hot water 15 mins before cooking",
-      tip: "Light portion. Shift starts in 30 mins after this.",
+      name: "Paneer Bhurji + 2 Phulka + Buttermilk",
+      time: "6:30 PM",
+      calories: 560,
+      protein: 34,
+      prep: "Cook paneer with onion, tomato, capsicum, turmeric, chilli, and light oil.",
+      tip: "Easy protein-rich main meal with ingredients available year-round in Vadodara."
     },
     snack: {
-      name: "Roasted Peanuts + Green Tea",
-      calories: 200,
-      protein: 9,
-      prep: "Dry roast - no oil",
-      tip: "Take a 5 min walk after this snack.",
+      name: "Guava or Papaya",
+      time: "11:00 PM",
+      calories: 90,
+      protein: 2,
+      prep: "One bowl fruit. Add chaat masala if needed.",
+      tip: "One fruit per day is enough."
     },
     meal3: {
-      name: "Vegetable Khichdi + Curd",
-      calories: 320,
-      protein: 14,
-      prep: "Use less salt. Add ghee - 1 tsp only.",
-      tip: "Light and warm. Best wind-down meal.",
+      name: "Cheese Sandwich + Cucumber",
+      time: "4:00 AM",
+      calories: 360,
+      protein: 16,
+      prep: "Use whole wheat or multigrain bread. Add cucumber, tomato, and light cheese.",
+      tip: "Light, quick, and practical after a long day."
     }
   },
 
   Tue: {
-    meal1: {
-      name: "Besan Chilla + Tomato Chutney",
-      calories: 400,
-      protein: 22,
-      prep: "Add ajwain to batter for digestion",
-      tip: "Add chopped onion and green chilli for taste.",
-    },
+    meal1: fixedOats("1 tbsp flaxseed powder"),
     meal2: {
-      name: "Paneer Bhurji + 1 Roti",
-      calories: 390,
-      protein: 28,
-      prep: "Use minimal oil - 1 tsp. Add capsicum.",
-      tip: "Don't overeat before shift. Half roti if full.",
+      name: "Mixed Dal + Brown Rice + Salad",
+      time: "6:30 PM",
+      calories: 540,
+      protein: 25,
+      prep: "Pressure cook mixed dal. Temper with jeera, garlic, turmeric, and a little ghee.",
+      tip: "Comforting, affordable, and high-fibre."
     },
     snack: {
-      name: "Boiled Egg (2) + Black Coffee",
-      calories: 180,
-      protein: 14,
-      prep: "Boil eggs in the evening before shift",
-      tip: "If avoiding eggs, replace with 30g peanuts.",
+      name: "Buttermilk + Roasted Chana",
+      time: "11:00 PM",
+      calories: 160,
+      protein: 9,
+      prep: "Keep buttermilk chilled. Add roasted chana for crunch.",
+      tip: "Good for Gujarat heat and easy digestion."
     },
     meal3: {
-      name: "Curd Rice + Pickle",
-      calories: 300,
-      protein: 10,
-      prep: "Use room temperature curd. Not cold at 4 AM.",
-      tip: "Probiotic gut reset after night shift.",
+      name: "Mixed Vegetable Soup",
+      time: "4:00 AM",
+      calories: 220,
+      protein: 7,
+      prep: "Use tomato, carrot, spinach, cabbage, and black pepper. Keep it light.",
+      tip: "Warm, hydrating, and not too heavy."
     }
   },
 
   Wed: {
-    meal1: {
-      name: "Rajma (Kidney Bean) Curry + 2 Rotis",
-      calories: 480,
-      protein: 28,
-      prep: "Soak rajma overnight. Pressure cook 4-5 whistles.",
-      tip: "High fibre and protein. Eat slowly.",
-    },
+    meal1: fixedOats("8-10 almonds"),
     meal2: {
-      name: "Sprouts Salad + Lemon + Chaat Masala",
-      calories: 220,
-      protein: 14,
-      prep: "Soak moong overnight, sprout for 1 day",
-      tip: "Light pre-shift. Easily digestible.",
+      name: "Chole + 2 Phulka + Onion Salad",
+      time: "6:30 PM",
+      calories: 590,
+      protein: 26,
+      prep: "Soak chickpeas overnight. Pressure cook and finish with tomato-onion masala.",
+      tip: "Make extra chole once and reuse for wraps or sandwiches."
     },
     snack: {
-      name: "Makhana (Fox nuts) + Herbal Tea",
-      calories: 160,
-      protein: 5,
-      prep: "Dry roast makhana with pinch of rock salt",
-      tip: "Great late night snack - light on stomach.",
+      name: "Apple or Pomegranate",
+      time: "11:00 PM",
+      calories: 110,
+      protein: 1,
+      prep: "Wash and cut fresh.",
+      tip: "Simple fruit rotation keeps the plan easy."
     },
     meal3: {
-      name: "Moong Dal Soup + 1 Roti",
-      calories: 280,
-      protein: 16,
-      prep: "Thin consistency. Add turmeric and cumin.",
-      tip: "Warm soup helps sleep. Don't skip this.",
+      name: "Paneer Sandwich",
+      time: "4:00 AM",
+      calories: 390,
+      protein: 23,
+      prep: "Use crumbled paneer, capsicum, onion, tomato, and green chutney.",
+      tip: "Higher protein light dinner without needing a full sabzi."
     }
   },
 
   Thu: {
-    meal1: {
-      name: "Egg Omelette (3 eggs) + Brown Bread (2 slices)",
-      calories: 460,
-      protein: 36,
-      prep: "Add vegetables - onion, tomato, capsicum",
-      tip: "Vegetarian option: Tofu scramble instead of eggs.",
-    },
+    meal1: fixedOats("apple pieces + cinnamon"),
     meal2: {
-      name: "Chana Dal + 1 Roti + Salad",
-      calories: 360,
-      protein: 20,
-      prep: "Pressure cook 3 whistles. Season with jeera.",
-      tip: "Have salad first, then dal-roti.",
+      name: "Palak Paneer + 2 Phulka",
+      time: "6:30 PM",
+      calories: 560,
+      protein: 32,
+      prep: "Use spinach, paneer, garlic, onion, tomato, and mild spices.",
+      tip: "Best in winter, but spinach is usually available most of the year."
     },
     snack: {
-      name: "Roasted Chana + Lemon Water",
-      calories: 170,
-      protein: 10,
-      prep: "Buy pre-roasted or dry roast at home",
-      tip: "Lemon water reduces cravings during shift.",
+      name: "Cucumber + Lemon Water",
+      time: "11:00 PM",
+      calories: 50,
+      protein: 1,
+      prep: "Slice cucumber. Add lemon and salt to water if needed.",
+      tip: "Useful in summer and after salty meals."
     },
     meal3: {
-      name: "Banana + Peanut Butter + Warm Milk",
+      name: "Vegetable Dalia",
+      time: "4:00 AM",
       calories: 310,
-      protein: 12,
-      prep: "1 banana + 1 tbsp peanut butter + 1 glass warm milk",
-      tip: "Natural tryptophan in banana + milk helps sleep.",
+      protein: 10,
+      prep: "Cook broken wheat with carrot, peas, capsicum, and light spices.",
+      tip: "Soft, warm, and steady energy."
     }
   },
 
   Fri: {
-    meal1: {
-      name: "Soya Chunks Pulao + Raita",
-      calories: 500,
-      protein: 38,
-      prep: "Soak soya 15 mins. Use basmati rice - 1 cup.",
-      tip: "Friday big meal - you've earned it.",
-    },
+    meal1: fixedOats("1 tbsp chia seeds"),
     meal2: {
-      name: "Mixed Vegetable Soup + 1 Roti",
-      calories: 240,
-      protein: 9,
-      prep: "Blend or chunky. Add black pepper and ginger.",
-      tip: "Weekend starts tomorrow - keep dinner light.",
+      name: "Rajma + Brown Rice + Buttermilk",
+      time: "6:30 PM",
+      calories: 610,
+      protein: 27,
+      prep: "Soak rajma overnight. Pressure cook well and keep masala moderate.",
+      tip: "Good weekly legume meal. Keep rice portion controlled."
     },
     snack: {
-      name: "Walnuts (5-6) + Green Tea",
-      calories: 190,
-      protein: 4,
-      prep: "No prep needed",
-      tip: "Walnuts are great for mood and brain - helpful during withdrawal.",
+      name: "Orange or Sweet Lime",
+      time: "11:00 PM",
+      calories: 80,
+      protein: 1,
+      prep: "One fruit serving.",
+      tip: "Fresh and easy when available."
     },
     meal3: {
-      name: "Vegetable Daliya (Broken wheat) + Curd",
-      calories: 290,
-      protein: 11,
-      prep: "Add mixed vegetables. Cook soft consistency.",
-      tip: "Easy to digest at 4 AM. Good sleep food.",
+      name: "Vegetable Poha",
+      time: "4:00 AM",
+      calories: 300,
+      protein: 8,
+      prep: "Add peanuts, curry leaves, peas, onion, and lemon.",
+      tip: "Fast dinner when you want something warm but light."
     }
   },
 
   Sat: {
-    meal1: {
-      name: "Poha + Peanuts + Lemon",
-      calories: 380,
-      protein: 14,
-      prep: "Rinse poha well. Add curry leaves and mustard seeds.",
-      tip: "Weekend treat meal - enjoy it mindfully.",
-    },
+    meal1: fixedOats("raisins + walnuts"),
     meal2: {
-      name: "Paneer Tikka (home style) + Green Chutney",
-      calories: 420,
-      protein: 30,
-      prep: "Marinate paneer in curd + spices for 30 mins. Tawa cook.",
-      tip: "No shift today - enjoy a slightly bigger meal.",
+      name: "Soya Chunks Curry + 2 Phulka + Salad",
+      time: "6:30 PM",
+      calories: 540,
+      protein: 36,
+      prep: "Soak soya chunks in hot water, squeeze, then cook with onion-tomato masala.",
+      tip: "Excellent budget protein source."
     },
     snack: {
-      name: "Fruit Bowl - Banana + Apple + Pomegranate",
-      calories: 200,
-      protein: 3,
-      prep: "Fresh cut. No sugar. Add chaat masala if needed.",
-      tip: "Antioxidants for skin balance on your rest day.",
+      name: "Watermelon or Muskmelon",
+      time: "11:00 PM",
+      calories: 90,
+      protein: 2,
+      prep: "One bowl. Use mainly in summer.",
+      tip: "Hydrating seasonal fruit for Vadodara heat."
     },
     meal3: {
-      name: "Khichdi + Ghee + Pickle",
-      calories: 330,
-      protein: 13,
-      prep: "1 tsp ghee on top after cooking. Comfort meal.",
-      tip: "Saturday night comfort. Sleep well tonight.",
+      name: "Tomato Soup + Garlic Toast",
+      time: "4:00 AM",
+      calories: 300,
+      protein: 8,
+      prep: "Make tomato soup with garlic, pepper, and a little butter if needed.",
+      tip: "Comforting light dinner."
     }
   },
 
   Sun: {
-    meal1: {
-      name: "Upma + Coconut Chutney",
-      calories: 360,
-      protein: 12,
-      prep: "Dry roast sooji first. Add mixed veggies.",
-      tip: "Light Sunday start. Sets up a good week.",
-    },
+    meal1: fixedOats("mango in summer or dates in winter", "Summer/Winter"),
     meal2: {
-      name: "Dal Tadka + 2 Rotis + Salad",
-      calories: 450,
-      protein: 24,
-      prep: "Toor dal. Tadka with ghee, jeera, garlic.",
-      tip: "Classic Sunday meal. Protein and comfort together.",
+      name: "Mixed Veg + Gujarati Dal + 2 Phulka",
+      time: "6:30 PM",
+      calories: 570,
+      protein: 22,
+      prep: "Use available seasonal vegetables. Keep dal light and not too sweet.",
+      tip: "Flexible Sunday meal based on what is fresh in the market."
     },
     snack: {
-      name: "Peanut Butter + Apple slices",
-      calories: 210,
-      protein: 7,
-      prep: "1 tbsp peanut butter. Slice apple thin.",
-      tip: "Good fat and fibre combo for energy.",
+      name: "Banana or Grapes",
+      time: "11:00 PM",
+      calories: 105,
+      protein: 1,
+      prep: "One fruit serving.",
+      tip: "Keep snacks simple instead of adding another full meal."
     },
     meal3: {
-      name: "Warm Turmeric Milk + 2 Whole Wheat Biscuits",
-      calories: 220,
-      protein: 8,
-      prep: "1 glass milk + pinch turmeric + pinch black pepper",
-      tip: "Sunday wind-down. Prepares body for Mon-Fri routine.",
+      name: "Vegetable Khichdi + Curd",
+      time: "4:00 AM",
+      calories: 340,
+      protein: 14,
+      prep: "Cook rice and moong dal soft with vegetables. Add curd on the side.",
+      tip: "Light, warm, and gut-friendly."
     }
   }
 };

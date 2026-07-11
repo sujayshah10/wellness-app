@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AppDataContext } from "./app-data-context";
-import { DEFAULT_APP_DATA, DEFAULT_ABOUT, DEFAULT_SETTINGS, DEFAULT_TARGETS, DAYS, MEAL_SLOTS } from "../data/defaultAppData";
+import { APP_DATA_VERSION, DEFAULT_APP_DATA, DEFAULT_ABOUT, DEFAULT_SETTINGS, DEFAULT_TARGETS, DAYS, MEAL_SLOTS } from "../data/defaultAppData";
 
 const STORAGE_KEY = "wellnessAppData";
 
@@ -26,11 +26,15 @@ function normalizeDietPlan(dietPlan = {}) {
 }
 
 function normalizeAppData(data) {
+  const shouldRefreshSeedData = data?.dataVersion !== APP_DATA_VERSION;
+
   return {
     ...clone(DEFAULT_APP_DATA),
     ...(data || {}),
-    dietPlan: normalizeDietPlan(data?.dietPlan || DEFAULT_APP_DATA.dietPlan),
-    foodDatabase: data?.foodDatabase || DEFAULT_APP_DATA.foodDatabase,
+    dataVersion: APP_DATA_VERSION,
+    dietPlan: normalizeDietPlan(shouldRefreshSeedData ? DEFAULT_APP_DATA.dietPlan : data?.dietPlan || DEFAULT_APP_DATA.dietPlan),
+    foodDatabase: shouldRefreshSeedData ? DEFAULT_APP_DATA.foodDatabase : data?.foodDatabase || DEFAULT_APP_DATA.foodDatabase,
+    foodLibrary: shouldRefreshSeedData ? DEFAULT_APP_DATA.foodLibrary : data?.foodLibrary || DEFAULT_APP_DATA.foodLibrary,
     workouts: data?.workouts || DEFAULT_APP_DATA.workouts,
     targets: {
       ...DEFAULT_TARGETS,
