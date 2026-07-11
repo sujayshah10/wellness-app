@@ -3,6 +3,7 @@ import { useDay } from "../context/useDay";
 import { useAppData } from "../context/useAppData";
 import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
+import { MEAL_SLOTS } from "../data/defaultAppData";
 import { findNextMeals } from "../utils/mealEngine";
 import { useTranslation } from "../utils/useTranslation";
 
@@ -15,13 +16,12 @@ export default function Home() {
   const dietData = appData.dietPlan[selectedDay];
   const workout = appData.workouts[selectedDay] || { focus: "", exercises: [] };
 
-  // Calculate stats dynamically from diet data
   const totalCalories = dietData
-    ? dietData.meal1.calories + dietData.meal2.calories + dietData.snack.calories + dietData.meal3.calories
+    ? MEAL_SLOTS.reduce((total, slot) => total + (Number(dietData[slot.key]?.calories) || 0), 0)
     : 0;
 
   const totalProtein = dietData
-    ? dietData.meal1.protein + dietData.meal2.protein + dietData.snack.protein + dietData.meal3.protein
+    ? MEAL_SLOTS.reduce((total, slot) => total + (Number(dietData[slot.key]?.protein) || 0), 0)
     : 0;
 
   const calorieTarget = Number(appData.targets.calories) || 0;
@@ -112,7 +112,7 @@ export default function Home() {
 
       </div>
 
-      {/* Next Meals */}
+      {/* Next Intakes */}
 
       <div style={{
         background:"var(--app-surface)",

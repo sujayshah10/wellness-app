@@ -1,70 +1,41 @@
+const fullBody = (focus, exercises) => ({ focus, exercises });
+
 export const WORKOUT_SPLIT = {
+  Mon: fullBody("Full Body A - Small Portions", [
+    { name: "Push-Up Board - Chest", sets: 2, reps: "8-10" },
+    { name: "Dumbbell Bent-Over Rows - Back", sets: 2, reps: "10-12" },
+    { name: "Bodyweight Squats - Legs", sets: 2, reps: "12-15" },
+    { name: "Dumbbell Shoulder Press - Shoulders", sets: 2, reps: "10-12" },
+    { name: "Plank - Core", sets: 2, reps: "25-40 sec" }
+  ]),
 
-  Mon: {
-    focus: "Chest",
-    exercises: [
-      { name: "Push-Up Board - Wide Grip", sets: 3, reps: "8-10" },
-      { name: "Push-Up Board - Narrow Grip", sets: 3, reps: "8-10" },
-      { name: "Decline Push-Ups", sets: 2, reps: "6-8" }
-    ]
-  },
+  Tue: fullBody("Full Body B - Small Portions", [
+    { name: "Incline or Narrow Push-Ups - Chest/Triceps", sets: 2, reps: "8-10" },
+    { name: "Rear Delt Fly - Upper Back", sets: 2, reps: "12-15" },
+    { name: "Reverse Lunges - Legs", sets: 2, reps: "8-10 each leg" },
+    { name: "Bicep Curls - Arms", sets: 2, reps: "10-12" },
+    { name: "Dead Bug - Core", sets: 2, reps: "10 each side" }
+  ]),
 
-  Tue: {
-    focus: "Shoulders + Arms",
-    exercises: [
-      { name: "Dumbbell Shoulder Press", sets: 3, reps: "10-12" },
-      { name: "Lateral Raises", sets: 3, reps: "12-15" },
-      { name: "Bicep Curls", sets: 3, reps: "10-12" },
-      { name: "Overhead Tricep Extension", sets: 2, reps: "10-12" }
-    ]
-  },
+  Wed: fullBody("Rest", []),
 
-  Wed: {
-    focus: "Back + Posture",
-    exercises: [
-      { name: "Dumbbell Bent-Over Rows", sets: 3, reps: "10-12" },
-      { name: "Rear Delt Fly", sets: 3, reps: "12-15" },
-      { name: "Superman Hold", sets: 3, reps: "20-30 sec" },
-      { name: "Wall Angels", sets: 2, reps: "10" }
-    ]
-  },
+  Thu: fullBody("Full Body C - Small Portions", [
+    { name: "Decline Push-Ups - Chest", sets: 2, reps: "6-8" },
+    { name: "One-Arm Dumbbell Row - Back", sets: 2, reps: "10 each side" },
+    { name: "Glute Bridges - Glutes", sets: 2, reps: "15-20" },
+    { name: "Lateral Raises - Shoulders", sets: 2, reps: "12-15" },
+    { name: "Side Plank - Core", sets: 2, reps: "20 sec each side" }
+  ]),
 
-  Thu: {
-    focus: "Core + Abs",
-    exercises: [
-      { name: "Plank", sets: 3, reps: "20-40 sec" },
-      { name: "Crunches", sets: 3, reps: "15-20" },
-      { name: "Leg Raises", sets: 3, reps: "10-15" },
-      { name: "Side Plank", sets: 2, reps: "20 sec each side" }
-    ]
-  },
+  Fri: fullBody("Full Body D - Small Portions", [
+    { name: "Push-Up Board - Mixed Grip", sets: 2, reps: "8-10" },
+    { name: "Superman Hold - Back/Posture", sets: 2, reps: "25-35 sec" },
+    { name: "Calf Raises - Legs", sets: 2, reps: "18-25" },
+    { name: "Overhead Tricep Extension - Arms", sets: 2, reps: "10-12" },
+    { name: "Crunches - Core", sets: 2, reps: "15-20" }
+  ]),
 
-  Fri: {
-    focus: "Legs + Glutes",
-    exercises: [
-      { name: "Bodyweight Squats", sets: 3, reps: "15-20" },
-      { name: "Reverse Lunges", sets: 3, reps: "10 each leg" },
-      { name: "Glute Bridges", sets: 3, reps: "15-20" },
-      { name: "Calf Raises", sets: 3, reps: "20" }
-    ]
-  },
+  Sat: fullBody("Rest", []),
 
-  Sat: {
-    focus: "Active Rest",
-    exercises: [
-      { name: "Outdoor Walk", sets: 1, reps: "20-30 minutes" },
-      { name: "Full Body Stretch", sets: 1, reps: "10-15 minutes" },
-      { name: "Deep Breathing / Pranayama", sets: 1, reps: "5-10 minutes" }
-    ]
-  },
-
-  Sun: {
-    focus: "Active Rest",
-    exercises: [
-      { name: "Outdoor Walk", sets: 1, reps: "20-30 minutes" },
-      { name: "Full Body Stretch", sets: 1, reps: "10-15 minutes" },
-      { name: "Journaling + Intention Setting", sets: 1, reps: "5-10 minutes" }
-    ]
-  }
-
+  Sun: fullBody("Rest", [])
 };

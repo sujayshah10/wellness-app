@@ -5,7 +5,7 @@ import { DAYS, LANGUAGES, MEAL_SLOTS, THEMES, TIMEZONE_OPTIONS } from "../data/d
 import { useTranslation } from "../utils/useTranslation";
 
 const SECTIONS = [
-  { key: "Meals", labelKey: "meals", descriptionKey: "descMeals" },
+  { key: "Intakes", labelKey: "intakes", descriptionKey: "descIntakes" },
   { key: "Exercises", labelKey: "exercises", descriptionKey: "descExercises" },
   { key: "Targets", labelKey: "targets", descriptionKey: "descTargets" },
   { key: "Settings", labelKey: "settings", descriptionKey: "descSettings" },
@@ -127,16 +127,16 @@ function DayPicker({ selectedDay, onSelect }) {
   );
 }
 
-function MealsSection({ appData, setAppData, t }) {
+function IntakesSection({ appData, setAppData, t }) {
   const [day, setDay] = useState("Mon");
-  const [slot, setSlot] = useState("meal1");
+  const [slot, setSlot] = useState("intake1");
   const [draft, setDraft] = useState(() => ({
     ...emptyMeal,
-    ...(appData.dietPlan.Mon?.meal1 || {})
+    ...(appData.dietPlan.Mon?.intake1 || {})
   }));
   const [addDays, setAddDays] = useState(["Mon"]);
 
-  const getMealDraft = (nextDay, nextSlot) => {
+  const getIntakeDraft = (nextDay, nextSlot) => {
     const slotDefault = MEAL_SLOTS.find((item) => item.key === nextSlot);
     return {
       ...emptyMeal,
@@ -148,18 +148,18 @@ function MealsSection({ appData, setAppData, t }) {
   const selectDay = (nextDay) => {
     setDay(nextDay);
     setAddDays([nextDay]);
-    setDraft(getMealDraft(nextDay, slot));
+    setDraft(getIntakeDraft(nextDay, slot));
   };
 
   const selectSlot = (nextSlot) => {
     setSlot(nextSlot);
-    setDraft(getMealDraft(day, nextSlot));
+    setDraft(getIntakeDraft(day, nextSlot));
   };
 
-  const loadMeal = (nextDay, nextSlot) => {
+  const loadIntake = (nextDay, nextSlot) => {
     setDay(nextDay);
     setSlot(nextSlot);
-    setDraft(getMealDraft(nextDay, nextSlot));
+    setDraft(getIntakeDraft(nextDay, nextSlot));
   };
 
   const clearDraft = () => {
@@ -170,7 +170,7 @@ function MealsSection({ appData, setAppData, t }) {
     });
   };
 
-  const visibleMeals = useMemo(() =>
+  const visibleIntakes = useMemo(() =>
     MEAL_SLOTS.map((mealSlot) => ({
       day,
       slot: mealSlot.key,
@@ -183,7 +183,7 @@ function MealsSection({ appData, setAppData, t }) {
     setDraft((current) => ({ ...current, [key]: value }));
   };
 
-  const saveMeal = () => {
+  const saveIntake = () => {
     setAppData((current) => ({
       ...current,
       dietPlan: {
@@ -196,7 +196,7 @@ function MealsSection({ appData, setAppData, t }) {
     }));
   };
 
-  const addMeal = () => {
+  const addIntake = () => {
     setAppData((current) => {
       const nextDietPlan = { ...current.dietPlan };
       addDays.forEach((selectedDay) => {
@@ -209,7 +209,7 @@ function MealsSection({ appData, setAppData, t }) {
     });
   };
 
-  const deleteMeal = () => {
+  const deleteIntake = () => {
     setAppData((current) => {
       const dayMeals = { ...current.dietPlan[day] };
       delete dayMeals[slot];
@@ -227,7 +227,7 @@ function MealsSection({ appData, setAppData, t }) {
   return (
     <>
       <div style={cardStyle()}>
-        <h3 style={{ marginTop: 0 }}>{t("addEditDish")}</h3>
+        <h3 style={{ marginTop: 0 }}>{t("addEditIntake")}</h3>
 
         <DayPicker selectedDay={day} onSelect={selectDay} />
 
@@ -265,20 +265,20 @@ function MealsSection({ appData, setAppData, t }) {
         </div>
 
         <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-          <button type="button" onClick={saveMeal} style={buttonStyle()}>{t("save")}</button>
-          <button type="button" onClick={addMeal} style={buttonStyle("soft")}>{t("saveToSelectedDays")}</button>
+          <button type="button" onClick={saveIntake} style={buttonStyle()}>{t("save")}</button>
+          <button type="button" onClick={addIntake} style={buttonStyle("soft")}>{t("saveToSelectedDays")}</button>
           <button type="button" onClick={clearDraft} style={buttonStyle("soft")}>{t("clear")}</button>
-          <button type="button" onClick={deleteMeal} style={buttonStyle("danger")}>{t("delete")}</button>
+          <button type="button" onClick={deleteIntake} style={buttonStyle("danger")}>{t("delete")}</button>
         </div>
       </div>
 
       <div style={cardStyle()}>
-        <h3 style={{ marginTop: 0 }}>{day} {t("meals")}</h3>
-        {visibleMeals.map((item) => (
+        <h3 style={{ marginTop: 0 }}>{day} {t("intakes")}</h3>
+        {visibleIntakes.map((item) => (
           <button
             type="button"
             key={`${item.day}-${item.slot}`}
-            onClick={() => loadMeal(item.day, item.slot)}
+            onClick={() => loadIntake(item.day, item.slot)}
             style={{
               width: "100%",
               textAlign: "left",
@@ -606,7 +606,7 @@ export default function Menu() {
       </div>
 
       {!section && <MenuList onOpen={setSection} t={t} />}
-      {section === "Meals" && <MealsSection appData={appData} setAppData={setAppData} t={t} />}
+      {section === "Intakes" && <IntakesSection appData={appData} setAppData={setAppData} t={t} />}
       {section === "Exercises" && <ExercisesSection appData={appData} setAppData={setAppData} t={t} />}
       {section === "Targets" && <TargetsSection appData={appData} setAppData={setAppData} t={t} />}
       {section === "Settings" && <SettingsSection appData={appData} setAppData={setAppData} t={t} />}

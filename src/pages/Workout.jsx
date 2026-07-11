@@ -34,6 +34,22 @@ export default function Workout() {
 
       {/* Exercises */}
 
+      {workout.exercises.length === 0 && (
+        <div
+          style={{
+            background: "var(--app-surface)",
+            color: "var(--app-text)",
+            padding: "18px",
+            borderRadius: "12px",
+            marginBottom: "14px",
+            boxShadow: "var(--app-shadow)",
+            border: "1px solid var(--app-border)"
+          }}
+        >
+          {t("restDay")}
+        </div>
+      )}
+
       {workout.exercises.map((ex, index) => (
 
         <div

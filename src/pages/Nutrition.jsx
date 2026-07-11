@@ -1,6 +1,7 @@
 import { useDay } from "../context/useDay";
 import { useMeals } from "../context/useMeals";
 import { useAppData } from "../context/useAppData";
+import { MEAL_SLOTS } from "../data/defaultAppData";
 import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
 import { useTranslation } from "../utils/useTranslation";
@@ -27,16 +28,11 @@ export default function Nutrition() {
 
       <DaySelector selectedDay={selectedDay} setSelectedDay={setSelectedDay} />
 
-      {/* Meal Timeline */}
+      {/* Intake Timeline */}
 
       {dietData ? (
         <>
-          {[
-            { key: "meal1", label: t("meal1") },
-            { key: "meal2", label: t("meal2") },
-            { key: "snack", label: t("snack") },
-            { key: "meal3", label: t("meal3") }
-          ].map((mealType) => {
+          {MEAL_SLOTS.map((mealType) => {
             const meal = dietData[mealType.key];
             if (!meal) return null;
 
@@ -72,7 +68,7 @@ export default function Nutrition() {
                         marginBottom: "4px"
                       }}
                     >
-                      {mealType.label}
+                      {t(mealType.key)}
                       {meal.time ? ` - ${meal.time}` : ""}
                     </div>
 

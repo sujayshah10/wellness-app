@@ -35,7 +35,7 @@ function normalizeAppData(data) {
     dietPlan: normalizeDietPlan(shouldRefreshSeedData ? DEFAULT_APP_DATA.dietPlan : data?.dietPlan || DEFAULT_APP_DATA.dietPlan),
     foodDatabase: shouldRefreshSeedData ? DEFAULT_APP_DATA.foodDatabase : data?.foodDatabase || DEFAULT_APP_DATA.foodDatabase,
     foodLibrary: shouldRefreshSeedData ? DEFAULT_APP_DATA.foodLibrary : data?.foodLibrary || DEFAULT_APP_DATA.foodLibrary,
-    workouts: data?.workouts || DEFAULT_APP_DATA.workouts,
+    workouts: shouldRefreshSeedData ? DEFAULT_APP_DATA.workouts : data?.workouts || DEFAULT_APP_DATA.workouts,
     targets: {
       ...DEFAULT_TARGETS,
       ...(data?.targets || {})
