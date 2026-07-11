@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppData } from "../context/useAppData";
-import { DAYS, DEFAULT_INTAKE_SLOTS, LANGUAGES, THEMES, TIMEZONE_OPTIONS } from "../data/defaultAppData";
+import { DAYS, DEFAULT_APP_DATA, DEFAULT_INTAKE_SLOTS, LANGUAGES, THEMES, TIMEZONE_OPTIONS } from "../data/defaultAppData";
 import { useTranslation } from "../utils/useTranslation";
 
 const SECTIONS = [
@@ -417,27 +417,12 @@ function IntakesSection({ appData, setAppData, t }) {
           <button type="button" onClick={removeCurrentIntakeSlot} style={{ ...buttonStyle("danger"), marginBottom: "12px" }}>{t("delete")}</button>
           <button type="button" onClick={() => {
             if (!window.confirm(t("confirmRestoreDefaultIntakes"))) return;
-            setAppData((current) => {
-              const nextDietPlan = {};
-              DAYS.forEach((item) => {
-                const dayPlan = current.dietPlan[item] || {};
-                nextDietPlan[item] = {};
-                DEFAULT_INTAKE_SLOTS.forEach((slotDef) => {
-                  nextDietPlan[item][slotDef.key] = {
-                    ...emptyMeal,
-                    ...(dayPlan[slotDef.key] || {}),
-                    name: dayPlan[slotDef.key]?.name || slotDef.label,
-                    time: slotDef.time || dayPlan[slotDef.key]?.time || ""
-                  };
-                });
-              });
-              return {
-                ...current,
-                intakeSlots: DEFAULT_INTAKE_SLOTS,
-                dietPlan: nextDietPlan
-              };
-            });
-            setSlot(DEFAULT_INTAKE_SLOTS[0].key);
+            setAppData((current) => ({
+              ...current,
+              intakeSlots: DEFAULT_APP_DATA.intakeSlots,
+              dietPlan: DEFAULT_APP_DATA.dietPlan
+            }));
+            setSlot(DEFAULT_APP_DATA.intakeSlots[0].key);
           }} style={{ ...buttonStyle("primary"), marginBottom: "12px" }}>{t("restoreDefaultIntakes")}</button>
         </div>
 
