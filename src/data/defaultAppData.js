@@ -3,7 +3,7 @@ import { foodDatabase } from "./foodDatabase";
 import { foodLibrary } from "./foodLibrary";
 import { WORKOUT_SPLIT } from "./workouts";
 
-export const APP_DATA_VERSION = "polished-configurable-wellness-v2";
+export const APP_DATA_VERSION = "polished-configurable-wellness-v3";
 
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -21,7 +21,7 @@ export const DEFAULT_TARGETS = {
 };
 
 export const DEFAULT_ABOUT = {
-  version: "0.3.0",
+  version: "0.4.0",
   ownerName: "Sujay Shah",
   tagline: "Three daily intakes, seasonal food, and full-body training."
 };
