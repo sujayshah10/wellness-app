@@ -32,6 +32,15 @@ export const DEFAULT_SETTINGS = {
   theme: "light"
 };
 
+export const DEFAULT_WORKOUT_TRACKER = DAYS.reduce((tracker, day) => {
+  tracker[day] = {
+    warmup: false,
+    mainWorkout: false,
+    afterWorkoutStretches: false
+  };
+  return tracker;
+}, {});
+
 export const LANGUAGES = [
   { key: "en", label: "English" },
   { key: "gu", label: "Gujarati" },
@@ -77,5 +86,6 @@ export const DEFAULT_APP_DATA = {
   workouts: WORKOUT_SPLIT,
   targets: DEFAULT_TARGETS,
   about: DEFAULT_ABOUT,
-  settings: DEFAULT_SETTINGS
+  settings: DEFAULT_SETTINGS,
+  workoutTracker: DEFAULT_WORKOUT_TRACKER
 };
