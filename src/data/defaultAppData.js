@@ -25,13 +25,16 @@ export const DEFAULT_PROFILE = {
   age: 30,
   gender: "male",
   heightCm: 175,
+  heightUnit: "cm",
   weightKg: 80,
+  weightUnit: "kg",
   activityLevel: "light",
   goal: "fatLoss",
   deficitTarget: 400,
   sugar: false,
   bloodPressure: false,
-  notes: ""
+  foodAvoidances: "",
+  workoutLimitations: ""
 };
 
 export const DEFAULT_ABOUT = {

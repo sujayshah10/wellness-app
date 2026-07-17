@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppData } from "../context/useAppData";
-import { DAYS, DEFAULT_APP_DATA, DEFAULT_INTAKE_SLOTS, LANGUAGES, THEMES, TIMEZONE_OPTIONS } from "../data/defaultAppData";
+import { DAYS, DEFAULT_APP_DATA, DEFAULT_INTAKE_SLOTS, DEFAULT_PROFILE, LANGUAGES, THEMES, TIMEZONE_OPTIONS } from "../data/defaultAppData";
 import { useTranslation } from "../utils/useTranslation";
 import { titleCase } from "../utils/textCase";
-import { calculateBodyMetrics } from "../utils/healthCalculator";
+import { calculateBodyMetrics, cmToFeetInches, feetInchesToCm, kgToPounds, poundsToKg } from "../utils/healthCalculator";
 
 const SECTIONS = [
   { key: "Intakes", labelKey: "intakes", descriptionKey: "descIntakes", icon: "utensils" },
@@ -112,7 +112,7 @@ function buttonStyle(kind = "primary") {
   };
 }
 
-function Field({ label, value, onChange, type = "text", textarea = false }) {
+function Field({ label, value, onChange, type = "text", textarea = false, disabled = false }) {
   return (
     <label style={{ display: "block", marginBottom: "12px", fontSize: "14px", color: "var(--app-text)" }}>
       <span style={{ display: "block", marginBottom: "6px", fontWeight: 550 }}>{label}</span>
@@ -120,6 +120,7 @@ function Field({ label, value, onChange, type = "text", textarea = false }) {
         <textarea
           value={value}
           onChange={(event) => onChange(event.target.value)}
+          disabled={disabled}
           rows={3}
           style={{ ...fieldStyle(), resize: "vertical" }}
         />
@@ -128,11 +129,20 @@ function Field({ label, value, onChange, type = "text", textarea = false }) {
           type={type}
           value={value}
           onChange={(event) => onChange(type === "number" ? Number(event.target.value) : event.target.value)}
-          style={fieldStyle()}
+          disabled={disabled}
+          style={{ ...fieldStyle(), opacity: disabled ? 0.72 : 1 }}
         />
       )}
     </label>
   );
+}
+
+function segmentedStyle(active) {
+  return {
+    ...buttonStyle(active ? "primary" : "soft"),
+    padding: "9px 12px",
+    minWidth: "58px"
+  };
 }
 
 function DayPicker({ selectedDay, onSelect }) {
@@ -675,59 +685,153 @@ function TargetsSection({ appData, setAppData, t }) {
 
 function ProfileSection({ appData, setAppData, t }) {
   const profile = appData.profile || {};
-  const metrics = calculateBodyMetrics(profile, appData.targets);
-  const updateProfile = (key, value) => {
-    setAppData((current) => ({
-      ...current,
-      profile: {
-        ...(current.profile || {}),
-        [key]: value
-      }
-    }));
+  const [draft, setDraft] = useState(() => ({ ...DEFAULT_PROFILE, ...profile }));
+  const [isEditing, setIsEditing] = useState(false);
+  const metrics = calculateBodyMetrics(draft, appData.targets);
+  const heightFtIn = cmToFeetInches(draft.heightCm);
+  const displayedWeight = draft.weightUnit === "lb"
+    ? Math.round(kgToPounds(draft.weightKg))
+    : Math.round(Number(draft.weightKg) || 0);
+
+  const updateDraft = (key, value) => {
+    setDraft((current) => ({ ...current, [key]: value }));
+  };
+
+  const updateWeight = (value) => {
+    updateDraft("weightKg", draft.weightUnit === "lb" ? Math.round(poundsToKg(value) * 10) / 10 : value);
+  };
+
+  const updateHeightFeet = (feet) => {
+    updateDraft("heightCm", Math.round(feetInchesToCm(feet, heightFtIn.inches)));
+  };
+
+  const updateHeightInches = (inches) => {
+    updateDraft("heightCm", Math.round(feetInchesToCm(heightFtIn.feet, inches)));
+  };
+
+  const saveProfile = () => {
+    setAppData((current) => ({ ...current, profile: draft }));
+    setIsEditing(false);
+  };
+
+  const refreshDraft = () => {
+    setDraft({ ...DEFAULT_PROFILE, ...(appData.profile || {}) });
+    setIsEditing(false);
+  };
+
+  const resetDraft = () => {
+    setDraft(DEFAULT_PROFILE);
+    setIsEditing(true);
   };
 
   return (
-    <div style={cardStyle()}>
-      <h3 style={{ marginTop: 0 }}>{t("profile")}</h3>
+    <div>
+      <div style={{
+        ...cardStyle(),
+        background: "linear-gradient(145deg, color-mix(in srgb, var(--app-primary) 18%, var(--app-surface)), var(--app-surface))"
+      }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px", marginBottom: "14px" }}>
+          <div>
+            <h3 style={{ margin: 0 }}>{t("profile")}</h3>
+            <p style={{ margin: "6px 0 0", color: "var(--app-muted)", fontSize: "13px" }}>
+              {t("profileSummary")}
+            </p>
+          </div>
+          <span style={{
+            border: "1px solid var(--app-border)",
+            borderRadius: "999px",
+            padding: "6px 10px",
+            color: "var(--app-primary)",
+            fontWeight: 700,
+            fontSize: "12px"
+          }}>
+            {isEditing ? t("editing") : t("saved")}
+          </span>
+        </div>
 
-      <div className="empty-state compact" style={{ marginBottom: "12px" }}>
-        <strong>{metrics.calorieTarget} Cal / {metrics.proteinTarget}g Protein</strong>
-        <span>BMR {metrics.bmr || "-"} / Maintenance {metrics.tdee || "-"} / Deficit {metrics.deficitTarget || "-"}</span>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "8px" }}>
+          <div className="empty-state compact">
+            <strong>{metrics.calorieTarget}</strong>
+            <span>Cal Target</span>
+          </div>
+          <div className="empty-state compact">
+            <strong>{metrics.proteinTarget}g</strong>
+            <span>Protein</span>
+          </div>
+          <div className="empty-state compact">
+            <strong>{metrics.deficitTarget || "-"}</strong>
+            <span>Deficit</span>
+          </div>
+        </div>
       </div>
 
-      <Field label={t("yourName")} value={profile.name || ""} onChange={(value) => updateProfile("name", value)} />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-        <Field label={t("age")} type="number" value={profile.age || 0} onChange={(value) => updateProfile("age", value)} />
-        <Field label={t("weightKg")} type="number" value={profile.weightKg || 0} onChange={(value) => updateProfile("weightKg", value)} />
+      <div style={cardStyle()}>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "14px" }}>
+          <button type="button" onClick={() => setIsEditing(true)} style={buttonStyle("soft")}>{t("edit")}</button>
+          <button type="button" onClick={saveProfile} style={buttonStyle()}>{t("save")}</button>
+          <button type="button" onClick={refreshDraft} style={buttonStyle("soft")}>{t("refresh")}</button>
+          <button type="button" onClick={resetDraft} style={buttonStyle("danger")}>{t("reset")}</button>
+        </div>
+
+        <Field label={t("yourName")} value={draft.name || ""} disabled={!isEditing} onChange={(value) => updateDraft("name", value)} />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+          <Field label={t("age")} type="number" value={draft.age || 0} disabled={!isEditing} onChange={(value) => updateDraft("age", value)} />
+          <label style={{ display: "block", marginBottom: "12px", fontSize: "14px", color: "var(--app-text)" }}>
+            <span style={{ display: "block", marginBottom: "6px", fontWeight: 550 }}>{t("gender")}</span>
+            <select disabled={!isEditing} value={draft.gender || "male"} onChange={(event) => updateDraft("gender", event.target.value)} style={fieldStyle()}>
+              <option value="male">{t("male")}</option>
+              <option value="female">{t("female")}</option>
+            </select>
+          </label>
+        </div>
+
+        <div style={{ marginBottom: "12px" }}>
+          <strong style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>{t("weight")}</strong>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+            <button type="button" disabled={!isEditing} onClick={() => updateDraft("weightUnit", "kg")} style={segmentedStyle(draft.weightUnit !== "lb")}>Kg</button>
+            <button type="button" disabled={!isEditing} onClick={() => updateDraft("weightUnit", "lb")} style={segmentedStyle(draft.weightUnit === "lb")}>Lb</button>
+          </div>
+          <input disabled={!isEditing} type="number" value={displayedWeight} onChange={(event) => updateWeight(Number(event.target.value))} style={fieldStyle()} />
+        </div>
+
+        <div style={{ marginBottom: "12px" }}>
+          <strong style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>{t("height")}</strong>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+            <button type="button" disabled={!isEditing} onClick={() => updateDraft("heightUnit", "cm")} style={segmentedStyle(draft.heightUnit !== "ft")}>Cm</button>
+            <button type="button" disabled={!isEditing} onClick={() => updateDraft("heightUnit", "ft")} style={segmentedStyle(draft.heightUnit === "ft")}>Ft</button>
+          </div>
+          {draft.heightUnit === "ft" ? (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              <Field label={t("feet")} type="number" value={heightFtIn.feet} disabled={!isEditing} onChange={updateHeightFeet} />
+              <Field label={t("inches")} type="number" value={heightFtIn.inches} disabled={!isEditing} onChange={updateHeightInches} />
+            </div>
+          ) : (
+            <input disabled={!isEditing} type="number" value={Math.round(draft.heightCm || 0)} onChange={(event) => updateDraft("heightCm", Number(event.target.value))} style={fieldStyle()} />
+          )}
+        </div>
+
+        <label style={{ display: "block", marginBottom: "12px", fontWeight: 600 }}>
+          {t("activityLevel")}
+          <select disabled={!isEditing} value={draft.activityLevel || "light"} onChange={(event) => updateDraft("activityLevel", event.target.value)} style={{ ...fieldStyle(), marginTop: "6px" }}>
+            <option value="sedentary">{t("sedentary")}</option>
+            <option value="light">{t("lightActivity")}</option>
+            <option value="moderate">{t("moderateActivity")}</option>
+            <option value="active">{t("active")}</option>
+          </select>
+        </label>
+
+        <Field label={t("calorieDeficit")} type="number" value={draft.deficitTarget || 0} disabled={!isEditing} onChange={(value) => updateDraft("deficitTarget", value)} />
       </div>
-      <Field label={t("heightCm")} type="number" value={profile.heightCm || 0} onChange={(value) => updateProfile("heightCm", value)} />
 
-      <label style={{ display: "block", marginBottom: "12px", fontWeight: 600 }}>
-        {t("gender")}
-        <select value={profile.gender || "male"} onChange={(event) => updateProfile("gender", event.target.value)} style={{ ...fieldStyle(), marginTop: "6px" }}>
-          <option value="male">{t("male")}</option>
-          <option value="female">{t("female")}</option>
-        </select>
-      </label>
-
-      <label style={{ display: "block", marginBottom: "12px", fontWeight: 600 }}>
-        {t("activityLevel")}
-        <select value={profile.activityLevel || "light"} onChange={(event) => updateProfile("activityLevel", event.target.value)} style={{ ...fieldStyle(), marginTop: "6px" }}>
-          <option value="sedentary">{t("sedentary")}</option>
-          <option value="light">{t("lightActivity")}</option>
-          <option value="moderate">{t("moderateActivity")}</option>
-          <option value="active">{t("active")}</option>
-        </select>
-      </label>
-
-      <Field label={t("calorieDeficit")} type="number" value={profile.deficitTarget || 0} onChange={(value) => updateProfile("deficitTarget", value)} />
-
-      <div style={{ display: "grid", gap: "8px", marginBottom: "12px" }}>
-        <label><input type="checkbox" checked={!!profile.sugar} onChange={(event) => updateProfile("sugar", event.target.checked)} /> {t("sugarCondition")}</label>
-        <label><input type="checkbox" checked={!!profile.bloodPressure} onChange={(event) => updateProfile("bloodPressure", event.target.checked)} /> {t("bpCondition")}</label>
+      <div style={cardStyle()}>
+        <h3 style={{ marginTop: 0 }}>{t("healthAndAvoidance")}</h3>
+        <div style={{ display: "grid", gap: "8px", marginBottom: "12px" }}>
+          <label><input disabled={!isEditing} type="checkbox" checked={!!draft.sugar} onChange={(event) => updateDraft("sugar", event.target.checked)} /> {t("sugarCondition")}</label>
+          <label><input disabled={!isEditing} type="checkbox" checked={!!draft.bloodPressure} onChange={(event) => updateDraft("bloodPressure", event.target.checked)} /> {t("bpCondition")}</label>
+        </div>
+        <Field label={t("foodAvoidances")} textarea value={draft.foodAvoidances || ""} disabled={!isEditing} onChange={(value) => updateDraft("foodAvoidances", value)} />
+        <Field label={t("workoutLimitations")} textarea value={draft.workoutLimitations || ""} disabled={!isEditing} onChange={(value) => updateDraft("workoutLimitations", value)} />
       </div>
-
-      <Field label={t("notes")} textarea value={profile.notes || ""} onChange={(value) => updateProfile("notes", value)} />
     </div>
   );
 }

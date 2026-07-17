@@ -5,6 +5,26 @@ const activityMultipliers = {
   active: 1.725
 };
 
+export function poundsToKg(value) {
+  return (Number(value) || 0) / 2.20462;
+}
+
+export function kgToPounds(value) {
+  return (Number(value) || 0) * 2.20462;
+}
+
+export function feetInchesToCm(feet, inches) {
+  return ((Number(feet) || 0) * 30.48) + ((Number(inches) || 0) * 2.54);
+}
+
+export function cmToFeetInches(value) {
+  const totalInches = Math.round((Number(value) || 0) / 2.54);
+  return {
+    feet: Math.floor(totalInches / 12),
+    inches: totalInches % 12
+  };
+}
+
 function roundToNearest(value, step = 10) {
   return Math.round(value / step) * step;
 }
