@@ -66,8 +66,22 @@ export default function Workout() {
     }));
   };
 
-  const mediaUrlFor = (exercise) =>
-    exercise.mediaUrl || `https://www.youtube.com/results?search_query=${encodeURIComponent(`${exercise.name} proper form`)}`;
+  const mediaUrlFor = (exercise) => {
+    const customUrl = exercise.mediaUrl?.trim();
+    if (customUrl?.startsWith("http://") || customUrl?.startsWith("https://")) {
+      return customUrl;
+    }
+
+    return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${exercise.name} proper form`)}`;
+  };
+
+  const openMedia = (exercise) => {
+    const url = mediaUrlFor(exercise);
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (!opened) {
+      window.location.href = url;
+    }
+  };
 
   const renderExercise = (ex, index) => (
     <div
@@ -88,14 +102,20 @@ export default function Workout() {
         {ex.sets} {t("sets")} x {ex.reps}
       </p>
 
-      <a
-        href={mediaUrlFor(ex)}
-        target="_blank"
-        rel="noreferrer"
+      <button
+        type="button"
+        onClick={() => openMedia(ex)}
         className="media-link"
+        style={{
+          border: 0,
+          background: "transparent",
+          padding: 0,
+          cursor: "pointer",
+          font: "inherit"
+        }}
       >
         {t("watchForm")}
-      </a>
+      </button>
     </div>
   );
 
