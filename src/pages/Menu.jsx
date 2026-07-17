@@ -4,10 +4,12 @@ import { useAppData } from "../context/useAppData";
 import { DAYS, DEFAULT_APP_DATA, DEFAULT_INTAKE_SLOTS, LANGUAGES, THEMES, TIMEZONE_OPTIONS } from "../data/defaultAppData";
 import { useTranslation } from "../utils/useTranslation";
 import { titleCase } from "../utils/textCase";
+import { calculateBodyMetrics } from "../utils/healthCalculator";
 
 const SECTIONS = [
   { key: "Intakes", labelKey: "intakes", descriptionKey: "descIntakes", icon: "utensils" },
   { key: "Exercises", labelKey: "exercises", descriptionKey: "descExercises", icon: "activity" },
+  { key: "Profile", labelKey: "profile", descriptionKey: "descProfile", icon: "user" },
   { key: "Targets", labelKey: "targets", descriptionKey: "descTargets", icon: "target" },
   { key: "Settings", labelKey: "settings", descriptionKey: "descSettings", icon: "settings" },
   { key: "App Data", labelKey: "appData", descriptionKey: "descAppData", icon: "database" },
@@ -38,6 +40,7 @@ function Icon({ name }) {
   const paths = {
     utensils: "M7 3v8M4 3v8M10 3v8M4 7h6M7 11v10M16 3v18M16 3c3 2 4 6 0 9",
     activity: "M3 12h4l3-7 4 14 3-7h4",
+    user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21c1.5-4 14.5-4 16 0",
     target: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM12 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z",
     settings: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM4 12h2M18 12h2M12 4v2M12 18v2M6.6 6.6l1.4 1.4M16 16l1.4 1.4M17.4 6.6 16 8M8 16l-1.4 1.4",
     database: "M5 6c0-2 14-2 14 0v12c0 2-14 2-14 0V6ZM5 6c0 2 14 2 14 0M5 12c0 2 14 2 14 0",
@@ -630,6 +633,7 @@ function ExercisesSection({ appData, setAppData, t }) {
 }
 
 function TargetsSection({ appData, setAppData, t }) {
+  const metrics = calculateBodyMetrics(appData.profile, appData.targets);
   const updateTargets = (key, value) => {
     setAppData((current) => ({
       ...current,
@@ -643,8 +647,12 @@ function TargetsSection({ appData, setAppData, t }) {
   return (
     <div style={cardStyle()}>
       <h3 style={{ marginTop: 0 }}>{t("targets")}</h3>
+      <div className="empty-state compact" style={{ marginBottom: "12px" }}>
+        <strong>{metrics.calorieTarget} Cal Target</strong>
+        <span>BMR {metrics.bmr || "-"} / Maintenance {metrics.tdee || "-"} / Deficit {metrics.deficitTarget || "-"}</span>
+      </div>
       <Field label={t("dailyCalorieGoal")} type="number" value={appData.targets.calories} onChange={(value) => updateTargets("calories", value)} />
-      <Field label={t("dailyProteinGoal")} type="number" value={appData.targets.protein} onChange={(value) => updateTargets("protein", value)} />
+      <Field label={t("dailyProteinGoal")} type="number" value={metrics.proteinTarget || appData.targets.protein} onChange={(value) => updateTargets("protein", value)} />
 
       <label style={{ display: "block", marginBottom: "12px", fontWeight: 600 }}>
         {t("deficitTarget")}
@@ -661,6 +669,65 @@ function TargetsSection({ appData, setAppData, t }) {
       {appData.targets.deficitMode === "manual" && (
         <Field label={t("manualDeficit")} type="number" value={appData.targets.deficitOverride} onChange={(value) => updateTargets("deficitOverride", value)} />
       )}
+    </div>
+  );
+}
+
+function ProfileSection({ appData, setAppData, t }) {
+  const profile = appData.profile || {};
+  const metrics = calculateBodyMetrics(profile, appData.targets);
+  const updateProfile = (key, value) => {
+    setAppData((current) => ({
+      ...current,
+      profile: {
+        ...(current.profile || {}),
+        [key]: value
+      }
+    }));
+  };
+
+  return (
+    <div style={cardStyle()}>
+      <h3 style={{ marginTop: 0 }}>{t("profile")}</h3>
+
+      <div className="empty-state compact" style={{ marginBottom: "12px" }}>
+        <strong>{metrics.calorieTarget} Cal / {metrics.proteinTarget}g Protein</strong>
+        <span>BMR {metrics.bmr || "-"} / Maintenance {metrics.tdee || "-"} / Deficit {metrics.deficitTarget || "-"}</span>
+      </div>
+
+      <Field label={t("yourName")} value={profile.name || ""} onChange={(value) => updateProfile("name", value)} />
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+        <Field label={t("age")} type="number" value={profile.age || 0} onChange={(value) => updateProfile("age", value)} />
+        <Field label={t("weightKg")} type="number" value={profile.weightKg || 0} onChange={(value) => updateProfile("weightKg", value)} />
+      </div>
+      <Field label={t("heightCm")} type="number" value={profile.heightCm || 0} onChange={(value) => updateProfile("heightCm", value)} />
+
+      <label style={{ display: "block", marginBottom: "12px", fontWeight: 600 }}>
+        {t("gender")}
+        <select value={profile.gender || "male"} onChange={(event) => updateProfile("gender", event.target.value)} style={{ ...fieldStyle(), marginTop: "6px" }}>
+          <option value="male">{t("male")}</option>
+          <option value="female">{t("female")}</option>
+        </select>
+      </label>
+
+      <label style={{ display: "block", marginBottom: "12px", fontWeight: 600 }}>
+        {t("activityLevel")}
+        <select value={profile.activityLevel || "light"} onChange={(event) => updateProfile("activityLevel", event.target.value)} style={{ ...fieldStyle(), marginTop: "6px" }}>
+          <option value="sedentary">{t("sedentary")}</option>
+          <option value="light">{t("lightActivity")}</option>
+          <option value="moderate">{t("moderateActivity")}</option>
+          <option value="active">{t("active")}</option>
+        </select>
+      </label>
+
+      <Field label={t("calorieDeficit")} type="number" value={profile.deficitTarget || 0} onChange={(value) => updateProfile("deficitTarget", value)} />
+
+      <div style={{ display: "grid", gap: "8px", marginBottom: "12px" }}>
+        <label><input type="checkbox" checked={!!profile.sugar} onChange={(event) => updateProfile("sugar", event.target.checked)} /> {t("sugarCondition")}</label>
+        <label><input type="checkbox" checked={!!profile.bloodPressure} onChange={(event) => updateProfile("bloodPressure", event.target.checked)} /> {t("bpCondition")}</label>
+      </div>
+
+      <Field label={t("notes")} textarea value={profile.notes || ""} onChange={(value) => updateProfile("notes", value)} />
     </div>
   );
 }
@@ -855,6 +922,7 @@ export default function Menu() {
       {!section && <MenuList onOpen={setSection} t={t} />}
       {section === "Intakes" && <IntakesSection appData={appData} setAppData={setAppData} t={t} />}
       {section === "Exercises" && <ExercisesSection appData={appData} setAppData={setAppData} t={t} />}
+      {section === "Profile" && <ProfileSection appData={appData} setAppData={setAppData} t={t} />}
       {section === "Targets" && <TargetsSection appData={appData} setAppData={setAppData} t={t} />}
       {section === "Settings" && <SettingsSection appData={appData} setAppData={setAppData} t={t} />}
       {section === "App Data" && <AppDataSection appData={appData} setAppData={setAppData} resetAppData={resetAppData} t={t} />}

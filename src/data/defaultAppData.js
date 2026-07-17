@@ -20,6 +20,20 @@ export const DEFAULT_TARGETS = {
   deficitOverride: 0
 };
 
+export const DEFAULT_PROFILE = {
+  name: "",
+  age: 30,
+  gender: "male",
+  heightCm: 175,
+  weightKg: 80,
+  activityLevel: "light",
+  goal: "fatLoss",
+  deficitTarget: 400,
+  sugar: false,
+  bloodPressure: false,
+  notes: ""
+};
+
 export const DEFAULT_ABOUT = {
   version: "0.4.0",
   ownerName: "Sujay Shah",
@@ -85,6 +99,7 @@ export const DEFAULT_APP_DATA = {
   foodLibrary,
   workouts: WORKOUT_SPLIT,
   targets: DEFAULT_TARGETS,
+  profile: DEFAULT_PROFILE,
   about: DEFAULT_ABOUT,
   settings: DEFAULT_SETTINGS,
   workoutTracker: DEFAULT_WORKOUT_TRACKER

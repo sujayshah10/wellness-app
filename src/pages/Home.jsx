@@ -6,6 +6,7 @@ import DaySelector from "../components/DaySelector";
 import { findNextMeals } from "../utils/mealEngine";
 import { useTranslation } from "../utils/useTranslation";
 import { titleCase } from "../utils/textCase";
+import { calculateBodyMetrics } from "../utils/healthCalculator";
 
 export default function Home() {
 
@@ -26,7 +27,8 @@ export default function Home() {
     ? intakeSlots.reduce((total, slot) => total + (Number(dietData[slot.key]?.protein) || 0), 0)
     : 0;
 
-  const calorieTarget = Number(appData.targets.calories) || 0;
+  const metrics = calculateBodyMetrics(appData.profile, appData.targets);
+  const calorieTarget = metrics.calorieTarget || Number(appData.targets.calories) || 0;
   const deficit = calorieTarget - totalCalories;
 
   const { nextMeals, nextPrepMeal } = findNextMeals(appData.dietPlan, selectedDay);

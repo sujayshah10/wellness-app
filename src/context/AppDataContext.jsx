@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AppDataContext } from "./app-data-context";
-import { APP_DATA_VERSION, DEFAULT_APP_DATA, DEFAULT_ABOUT, DEFAULT_INTAKE_SLOTS, DEFAULT_SETTINGS, DEFAULT_TARGETS, DAYS } from "../data/defaultAppData";
+import { APP_DATA_VERSION, DEFAULT_APP_DATA, DEFAULT_ABOUT, DEFAULT_INTAKE_SLOTS, DEFAULT_PROFILE, DEFAULT_SETTINGS, DEFAULT_TARGETS, DAYS } from "../data/defaultAppData";
 
 const STORAGE_KEY = "wellnessAppData";
 
@@ -108,6 +108,10 @@ function normalizeAppData(data) {
     targets: {
       ...DEFAULT_TARGETS,
       ...(data?.targets || {})
+    },
+    profile: {
+      ...DEFAULT_PROFILE,
+      ...(data?.profile || {})
     },
     about: {
       ...DEFAULT_ABOUT,
