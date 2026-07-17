@@ -3,7 +3,7 @@ import { foodDatabase } from "./foodDatabase";
 import { foodLibrary } from "./foodLibrary";
 import { WORKOUT_SPLIT } from "./workouts";
 
-export const APP_DATA_VERSION = "polished-configurable-wellness-v3";
+export const APP_DATA_VERSION = "polished-configurable-wellness-v4";
 
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 

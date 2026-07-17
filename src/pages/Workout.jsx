@@ -94,7 +94,7 @@ export default function Workout() {
         rel="noreferrer"
         className="media-link"
       >
-        Play {t("watchForm")}
+        {t("watchForm")}
       </a>
     </div>
   );
@@ -121,7 +121,7 @@ export default function Workout() {
       <div style={{ marginBottom: "18px" }}>
         <h4 style={{ color: "var(--app-primary)", marginBottom: "8px" }}>{t("strengthRecoveryTracker")}</h4>
         <div style={{ color: "var(--app-muted)", marginBottom: "10px" }}>
-          {completedCount} / {trackerSteps.length} {t("stepsCompleted")}
+          {completedCount} of {trackerSteps.length} {t("stepsCompleted")}
         </div>
         <div style={{ display: "grid", gap: "10px" }}>
           {trackerSteps.map(({ key, label }) => (

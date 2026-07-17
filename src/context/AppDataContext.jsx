@@ -39,7 +39,11 @@ function normalizeDietPlan(dietPlan = {}, intakeSlots = DEFAULT_INTAKE_SLOTS) {
 }
 
 function normalizeAppData(data) {
-  const shouldRefreshSeedData = data?.dataVersion !== APP_DATA_VERSION;
+  const previousVersion = data?.dataVersion;
+  const shouldRefreshSeedData = !previousVersion
+    || previousVersion === "vadodara-seasonal-eating-v1"
+    || previousVersion === "vadodara-intake-full-body-v1";
+  const shouldRefreshWorkouts = previousVersion !== APP_DATA_VERSION;
   const intakeSlots = normalizeIntakeSlots(shouldRefreshSeedData ? DEFAULT_APP_DATA.intakeSlots : data?.intakeSlots || DEFAULT_APP_DATA.intakeSlots);
 
   return {
@@ -50,7 +54,7 @@ function normalizeAppData(data) {
     dietPlan: normalizeDietPlan(shouldRefreshSeedData ? DEFAULT_APP_DATA.dietPlan : data?.dietPlan || DEFAULT_APP_DATA.dietPlan, intakeSlots),
     foodDatabase: shouldRefreshSeedData ? DEFAULT_APP_DATA.foodDatabase : data?.foodDatabase || DEFAULT_APP_DATA.foodDatabase,
     foodLibrary: shouldRefreshSeedData ? DEFAULT_APP_DATA.foodLibrary : data?.foodLibrary || DEFAULT_APP_DATA.foodLibrary,
-    workouts: shouldRefreshSeedData ? DEFAULT_APP_DATA.workouts : data?.workouts || DEFAULT_APP_DATA.workouts,
+    workouts: shouldRefreshWorkouts ? DEFAULT_APP_DATA.workouts : data?.workouts || DEFAULT_APP_DATA.workouts,
     targets: {
       ...DEFAULT_TARGETS,
       ...(data?.targets || {})
