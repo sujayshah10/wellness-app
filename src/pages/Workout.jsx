@@ -3,6 +3,7 @@ import { useAppData } from "../context/useAppData";
 import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
 import { useTranslation } from "../utils/useTranslation";
+import { titleCase } from "../utils/textCase";
 
 export default function Workout() {
 
@@ -98,10 +99,10 @@ export default function Workout() {
         border: "1px solid var(--app-border)"
       }}
     >
-      <strong>{ex.name}</strong>
+      <strong>{titleCase(ex.name)}</strong>
 
       <p style={{ color: "var(--app-muted)", marginTop: "6px" }}>
-        {ex.sets} {t("sets")} x {ex.reps}
+        {ex.sets} {t("sets")} X {titleCase(ex.reps)}
       </p>
 
       <button
@@ -143,7 +144,7 @@ export default function Workout() {
       <div style={{ marginBottom: "18px" }}>
         <h4 style={{ color: "var(--app-primary)", marginBottom: "8px" }}>{t("strengthRecoveryTracker")}</h4>
         <div style={{ color: "var(--app-muted)", marginBottom: "10px" }}>
-          {completedCount} of {trackerSteps.length} {t("stepsCompleted")}
+          {completedCount} Of {trackerSteps.length} {t("stepsCompleted")}
         </div>
         <div style={{ display: "grid", gap: "10px" }}>
           {trackerSteps.map(({ key, label }) => (
@@ -191,7 +192,7 @@ export default function Workout() {
         <div style={{ marginBottom: "18px" }}>
           <h4 style={{ color: "var(--app-primary)", marginBottom: "8px" }}>{t("equipment")}</h4>
           <div style={{ color: "var(--app-muted)", lineHeight: 1.6 }}>
-            {equipmentList.join(", ")}
+            {equipmentList.map(titleCase).join(", ")}
           </div>
         </div>
       )}

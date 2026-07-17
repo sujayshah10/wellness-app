@@ -5,6 +5,7 @@ import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
 import { findNextMeals } from "../utils/mealEngine";
 import { useTranslation } from "../utils/useTranslation";
+import { titleCase } from "../utils/textCase";
 
 export default function Home() {
 
@@ -152,7 +153,7 @@ export default function Home() {
               {meal.day ? `${dayName(meal.day)} - ${meal.time}` : meal.time}
             </div>
 
-            <strong>{meal.meal || meal.name}</strong>
+            <strong>{titleCase(meal.meal || meal.name)}</strong>
 
           </div>
 
@@ -216,7 +217,7 @@ export default function Home() {
           <ul>
             {workoutExercises.slice(0, 4).map((exercise) => (
               <li key={exercise.name}>
-                {exercise.name} - {exercise.sets} x {exercise.reps}
+                {titleCase(exercise.name)} - {exercise.sets} X {titleCase(exercise.reps)}
               </li>
             ))}
           </ul>

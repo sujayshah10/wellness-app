@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAppData } from "../context/useAppData";
 import { DAYS, DEFAULT_APP_DATA, DEFAULT_INTAKE_SLOTS, LANGUAGES, THEMES, TIMEZONE_OPTIONS } from "../data/defaultAppData";
 import { useTranslation } from "../utils/useTranslation";
+import { titleCase } from "../utils/textCase";
 
 const SECTIONS = [
   { key: "Intakes", labelKey: "intakes", descriptionKey: "descIntakes", icon: "utensils" },
@@ -501,9 +502,9 @@ function IntakesSection({ appData, setAppData, t }) {
               cursor: "pointer"
             }}
           >
-            <strong>{item.meal.name}</strong>
+            <strong>{titleCase(item.meal.name)}</strong>
             <div style={{ color: "var(--app-muted)", fontSize: "13px" }}>
-              {item.day} - {item.label} - {item.meal.time} - {item.meal.calories} cal - {item.meal.protein}g {t("protein")}
+              {item.day} - {item.label} - {item.meal.time} - {item.meal.calories} Cal - {item.meal.protein}g {t("protein")}
             </div>
           </button>
         ))}

@@ -4,6 +4,7 @@ import { useAppData } from "../context/useAppData";
 import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
 import { useTranslation } from "../utils/useTranslation";
+import { titleCase } from "../utils/textCase";
 
 export default function Nutrition() {
 
@@ -80,7 +81,7 @@ export default function Nutrition() {
                     </div>
 
                     <strong style={{ fontSize: "16px", color: "var(--app-text)", fontWeight: 700 }}>
-                      {meal.name}
+                      {titleCase(meal.name)}
                     </strong>
 
                     <div
@@ -92,8 +93,8 @@ export default function Nutrition() {
                         color: "var(--app-muted)"
                       }}
                     >
-                      <span>{meal.calories} cal</span>
-                      <span>{meal.protein}g protein</span>
+                      <span>{meal.calories} Cal</span>
+                      <span>{meal.protein}g Protein</span>
                     </div>
 
                     {meal.prep && (
@@ -110,7 +111,7 @@ export default function Nutrition() {
                         <div style={{ fontWeight: "500", marginBottom: "4px" }}>
                           {t("prep")}:
                         </div>
-                        <div style={{ color: "var(--app-muted)" }}>{meal.prep}</div>
+                        <div style={{ color: "var(--app-muted)" }}>{titleCase(meal.prep)}</div>
                       </div>
                     )}
 
@@ -123,7 +124,7 @@ export default function Nutrition() {
                           fontStyle: "italic"
                         }}
                       >
-                        {t("tip")}: {meal.tip}
+                        {t("tip")}: {titleCase(meal.tip)}
                       </div>
                     )}
                   </div>
