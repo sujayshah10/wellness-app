@@ -12,6 +12,8 @@ export default function Workout() {
 
   const workout =
     appData.workouts[selectedDay] || { focus: "", sections: [], exercises: [] };
+  const workoutSections = Array.isArray(workout.sections) ? workout.sections : [];
+  const workoutExercises = Array.isArray(workout.exercises) ? workout.exercises : [];
 
   const equipmentList = [
     "Pushup Board",
@@ -185,7 +187,7 @@ export default function Workout() {
         </button>
       </div>
 
-      {workout.sections && workout.sections.length > 0 && (
+      {workoutSections.length > 0 && (
         <div style={{ marginBottom: "18px" }}>
           <h4 style={{ color: "var(--app-primary)", marginBottom: "8px" }}>{t("equipment")}</h4>
           <div style={{ color: "var(--app-muted)", lineHeight: 1.6 }}>
@@ -194,22 +196,22 @@ export default function Workout() {
         </div>
       )}
 
-      {workout.sections && workout.sections.length > 0 ? (
-        workout.sections.map((section, sectionIndex) => (
+      {workoutSections.length > 0 ? (
+        workoutSections.map((section, sectionIndex) => (
           <div key={sectionIndex} style={{ marginBottom: "22px" }}>
             <h4 style={{ color: "var(--app-primary)", marginBottom: "10px" }}>
               {t(section.title)}
             </h4>
-            {section.exercises.map(renderExercise)}
+            {(Array.isArray(section.exercises) ? section.exercises : []).map(renderExercise)}
           </div>
         ))
-      ) : workout.exercises.length === 0 ? (
+      ) : workoutExercises.length === 0 ? (
         <div className="empty-state">
           <strong>{t("restDay")}</strong>
           <span>{t("noWorkoutData")}</span>
         </div>
       ) : (
-        workout.exercises.map(renderExercise)
+        workoutExercises.map(renderExercise)
       )}
 
     </div>

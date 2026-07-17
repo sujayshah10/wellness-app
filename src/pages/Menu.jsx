@@ -516,6 +516,7 @@ function ExercisesSection({ appData, setAppData, t }) {
   const [day, setDay] = useState("Mon");
   const [newExercise, setNewExercise] = useState(emptyExercise);
   const workout = appData.workouts[day] || { focus: "", exercises: [] };
+  const workoutExercises = Array.isArray(workout.exercises) ? workout.exercises : [];
 
   const updateWorkout = (nextWorkout) => {
     setAppData((current) => ({
@@ -528,25 +529,25 @@ function ExercisesSection({ appData, setAppData, t }) {
   };
 
   const updateExercise = (index, key, value) => {
-    const exercises = workout.exercises.map((exercise, exerciseIndex) =>
+    const exercises = workoutExercises.map((exercise, exerciseIndex) =>
       exerciseIndex === index ? { ...exercise, [key]: value } : exercise
     );
-    updateWorkout({ ...workout, exercises });
+    updateWorkout({ ...workout, sections: [], exercises });
   };
 
   const moveExercise = (index, direction) => {
     const nextIndex = index + direction;
-    if (nextIndex < 0 || nextIndex >= workout.exercises.length) return;
+    if (nextIndex < 0 || nextIndex >= workoutExercises.length) return;
 
-    const exercises = [...workout.exercises];
+    const exercises = [...workoutExercises];
     const [item] = exercises.splice(index, 1);
     exercises.splice(nextIndex, 0, item);
-    updateWorkout({ ...workout, exercises });
+    updateWorkout({ ...workout, sections: [], exercises });
   };
 
   const setExerciseCount = (value) => {
     const targetCount = Math.max(0, Math.min(30, Number(value) || 0));
-    const exercises = [...workout.exercises];
+    const exercises = [...workoutExercises];
 
     while (exercises.length < targetCount) {
       exercises.push({
@@ -555,7 +556,7 @@ function ExercisesSection({ appData, setAppData, t }) {
       });
     }
 
-    updateWorkout({ ...workout, exercises: exercises.slice(0, targetCount) });
+    updateWorkout({ ...workout, sections: [], exercises: exercises.slice(0, targetCount) });
   };
 
   return (
@@ -565,9 +566,9 @@ function ExercisesSection({ appData, setAppData, t }) {
       <DayPicker selectedDay={day} onSelect={setDay} />
 
       <Field label={t("workoutFocus")} value={workout.focus} onChange={(value) => updateWorkout({ ...workout, focus: value })} />
-      <Field label={t("numberOfExercises")} type="number" value={workout.exercises.length} onChange={setExerciseCount} />
+      <Field label={t("numberOfExercises")} type="number" value={workoutExercises.length} onChange={setExerciseCount} />
 
-      {workout.exercises.map((exercise, index) => (
+      {workoutExercises.map((exercise, index) => (
         <div key={`${exercise.name}-${index}`} style={{ borderTop: "1px solid var(--app-border)", paddingTop: "12px", marginTop: "12px" }}>
           <Field label={t("exercise")} value={exercise.name} onChange={(value) => updateExercise(index, "name", value)} />
           <Field label={t("mediaLink")} value={exercise.mediaUrl || ""} onChange={(value) => updateExercise(index, "mediaUrl", value)} />
@@ -582,7 +583,8 @@ function ExercisesSection({ appData, setAppData, t }) {
               type="button"
               onClick={() => updateWorkout({
                 ...workout,
-                exercises: workout.exercises.filter((_, exerciseIndex) => exerciseIndex !== index)
+                sections: [],
+                exercises: workoutExercises.filter((_, exerciseIndex) => exerciseIndex !== index)
               })}
               style={buttonStyle("danger")}
             >
@@ -606,8 +608,9 @@ function ExercisesSection({ appData, setAppData, t }) {
             if (!newExercise.name.trim()) return;
             updateWorkout({
               ...workout,
+              sections: [],
               exercises: [
-                ...workout.exercises,
+                ...workoutExercises,
                 {
                   ...newExercise,
                   mediaUrl: newExercise.mediaUrl || mediaSearchUrl(newExercise.name)

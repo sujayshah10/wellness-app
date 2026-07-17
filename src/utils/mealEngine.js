@@ -1,6 +1,7 @@
 export function findNextMeals(foodDatabase, selectedDay) {
 
   const days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  const safeFoodDatabase = foodDatabase || {};
 
   // current EST time
   const nowEST = new Date(
@@ -8,9 +9,13 @@ export function findNextMeals(foodDatabase, selectedDay) {
   );
 
   const parseTime = (timeStr) => {
+    if (!timeStr || typeof timeStr !== "string") return null;
 
     const [time, modifier] = timeStr.split(" ");
+    if (!time) return null;
+
     let [hours, minutes] = time.split(":").map(Number);
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
 
     if (modifier === "PM" && hours !== 12) hours += 12;
     if (modifier === "AM" && hours === 12) hours = 0;
@@ -22,24 +27,39 @@ export function findNextMeals(foodDatabase, selectedDay) {
   };
 
   const getMealsForDay = (day) => {
-    const dayData = foodDatabase[day] || {};
+    const dayData = safeFoodDatabase[day] || {};
 
     if (Array.isArray(dayData)) {
-      return dayData.map(meal => ({ ...meal, day }));
+      return dayData.map((meal) => {
+        if (meal && typeof meal === "object") {
+          return { ...meal, meal: meal.meal || meal.name, day };
+        }
+
+        return { name: String(meal || ""), meal: String(meal || ""), time: "", day };
+      });
     }
 
-    return Object.entries(dayData).map(([slot, meal]) => ({
-      ...meal,
-      slot,
-      meal: meal.meal || meal.name,
-      day
-    }));
+    return Object.entries(dayData).map(([slot, meal]) => {
+      if (!meal || typeof meal !== "object") {
+        return { slot, name: String(meal || ""), meal: String(meal || ""), time: "", day };
+      }
+
+      return {
+        ...meal,
+        slot,
+        meal: meal.meal || meal.name,
+        day
+      };
+    });
   };
 
   // attach day to today's meals
   const todayMeals = getMealsForDay(selectedDay);
 
-  let upcomingMeals = todayMeals.filter(meal => parseTime(meal.time) > nowEST);
+  let upcomingMeals = todayMeals.filter((meal) => {
+    const mealTime = parseTime(meal.time);
+    return mealTime ? mealTime > nowEST : false;
+  });
 
   // If today's meals are finished, move to tomorrow.
   if (upcomingMeals.length === 0) {

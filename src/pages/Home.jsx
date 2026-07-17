@@ -15,6 +15,7 @@ export default function Home() {
   const dietData = appData.dietPlan[selectedDay];
   const intakeSlots = (appData.intakeSlots || []).filter((slot) => slot.active !== false);
   const workout = appData.workouts[selectedDay] || { focus: "", exercises: [] };
+  const workoutExercises = Array.isArray(workout.exercises) ? workout.exercises : [];
 
   const totalCalories = dietData
     ? intakeSlots.reduce((total, slot) => total + (Number(dietData[slot.key]?.calories) || 0), 0)
@@ -207,13 +208,13 @@ export default function Home() {
           {workout.focus || t("noWorkoutData")}
         </p>
 
-        {workout.exercises.length === 0 ? (
+        {workoutExercises.length === 0 ? (
           <div className="empty-state compact" style={{ marginTop: "8px" }}>
             <strong>{t("noWorkoutData")}</strong>
           </div>
         ) : (
           <ul>
-            {workout.exercises.slice(0, 4).map((exercise) => (
+            {workoutExercises.slice(0, 4).map((exercise) => (
               <li key={exercise.name}>
                 {exercise.name} - {exercise.sets} x {exercise.reps}
               </li>

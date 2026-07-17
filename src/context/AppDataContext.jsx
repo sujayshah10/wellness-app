@@ -38,12 +38,62 @@ function normalizeDietPlan(dietPlan = {}, intakeSlots = DEFAULT_INTAKE_SLOTS) {
   }, {});
 }
 
+function normalizeExercises(exercises) {
+  return Array.isArray(exercises)
+    ? exercises
+        .filter(Boolean)
+        .map((exercise) => ({
+          name: exercise.name || "",
+          sets: exercise.sets ?? 0,
+          reps: exercise.reps || "",
+          mediaUrl: exercise.mediaUrl || ""
+        }))
+    : [];
+}
+
+function normalizeSections(sections) {
+  return Array.isArray(sections)
+    ? sections
+        .filter(Boolean)
+        .map((section) => ({
+          title: section.title || "",
+          exercises: normalizeExercises(section.exercises)
+        }))
+    : [];
+}
+
+function normalizeWorkout(workout = {}, defaultWorkout = {}) {
+  workout = workout || {};
+  defaultWorkout = defaultWorkout || {};
+  const sourceWorkout = Object.keys(workout).length ? workout : defaultWorkout;
+  const sections = normalizeSections(sourceWorkout.sections);
+  const flatExercises = normalizeExercises(sourceWorkout.exercises);
+  const exercises = flatExercises.length
+    ? flatExercises
+    : sections.flatMap((section) => section.exercises);
+
+  return {
+    focus: sourceWorkout.focus || defaultWorkout.focus || "",
+    sections,
+    exercises
+  };
+}
+
+function normalizeWorkouts(workouts = DEFAULT_APP_DATA.workouts) {
+  return DAYS.reduce((plan, day) => {
+    plan[day] = normalizeWorkout(workouts?.[day], DEFAULT_APP_DATA.workouts[day]);
+    return plan;
+  }, {});
+}
+
 function normalizeAppData(data) {
   const previousVersion = data?.dataVersion;
   const shouldRefreshSeedData = !previousVersion
     || previousVersion === "vadodara-seasonal-eating-v1"
     || previousVersion === "vadodara-intake-full-body-v1";
-  const shouldRefreshWorkouts = previousVersion !== APP_DATA_VERSION;
+  const rawWorkouts = previousVersion !== APP_DATA_VERSION
+    ? DEFAULT_APP_DATA.workouts
+    : data?.workouts || DEFAULT_APP_DATA.workouts;
   const intakeSlots = normalizeIntakeSlots(shouldRefreshSeedData ? DEFAULT_APP_DATA.intakeSlots : data?.intakeSlots || DEFAULT_APP_DATA.intakeSlots);
 
   return {
@@ -54,7 +104,7 @@ function normalizeAppData(data) {
     dietPlan: normalizeDietPlan(shouldRefreshSeedData ? DEFAULT_APP_DATA.dietPlan : data?.dietPlan || DEFAULT_APP_DATA.dietPlan, intakeSlots),
     foodDatabase: shouldRefreshSeedData ? DEFAULT_APP_DATA.foodDatabase : data?.foodDatabase || DEFAULT_APP_DATA.foodDatabase,
     foodLibrary: shouldRefreshSeedData ? DEFAULT_APP_DATA.foodLibrary : data?.foodLibrary || DEFAULT_APP_DATA.foodLibrary,
-    workouts: shouldRefreshWorkouts ? DEFAULT_APP_DATA.workouts : data?.workouts || DEFAULT_APP_DATA.workouts,
+    workouts: normalizeWorkouts(rawWorkouts),
     targets: {
       ...DEFAULT_TARGETS,
       ...(data?.targets || {})
