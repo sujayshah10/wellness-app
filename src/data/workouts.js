@@ -7,44 +7,99 @@ const exercise = (name, sets, reps, query = name) => ({
   mediaUrl: youtube(`${query} proper form`)
 });
 
-const fullBody = (focus, exercises) => ({ focus, exercises });
+const section = (title, exercises) => ({ title, exercises });
+const fullBody = (focus, sections) => ({ focus, sections });
 
 export const WORKOUT_SPLIT = {
-  Mon: fullBody("Full Body A - Small Portions", [
-    exercise("Push-Up Board - Chest", 2, "8-10", "push up board chest"),
-    exercise("Dumbbell Bent-Over Rows - Back", 2, "10-12", "dumbbell bent over row"),
-    exercise("Bodyweight Squats - Legs", 2, "12-15", "bodyweight squat"),
-    exercise("Dumbbell Shoulder Press - Shoulders", 2, "10-12", "dumbbell shoulder press"),
-    exercise("Plank - Core", 2, "25-40 sec", "plank exercise")
+  Mon: fullBody("Full Body A - Push + Pull", [
+    section("warmup", [
+      exercise("Skipping Rope Warmup", 1, "3-5 min", "skipping rope warmup"),
+      exercise("Arm Circles", 2, "15-20 reps", "arm circles"),
+      exercise("Hip Hinges", 2, "10 reps", "hip hinge warmup")
+    ]),
+    section("mainWorkout", [
+      exercise("Pushup Board - Chest Focus", 3, "8-10", "pushup board chest"),
+      exercise("Dumbbell Bent-Over Row", 3, "10-12", "dumbbell bent over row"),
+      exercise("Loaded Bag Squats", 3, "10-12", "weighted bag squats"),
+      exercise("Standing Overhead Press", 3, "10-12", "dumbbell overhead press")
+    ]),
+    section("afterWorkoutStretches", [
+      exercise("Chest Opener Stretch", 2, "30 sec", "chest opener stretch"),
+      exercise("Hamstring Stretch", 2, "30 sec", "hamstring stretch"),
+      exercise("Shoulder Stretch", 2, "30 sec", "shoulder stretch")
+    ])
   ]),
 
-  Tue: fullBody("Full Body B - Small Portions", [
-    exercise("Incline or Narrow Push-Ups - Chest/Triceps", 2, "8-10", "incline narrow push up"),
-    exercise("Rear Delt Fly - Upper Back", 2, "12-15", "rear delt fly"),
-    exercise("Reverse Lunges - Legs", 2, "8-10 each leg", "reverse lunge"),
-    exercise("Bicep Curls - Arms", 2, "10-12", "dumbbell bicep curl"),
-    exercise("Dead Bug - Core", 2, "10 each side", "dead bug exercise")
+  Tue: fullBody("Full Body B - Grip + Lower", [
+    section("warmup", [
+      exercise("Jump Rope Light Pace", 1, "3 min", "light jump rope"),
+      exercise("Wrist Mobility", 2, "15 reps", "wrist mobility exercises"),
+      exercise("Bodyweight Squats", 2, "12 reps", "bodyweight squat warmup")
+    ]),
+    section("mainWorkout", [
+      exercise("Incline Pushup Board", 3, "8-10", "incline pushup board"),
+      exercise("Grip Trainer Holds", 3, "20-30 sec", "grip trainer hold"),
+      exercise("Bag Squats with Plates", 3, "10-12", "weighted bag squats"),
+      exercise("Dumbbell Hammer Curls", 3, "10-12", "dumbbell hammer curl")
+    ]),
+    section("afterWorkoutStretches", [
+      exercise("Quad Stretch", 2, "30 sec", "quad stretch"),
+      exercise("Triceps Stretch", 2, "30 sec", "triceps stretch"),
+      exercise("Calf Stretch", 2, "30 sec", "calf stretch")
+    ])
   ]),
 
-  Wed: fullBody("Rest", []),
-
-  Thu: fullBody("Full Body C - Small Portions", [
-    exercise("Decline Push-Ups - Chest", 2, "6-8", "decline push up"),
-    exercise("One-Arm Dumbbell Row - Back", 2, "10 each side", "one arm dumbbell row"),
-    exercise("Glute Bridges - Glutes", 2, "15-20", "glute bridge"),
-    exercise("Lateral Raises - Shoulders", 2, "12-15", "dumbbell lateral raise"),
-    exercise("Side Plank - Core", 2, "20 sec each side", "side plank")
+  Wed: fullBody("Recovery Day", [
+    section("warmup", [
+      exercise("Gentle Rope Swing", 1, "2-3 min", "gentle jump rope"),
+      exercise("Cat-Cow Stretch", 2, "10 reps", "cat cow stretch")
+    ]),
+    section("mainWorkout", [
+      exercise("Slow Walking Glute Warmup", 1, "5 min", "walking glute warmup"),
+      exercise("Core Stability Hold", 3, "20-30 sec", "core stability hold")
+    ]),
+    section("afterWorkoutStretches", [
+      exercise("Spinal Twist", 2, "30 sec each side", "spinal twist stretch"),
+      exercise("Hip Flexor Stretch", 2, "30 sec each side", "hip flexor stretch")
+    ])
   ]),
 
-  Fri: fullBody("Full Body D - Small Portions", [
-    exercise("Push-Up Board - Mixed Grip", 2, "8-10", "push up board mixed grip"),
-    exercise("Superman Hold - Back/Posture", 2, "25-35 sec", "superman hold"),
-    exercise("Calf Raises - Legs", 2, "18-25", "calf raise"),
-    exercise("Overhead Tricep Extension - Arms", 2, "10-12", "overhead tricep extension"),
-    exercise("Crunches - Core", 2, "15-20", "crunch exercise")
+  Thu: fullBody("Full Body C - Strength + Stability", [
+    section("warmup", [
+      exercise("Skipping Rope", 1, "3-4 min", "skipping rope warmup"),
+      exercise("Shoulder Circles", 2, "15 reps", "shoulder circles"),
+      exercise("Bodyweight Lunges", 2, "8 each leg", "bodyweight lunge warmup")
+    ]),
+    section("mainWorkout", [
+      exercise("Decline Pushups on Pushup Board", 3, "8-10", "decline pushup board"),
+      exercise("One-Arm Dumbbell Row", 3, "10 each side", "one arm dumbbell row"),
+      exercise("Weighted Bag Goblet Squats", 3, "10-12", "weighted bag goblet squat"),
+      exercise("Dumbbell Lateral Raises", 3, "12-15", "dumbbell lateral raise")
+    ]),
+    section("afterWorkoutStretches", [
+      exercise("Lower Back Stretch", 2, "30 sec", "lower back stretch"),
+      exercise("Chest Stretch", 2, "30 sec", "chest stretch")
+    ])
+  ]),
+
+  Fri: fullBody("Full Body D - Endurance + Core", [
+    section("warmup", [
+      exercise("Skipping Rope", 1, "3 min", "skipping rope warmup"),
+      exercise("Wrist Warmup", 2, "15 reps", "wrist warmup"),
+      exercise("Hip Swings", 2, "10 each side", "hip swing warmup")
+    ]),
+    section("mainWorkout", [
+      exercise("Pushup Board Mixed Grip", 3, "8-10", "pushup board mixed grip"),
+      exercise("Dumbbell Goblet Squat", 3, "10-12", "dumbbell goblet squat"),
+      exercise("Standing Plate Hold", 3, "20 sec", "plate hold"),
+      exercise("Plank Variation", 3, "25-35 sec", "plank variation")
+    ]),
+    section("afterWorkoutStretches", [
+      exercise("Hamstring Stretch", 2, "30 sec", "hamstring stretch"),
+      exercise("Shoulder Mobility Stretch", 2, "30 sec", "shoulder mobility stretch")
+    ])
   ]),
 
   Sat: fullBody("Rest", []),
-
   Sun: fullBody("Rest", [])
 };

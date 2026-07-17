@@ -17,8 +17,8 @@ export default function Workout() {
     "Pushup Board",
     "Skipping Rope",
     "60 kg Grip Trainer",
-    "2 kg Dumbbells × 4",
-    "3 kg Dumbbells × 4",
+    "2 kg Dumbbells x 4",
+    "3 kg Dumbbells x 4",
     "Weighted squat bag plates"
   ];
 
@@ -94,7 +94,7 @@ export default function Workout() {
         rel="noreferrer"
         className="media-link"
       >
-        ▶ {t("watchForm")}
+        Play {t("watchForm")}
       </a>
     </div>
   );
@@ -121,7 +121,7 @@ export default function Workout() {
       <div style={{ marginBottom: "18px" }}>
         <h4 style={{ color: "var(--app-primary)", marginBottom: "8px" }}>{t("strengthRecoveryTracker")}</h4>
         <div style={{ color: "var(--app-muted)", marginBottom: "10px" }}>
-          {completedCount} / {trackerSteps.length} {t("stepsComplete")}
+          {completedCount} / {trackerSteps.length} {t("stepsCompleted")}
         </div>
         <div style={{ display: "grid", gap: "10px" }}>
           {trackerSteps.map(({ key, label }) => (
@@ -142,7 +142,7 @@ export default function Workout() {
             >
               <strong>{label}</strong>
               <div style={{ marginTop: "6px", color: "var(--app-muted)" }}>
-                {currentTracker[key] ? t("completed") : t("markComplete")}
+                {currentTracker[key] ? t("completed") : t("markAsComplete")}
               </div>
             </button>
           ))}
