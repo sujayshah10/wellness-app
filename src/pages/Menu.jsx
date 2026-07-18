@@ -221,9 +221,75 @@ function NumberStepper({ label, value, onChange, disabled = false, step = 1, min
   );
 }
 
-function toggleTag(list, tag) {
-  const current = Array.isArray(list) ? list : [];
-  return current.includes(tag) ? current.filter((item) => item !== tag) : [...current, tag];
+function SearchSelectBar({ label, options, selected, onChange, disabled = false, inputId }) {
+  const [query, setQuery] = useState("");
+  const selectedItems = Array.isArray(selected) ? selected : [];
+  const visibleOptions = options.filter((item) =>
+    item.toLowerCase().includes(query.trim().toLowerCase())
+    && !selectedItems.includes(item)
+  );
+
+  const addItem = (item) => {
+    const cleanItem = item.trim();
+    if (!cleanItem || selectedItems.includes(cleanItem)) return;
+    onChange([...selectedItems, cleanItem]);
+    setQuery("");
+  };
+
+  const removeItem = (item) => {
+    onChange(selectedItems.filter((selectedItem) => selectedItem !== item));
+  };
+
+  return (
+    <div style={{ marginBottom: "14px" }}>
+      <strong style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>{label}</strong>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "8px", marginBottom: "10px" }}>
+        <input
+          disabled={disabled}
+          list={inputId}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              addItem(query);
+            }
+          }}
+          placeholder="Search Or Type"
+          style={fieldStyle()}
+        />
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => addItem(query || visibleOptions[0] || "")}
+          style={buttonStyle("soft")}
+        >
+          Add
+        </button>
+      </div>
+      <datalist id={inputId}>
+        {visibleOptions.map((item) => <option key={item} value={item} />)}
+      </datalist>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+        {selectedItems.map((item) => (
+          <button
+            key={item}
+            type="button"
+            disabled={disabled}
+            onClick={() => removeItem(item)}
+            style={{
+              ...segmentedStyle(true),
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px"
+            }}
+          >
+            {item} <span aria-hidden="true">x</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function DayPicker({ selectedDay, onSelect }) {
@@ -901,7 +967,7 @@ function ProfileSection({ appData, setAppData, t }) {
           </select>
         </label>
 
-        <NumberStepper label={t("calorieDeficit")} type="number" value={draft.deficitTarget || 0} disabled={!isEditing} step={50} min={0} onChange={(value) => updateDraft("deficitTarget", value)} />
+        <NumberStepper label={t("calorieDeficit")} type="number" value={draft.deficitTarget || 0} disabled={!isEditing} step={50} min={-2000} onChange={(value) => updateDraft("deficitTarget", value)} />
       </div>
 
       <div style={cardStyle()}>
@@ -911,47 +977,25 @@ function ProfileSection({ appData, setAppData, t }) {
           <label><input disabled={!isEditing} type="checkbox" checked={!!draft.bloodPressure} onChange={(event) => updateDraft("bloodPressure", event.target.checked)} /> {t("bpCondition")}</label>
         </div>
 
-        <div style={{ marginBottom: "14px" }}>
-          <strong style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>{t("foodAvoidances")}</strong>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {FOOD_AVOIDANCE_OPTIONS.map((item) => {
-              const active = (draft.foodAvoidanceTags || []).includes(item);
-              return (
-                <button
-                  key={item}
-                  type="button"
-                  disabled={!isEditing}
-                  onClick={() => updateDraft("foodAvoidanceTags", toggleTag(draft.foodAvoidanceTags, item))}
-                  style={segmentedStyle(active)}
-                >
-                  {item}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <SearchSelectBar
+          label={t("foodAvoidances")}
+          options={FOOD_AVOIDANCE_OPTIONS}
+          selected={draft.foodAvoidanceTags}
+          disabled={!isEditing}
+          inputId="food-avoidance-search"
+          onChange={(items) => updateDraft("foodAvoidanceTags", items)}
+        />
 
         <Field label={t("otherFoodAvoidances")} textarea value={draft.foodAvoidances || ""} disabled={!isEditing} onChange={(value) => updateDraft("foodAvoidances", value)} />
 
-        <div style={{ marginBottom: "14px" }}>
-          <strong style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>{t("workoutLimitations")}</strong>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {WORKOUT_LIMITATION_OPTIONS.map((item) => {
-              const active = (draft.workoutLimitationTags || []).includes(item);
-              return (
-                <button
-                  key={item}
-                  type="button"
-                  disabled={!isEditing}
-                  onClick={() => updateDraft("workoutLimitationTags", toggleTag(draft.workoutLimitationTags, item))}
-                  style={segmentedStyle(active)}
-                >
-                  {item}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <SearchSelectBar
+          label={t("workoutLimitations")}
+          options={WORKOUT_LIMITATION_OPTIONS}
+          selected={draft.workoutLimitationTags}
+          disabled={!isEditing}
+          inputId="workout-limitation-search"
+          onChange={(items) => updateDraft("workoutLimitationTags", items)}
+        />
 
         <Field label={t("otherWorkoutLimitations")} textarea value={draft.workoutLimitations || ""} disabled={!isEditing} onChange={(value) => updateDraft("workoutLimitations", value)} />
       </div>
