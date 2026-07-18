@@ -110,7 +110,7 @@ export default function Home() {
           borderRadius:"14px",
           textAlign:"center"
         }}>
-          <h2 style={{margin:0}}>~{deficit}</h2>
+          <h2 style={{margin:0}}>{deficit > 0 ? `+${deficit}` : deficit}</h2>
           <p style={{margin:0,fontSize:"13px"}}>{t("deficit")}</p>
         </div>
 
