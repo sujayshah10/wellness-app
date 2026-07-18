@@ -22,7 +22,7 @@ export const DEFAULT_TARGETS = {
 
 export const DEFAULT_PROFILE = {
   name: "",
-  age: 30,
+  birthDate: "",
   gender: "male",
   heightCm: 175,
   heightUnit: "cm",
@@ -33,6 +33,8 @@ export const DEFAULT_PROFILE = {
   deficitTarget: 400,
   sugar: false,
   bloodPressure: false,
+  foodAvoidanceTags: [],
+  workoutLimitationTags: [],
   foodAvoidances: "",
   workoutLimitations: ""
 };

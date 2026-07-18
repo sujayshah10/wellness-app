@@ -2,7 +2,8 @@ const activityMultipliers = {
   sedentary: 1.2,
   light: 1.375,
   moderate: 1.55,
-  active: 1.725
+  active: 1.725,
+  veryActive: 1.9
 };
 
 export function poundsToKg(value) {
@@ -29,8 +30,28 @@ function roundToNearest(value, step = 10) {
   return Math.round(value / step) * step;
 }
 
+export function ageFromBirthDate(birthDate) {
+  if (!birthDate) return 0;
+  const date = new Date(birthDate);
+  if (Number.isNaN(date.getTime())) return 0;
+
+  const today = new Date();
+  let age = today.getFullYear() - date.getFullYear();
+  const hasBirthdayPassed =
+    today.getMonth() > date.getMonth()
+    || (today.getMonth() === date.getMonth() && today.getDate() >= date.getDate());
+
+  return hasBirthdayPassed ? age : age - 1;
+}
+
+function genderBmrOffset(gender) {
+  if (gender === "female") return -161;
+  if (gender === "male") return 5;
+  return -78;
+}
+
 export function calculateBodyMetrics(profile = {}, targets = {}) {
-  const age = Number(profile.age) || 0;
+  const age = ageFromBirthDate(profile.birthDate) || Number(profile.age) || 0;
   const heightCm = Number(profile.heightCm) || 0;
   const weightKg = Number(profile.weightKg) || 0;
   const gender = profile.gender || "male";
@@ -38,7 +59,7 @@ export function calculateBodyMetrics(profile = {}, targets = {}) {
   const deficitTarget = Number(profile.deficitTarget) || 400;
 
   const hasRequiredData = age > 0 && heightCm > 0 && weightKg > 0;
-  const genderOffset = gender === "female" ? -161 : 5;
+  const genderOffset = genderBmrOffset(gender);
   const bmr = hasRequiredData
     ? roundToNearest((10 * weightKg) + (6.25 * heightCm) - (5 * age) + genderOffset)
     : 0;
@@ -54,6 +75,7 @@ export function calculateBodyMetrics(profile = {}, targets = {}) {
   return {
     bmr,
     tdee,
+    age,
     calorieTarget,
     autoCalories,
     proteinTarget,

@@ -32,6 +32,47 @@ const emptyExercise = {
   mediaUrl: ""
 };
 
+const GENDER_OPTIONS = [
+  { key: "male", labelKey: "male" },
+  { key: "female", labelKey: "female" },
+  { key: "nonBinary", labelKey: "nonBinary" },
+  { key: "preferNotToSay", labelKey: "preferNotToSay" }
+];
+
+const ACTIVITY_OPTIONS = [
+  { key: "sedentary", labelKey: "sedentary" },
+  { key: "light", labelKey: "lightActivity" },
+  { key: "moderate", labelKey: "moderateActivity" },
+  { key: "active", labelKey: "active" },
+  { key: "veryActive", labelKey: "veryActive" }
+];
+
+const FOOD_AVOIDANCE_OPTIONS = [
+  "Dairy",
+  "Gluten",
+  "Peanuts",
+  "Tree Nuts",
+  "Soy",
+  "Eggs",
+  "High Sugar",
+  "Fried Food",
+  "Spicy Food",
+  "Late Caffeine"
+];
+
+const WORKOUT_LIMITATION_OPTIONS = [
+  "Back Issue",
+  "Cervical Issue",
+  "Knee Pain",
+  "Shoulder Pain",
+  "Wrist Pain",
+  "High Impact",
+  "Heavy Lifting",
+  "Overhead Press",
+  "Deep Squats",
+  "Jumping"
+];
+
 function mediaSearchUrl(name) {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${name} proper form`)}`;
 }
@@ -143,6 +184,46 @@ function segmentedStyle(active) {
     padding: "9px 12px",
     minWidth: "58px"
   };
+}
+
+function numberStepperStyle() {
+  return {
+    display: "grid",
+    gridTemplateColumns: "42px 1fr 42px",
+    alignItems: "center",
+    gap: "8px"
+  };
+}
+
+function stepperButtonStyle() {
+  return {
+    ...buttonStyle("soft"),
+    height: "42px",
+    padding: 0,
+    fontSize: "20px",
+    lineHeight: 1
+  };
+}
+
+function NumberStepper({ label, value, onChange, disabled = false, step = 1, min = 0 }) {
+  const nextValue = Number(value) || 0;
+  const update = (amount) => onChange(Math.max(min, nextValue + amount));
+
+  return (
+    <label style={{ display: "block", marginBottom: "12px", fontSize: "14px", color: "var(--app-text)" }}>
+      <span style={{ display: "block", marginBottom: "6px", fontWeight: 550 }}>{label}</span>
+      <div style={numberStepperStyle()}>
+        <button type="button" disabled={disabled} onClick={() => update(-step)} style={stepperButtonStyle()}>-</button>
+        <input disabled={disabled} type="number" value={nextValue} onChange={(event) => onChange(Math.max(min, Number(event.target.value) || 0))} style={{ ...fieldStyle(), textAlign: "center", fontWeight: 700 }} />
+        <button type="button" disabled={disabled} onClick={() => update(step)} style={stepperButtonStyle()}>+</button>
+      </div>
+    </label>
+  );
+}
+
+function toggleTag(list, tag) {
+  const current = Array.isArray(list) ? list : [];
+  return current.includes(tag) ? current.filter((item) => item !== tag) : [...current, tag];
 }
 
 function DayPicker({ selectedDay, onSelect }) {
@@ -775,12 +856,13 @@ function ProfileSection({ appData, setAppData, t }) {
 
         <Field label={t("yourName")} value={draft.name || ""} disabled={!isEditing} onChange={(value) => updateDraft("name", value)} />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-          <Field label={t("age")} type="number" value={draft.age || 0} disabled={!isEditing} onChange={(value) => updateDraft("age", value)} />
+          <Field label={t("birthDate")} type="date" value={draft.birthDate || ""} disabled={!isEditing} onChange={(value) => updateDraft("birthDate", value)} />
           <label style={{ display: "block", marginBottom: "12px", fontSize: "14px", color: "var(--app-text)" }}>
             <span style={{ display: "block", marginBottom: "6px", fontWeight: 550 }}>{t("gender")}</span>
             <select disabled={!isEditing} value={draft.gender || "male"} onChange={(event) => updateDraft("gender", event.target.value)} style={fieldStyle()}>
-              <option value="male">{t("male")}</option>
-              <option value="female">{t("female")}</option>
+              {GENDER_OPTIONS.map((item) => (
+                <option key={item.key} value={item.key}>{t(item.labelKey)}</option>
+              ))}
             </select>
           </label>
         </div>
@@ -791,7 +873,7 @@ function ProfileSection({ appData, setAppData, t }) {
             <button type="button" disabled={!isEditing} onClick={() => updateDraft("weightUnit", "kg")} style={segmentedStyle(draft.weightUnit !== "lb")}>Kg</button>
             <button type="button" disabled={!isEditing} onClick={() => updateDraft("weightUnit", "lb")} style={segmentedStyle(draft.weightUnit === "lb")}>Lb</button>
           </div>
-          <input disabled={!isEditing} type="number" value={displayedWeight} onChange={(event) => updateWeight(Number(event.target.value))} style={fieldStyle()} />
+          <NumberStepper disabled={!isEditing} label={draft.weightUnit === "lb" ? "Lb" : "Kg"} value={displayedWeight} min={1} onChange={updateWeight} />
         </div>
 
         <div style={{ marginBottom: "12px" }}>
@@ -802,25 +884,24 @@ function ProfileSection({ appData, setAppData, t }) {
           </div>
           {draft.heightUnit === "ft" ? (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-              <Field label={t("feet")} type="number" value={heightFtIn.feet} disabled={!isEditing} onChange={updateHeightFeet} />
-              <Field label={t("inches")} type="number" value={heightFtIn.inches} disabled={!isEditing} onChange={updateHeightInches} />
+              <NumberStepper label={t("feet")} value={heightFtIn.feet} disabled={!isEditing} min={1} onChange={updateHeightFeet} />
+              <NumberStepper label={t("inches")} value={heightFtIn.inches} disabled={!isEditing} min={0} onChange={updateHeightInches} />
             </div>
           ) : (
-            <input disabled={!isEditing} type="number" value={Math.round(draft.heightCm || 0)} onChange={(event) => updateDraft("heightCm", Number(event.target.value))} style={fieldStyle()} />
+            <NumberStepper disabled={!isEditing} label="Cm" value={Math.round(draft.heightCm || 0)} min={1} onChange={(value) => updateDraft("heightCm", value)} />
           )}
         </div>
 
         <label style={{ display: "block", marginBottom: "12px", fontWeight: 600 }}>
           {t("activityLevel")}
           <select disabled={!isEditing} value={draft.activityLevel || "light"} onChange={(event) => updateDraft("activityLevel", event.target.value)} style={{ ...fieldStyle(), marginTop: "6px" }}>
-            <option value="sedentary">{t("sedentary")}</option>
-            <option value="light">{t("lightActivity")}</option>
-            <option value="moderate">{t("moderateActivity")}</option>
-            <option value="active">{t("active")}</option>
+            {ACTIVITY_OPTIONS.map((item) => (
+              <option key={item.key} value={item.key}>{t(item.labelKey)}</option>
+            ))}
           </select>
         </label>
 
-        <Field label={t("calorieDeficit")} type="number" value={draft.deficitTarget || 0} disabled={!isEditing} onChange={(value) => updateDraft("deficitTarget", value)} />
+        <NumberStepper label={t("calorieDeficit")} type="number" value={draft.deficitTarget || 0} disabled={!isEditing} step={50} min={0} onChange={(value) => updateDraft("deficitTarget", value)} />
       </div>
 
       <div style={cardStyle()}>
@@ -829,8 +910,50 @@ function ProfileSection({ appData, setAppData, t }) {
           <label><input disabled={!isEditing} type="checkbox" checked={!!draft.sugar} onChange={(event) => updateDraft("sugar", event.target.checked)} /> {t("sugarCondition")}</label>
           <label><input disabled={!isEditing} type="checkbox" checked={!!draft.bloodPressure} onChange={(event) => updateDraft("bloodPressure", event.target.checked)} /> {t("bpCondition")}</label>
         </div>
-        <Field label={t("foodAvoidances")} textarea value={draft.foodAvoidances || ""} disabled={!isEditing} onChange={(value) => updateDraft("foodAvoidances", value)} />
-        <Field label={t("workoutLimitations")} textarea value={draft.workoutLimitations || ""} disabled={!isEditing} onChange={(value) => updateDraft("workoutLimitations", value)} />
+
+        <div style={{ marginBottom: "14px" }}>
+          <strong style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>{t("foodAvoidances")}</strong>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            {FOOD_AVOIDANCE_OPTIONS.map((item) => {
+              const active = (draft.foodAvoidanceTags || []).includes(item);
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  disabled={!isEditing}
+                  onClick={() => updateDraft("foodAvoidanceTags", toggleTag(draft.foodAvoidanceTags, item))}
+                  style={segmentedStyle(active)}
+                >
+                  {item}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <Field label={t("otherFoodAvoidances")} textarea value={draft.foodAvoidances || ""} disabled={!isEditing} onChange={(value) => updateDraft("foodAvoidances", value)} />
+
+        <div style={{ marginBottom: "14px" }}>
+          <strong style={{ display: "block", marginBottom: "8px", fontWeight: 600 }}>{t("workoutLimitations")}</strong>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            {WORKOUT_LIMITATION_OPTIONS.map((item) => {
+              const active = (draft.workoutLimitationTags || []).includes(item);
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  disabled={!isEditing}
+                  onClick={() => updateDraft("workoutLimitationTags", toggleTag(draft.workoutLimitationTags, item))}
+                  style={segmentedStyle(active)}
+                >
+                  {item}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <Field label={t("otherWorkoutLimitations")} textarea value={draft.workoutLimitations || ""} disabled={!isEditing} onChange={(value) => updateDraft("workoutLimitations", value)} />
       </div>
     </div>
   );
