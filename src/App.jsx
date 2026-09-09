@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Menu from "./pages/Menu";
 import Workout from "./pages/Workout";
 import Nutrition from "./pages/Nutrition";
+import OnboardingWizard from "./components/OnboardingWizard";
 import { useAppData } from "./context/useAppData";
 import { useTranslation } from "./utils/useTranslation";
 
@@ -24,14 +25,23 @@ function NavIcon({ name, active }) {
 
 function App() {
   const { t } = useTranslation();
-  const { appData } = useAppData();
+  const { appData, isFirstTime } = useAppData();
   const [loading, setLoading] = useState(true);
   const [online, setOnline] = useState(() => navigator.onLine !== false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setLoading(false), 800);
     return () => window.clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!loading && isFirstTime && !appData.settings?.onboardingCompleted) {
+      setShowOnboarding(true);
+    } else {
+      setShowOnboarding(false);
+    }
+  }, [loading, isFirstTime, appData.settings?.onboardingCompleted]);
 
   useEffect(() => {
     const updateStatus = () => setOnline(window.navigator.onLine !== false);
@@ -56,20 +66,25 @@ function App() {
 
       {!online && <div className="offline-pill">{t("offlineReady")}</div>}
 
-      <div style={{ paddingBottom: "82px" }}>
-        <div style={{ padding: "18px 18px 0" }}>
-          <div className="app-version-pill">v{appData.about.version}</div>
+      {showOnboarding ? (
+        <OnboardingWizard />
+      ) : (
+        <div style={{ paddingBottom: "82px" }}>
+          <div style={{ padding: "18px 18px 0" }}>
+            <div className="app-version-pill">v{appData.about.version}</div>
+          </div>
+
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/menu" element={<Menu />} />
+            <Route path="/workout" element={<Workout />} />
+            <Route path="/nutrition" element={<Nutrition />} />
+          </Routes>
         </div>
+      )}
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/menu" element={<Menu />} />
-          <Route path="/workout" element={<Workout />} />
-          <Route path="/nutrition" element={<Nutrition />} />
-        </Routes>
-      </div>
-
-      <nav className="bottom-nav">
+      {!showOnboarding && (
+        <nav className="bottom-nav">
         <NavLink to="/workout" className={({ isActive }) => `bottom-nav__item${isActive ? " active" : ""}`}>
           {({ isActive }) => (
             <>
@@ -97,6 +112,7 @@ function App() {
           )}
         </NavLink>
       </nav>
+      )}
     </div>
   );
 }

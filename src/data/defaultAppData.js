@@ -40,7 +40,7 @@ export const DEFAULT_PROFILE = {
 };
 
 export const DEFAULT_ABOUT = {
-  version: "0.4.1",
+  version: "0.5.0",
   ownerName: "Sujay Shah",
   tagline: "Three daily meals, seasonal food, and full-body training."
 };
@@ -48,6 +48,8 @@ export const DEFAULT_ABOUT = {
 export const DEFAULT_SETTINGS = {
   language: "en",
   timezoneDisplay: "both",
+  onboardingCompleted: false,
+  onboardingCompletedAt: null,
   theme: "light"
 };
 
