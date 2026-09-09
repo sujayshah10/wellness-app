@@ -7,13 +7,13 @@ import { titleCase } from "../utils/textCase";
 import { calculateBodyMetrics, cmToFeetInches, feetInchesToCm, kgToPounds, poundsToKg } from "../utils/healthCalculator";
 
 const SECTIONS = [
-  { key: "Intakes", labelKey: "intakes", descriptionKey: "descIntakes", icon: "utensils" },
-  { key: "Exercises", labelKey: "exercises", descriptionKey: "descExercises", icon: "activity" },
-  { key: "Profile", labelKey: "profile", descriptionKey: "descProfile", icon: "user" },
-  { key: "Targets", labelKey: "targets", descriptionKey: "descTargets", icon: "target" },
-  { key: "Settings", labelKey: "settings", descriptionKey: "descSettings", icon: "settings" },
-  { key: "App Data", labelKey: "appData", descriptionKey: "descAppData", icon: "database" },
-  { key: "About", labelKey: "about", descriptionKey: "descAbout", icon: "info" }
+  { key: "Profile", labelKey: "profile", descriptionKey: "descProfile", icon: "user", priority: "high" },
+  { key: "Targets", labelKey: "targets", descriptionKey: "descTargets", icon: "target", priority: "high" },
+  { key: "Intakes", labelKey: "intakes", descriptionKey: "descIntakes", icon: "utensils", priority: "medium" },
+  { key: "Exercises", labelKey: "exercises", descriptionKey: "descExercises", icon: "activity", priority: "medium" },
+  { key: "Settings", labelKey: "settings", descriptionKey: "descSettings", icon: "settings", priority: "low" },
+  { key: "App Data", labelKey: "appData", descriptionKey: "descAppData", icon: "database", priority: "low" },
+  { key: "About", labelKey: "about", descriptionKey: "descAbout", icon: "info", priority: "low" }
 ];
 
 const emptyMeal = {
@@ -645,7 +645,7 @@ function IntakesSection({ appData, setAppData, t }) {
 
       <div style={cardStyle()}>
         <h3 style={{ marginTop: 0 }}>{day} {t("intakes")}</h3>
-        {visibleIntakes.length === 0 && <div className="empty-state compact"><strong>{t("noActiveIntakes")}</strong><span>{t("addIntakesFromMenu")}</span></div>}
+        {visibleIntakes.length === 0 && <div className="empty-state compact"><strong>{t("noActiveIntakes")}</strong></div>}
         {visibleIntakes.map((item) => (
           <button
             type="button"
@@ -1135,7 +1135,7 @@ function AboutSection({ appData, setAppData, t }) {
   );
 }
 
-function MenuList({ onOpen, t }) {
+function MenuList({ onOpen, t, isFirstTime }) {
   return (
     <div style={{ display: "grid", gap: "12px" }}>
       {SECTIONS.map((item) => (
@@ -1146,15 +1146,32 @@ function MenuList({ onOpen, t }) {
           style={{
             ...cardStyle(),
             width: "100%",
-            border: 0,
+            border: item.priority === "high" && isFirstTime ? "2px solid var(--app-primary)" : 0,
             textAlign: "left",
             cursor: "pointer",
             display: "grid",
             gridTemplateColumns: "40px 1fr auto",
             alignItems: "center",
-            gap: "12px"
+            gap: "12px",
+            position: "relative"
           }}
         >
+          {item.priority === "high" && isFirstTime && (
+            <div style={{
+              position: "absolute",
+              top: "-8px",
+              right: "-8px",
+              background: "#FF6B6B",
+              color: "white",
+              fontSize: "10px",
+              fontWeight: "bold",
+              padding: "2px 6px",
+              borderRadius: "10px",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+            }}>
+              START HERE
+            </div>
+          )}
           <span className="menu-icon-shell"><Icon name={item.icon} /></span>
           <span>
             <strong style={{ display: "block", fontSize: "17px", marginBottom: "4px", fontWeight: 650 }}>{t(item.labelKey)}</strong>
@@ -1169,7 +1186,7 @@ function MenuList({ onOpen, t }) {
 
 export default function Menu() {
   const [section, setSection] = useState(null);
-  const { appData, setAppData, resetAppData } = useAppData();
+  const { appData, setAppData, resetAppData, isFirstTime } = useAppData();
   const { t } = useTranslation();
   const currentSection = SECTIONS.find((item) => item.key === section);
 
@@ -1190,7 +1207,7 @@ export default function Menu() {
         )}
       </div>
 
-      {!section && <MenuList onOpen={setSection} t={t} />}
+      {!section && <MenuList onOpen={setSection} t={t} isFirstTime={isFirstTime} />}
       {section === "Intakes" && <IntakesSection appData={appData} setAppData={setAppData} t={t} />}
       {section === "Exercises" && <ExercisesSection appData={appData} setAppData={setAppData} t={t} />}
       {section === "Profile" && <ProfileSection appData={appData} setAppData={setAppData} t={t} />}

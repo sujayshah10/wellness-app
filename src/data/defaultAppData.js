@@ -8,9 +8,9 @@ export const APP_DATA_VERSION = "polished-configurable-wellness-v4";
 export const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export const DEFAULT_INTAKE_SLOTS = [
-  { key: "intake1", label: "Intake 1", time: "4:30 PM", active: true },
-  { key: "intake2", label: "Intake 2", time: "6:30 PM", active: true },
-  { key: "intake3", label: "Intake 3", time: "4:00 AM", active: true }
+  { key: "intake1", label: "Meal 1", time: "4:30 PM", active: true },
+  { key: "intake2", label: "Meal 2", time: "6:30 PM", active: true },
+  { key: "intake3", label: "Meal 3", time: "4:00 AM", active: true }
 ];
 
 export const DEFAULT_TARGETS = {
@@ -40,9 +40,9 @@ export const DEFAULT_PROFILE = {
 };
 
 export const DEFAULT_ABOUT = {
-  version: "0.4.0",
+  version: "0.4.1",
   ownerName: "Sujay Shah",
-  tagline: "Three daily intakes, seasonal food, and full-body training."
+  tagline: "Three daily meals, seasonal food, and full-body training."
 };
 
 export const DEFAULT_SETTINGS = {

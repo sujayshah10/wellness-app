@@ -13,7 +13,7 @@ function normalizeIntakeSlots(slots = DEFAULT_INTAKE_SLOTS) {
     .filter((slot) => slot?.key)
     .map((slot, index) => ({
       key: slot.key,
-      label: slot.label || `Intake ${index + 1}`,
+      label: slot.label || `Meal ${index + 1}`,
       time: slot.time || "",
       active: slot.active !== false
     }));
@@ -125,6 +125,14 @@ function normalizeAppData(data) {
   };
 }
 
+function isFirstTimeUser(profile) {
+  return !profile || 
+    !profile.name || 
+    (profile.heightCm === DEFAULT_PROFILE.heightCm && 
+     profile.weightKg === DEFAULT_PROFILE.weightKg &&
+     profile.activityLevel === DEFAULT_PROFILE.activityLevel);
+}
+
 function loadAppData() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -158,11 +166,14 @@ export function AppDataProvider({ children }) {
     setAppDataState(next);
   };
 
+  const isFirstTime = isFirstTimeUser(appData.profile);
+
   const value = useMemo(() => ({
     appData,
     setAppData,
-    resetAppData
-  }), [appData]);
+    resetAppData,
+    isFirstTime
+  }), [appData, isFirstTime]);
 
   return (
     <AppDataContext.Provider value={value}>

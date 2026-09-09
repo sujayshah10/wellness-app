@@ -4,6 +4,7 @@ import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
 import { useTranslation } from "../utils/useTranslation";
 import { titleCase } from "../utils/textCase";
+import { shouldShowExercise } from "../utils/recommendationFilter";
 
 export default function Workout() {
 
@@ -15,6 +16,20 @@ export default function Workout() {
     appData.workouts[selectedDay] || { focus: "", sections: [], exercises: [] };
   const workoutSections = Array.isArray(workout.sections) ? workout.sections : [];
   const workoutExercises = Array.isArray(workout.exercises) ? workout.exercises : [];
+  const profile = appData.profile || {};
+  const workoutLimitations = profile.workoutLimitationTags || [];
+  const otherWorkoutLimitations = profile.workoutLimitations || "";
+
+  const filteredWorkoutSections = workoutSections.map(section => ({
+    ...section,
+    exercises: (section.exercises || []).filter(ex => 
+      shouldShowExercise(ex, workoutLimitations, otherWorkoutLimitations)
+    )
+  }));
+
+  const filteredWorkoutExercises = workoutExercises.filter(ex =>
+    shouldShowExercise(ex, workoutLimitations, otherWorkoutLimitations)
+  );
 
   const equipmentList = [
     "Pushup Board",
@@ -197,8 +212,8 @@ export default function Workout() {
         </div>
       )}
 
-      {workoutSections.length > 0 ? (
-        workoutSections.map((section, sectionIndex) => (
+      {filteredWorkoutSections.length > 0 ? (
+        filteredWorkoutSections.map((section, sectionIndex) => (
           <div key={sectionIndex} style={{ marginBottom: "22px" }}>
             <h4 style={{ color: "var(--app-primary)", marginBottom: "10px" }}>
               {t(section.title)}
@@ -206,13 +221,13 @@ export default function Workout() {
             {(Array.isArray(section.exercises) ? section.exercises : []).map(renderExercise)}
           </div>
         ))
-      ) : workoutExercises.length === 0 ? (
+      ) : filteredWorkoutExercises.length === 0 ? (
         <div className="empty-state">
           <strong>{t("restDay")}</strong>
           <span>{t("noWorkoutData")}</span>
         </div>
       ) : (
-        workoutExercises.map(renderExercise)
+        filteredWorkoutExercises.map(renderExercise)
       )}
 
     </div>

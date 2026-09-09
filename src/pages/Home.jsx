@@ -3,6 +3,7 @@ import { useDay } from "../context/useDay";
 import { useAppData } from "../context/useAppData";
 import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
+import SetupPrompt from "../components/SetupPrompt";
 import { findNextMeals } from "../utils/mealEngine";
 import { useTranslation } from "../utils/useTranslation";
 import { titleCase } from "../utils/textCase";
@@ -11,7 +12,7 @@ import { calculateBodyMetrics } from "../utils/healthCalculator";
 export default function Home() {
 
   const { selectedDay, setSelectedDay } = useDay();
-  const { appData } = useAppData();
+  const { appData, isFirstTime } = useAppData();
   const { t, dayName } = useTranslation();
 
   const dietData = appData.dietPlan[selectedDay];
@@ -65,6 +66,9 @@ export default function Home() {
       </div>
 
       <TimeHeader />
+
+      {/* Setup Prompt for First-Time Users */}
+      {isFirstTime && <SetupPrompt />}
 
       {/* Day Selector */}
 
@@ -135,7 +139,6 @@ export default function Home() {
         {nextMeals.length === 0 ? (
           <div className="empty-state compact">
             <strong>{t("noMealData")}</strong>
-            <span>Open Menu → Intakes to add your next meals.</span>
           </div>
         ) : nextMeals.map((meal,index)=>(
 

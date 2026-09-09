@@ -5,6 +5,7 @@ import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
 import { useTranslation } from "../utils/useTranslation";
 import { titleCase } from "../utils/textCase";
+import { shouldShowMeal } from "../utils/recommendationFilter";
 
 export default function Nutrition() {
 
@@ -15,6 +16,9 @@ export default function Nutrition() {
 
   const dietData = appData.dietPlan[selectedDay];
   const intakeSlots = (appData.intakeSlots || []).filter((slot) => slot.active !== false);
+  const profile = appData.profile || {};
+  const foodAvoidances = profile.foodAvoidanceTags || [];
+  const otherFoodAvoidances = profile.foodAvoidances || "";
 
   return (
     <div className="page">
@@ -36,7 +40,6 @@ export default function Nutrition() {
           {intakeSlots.length === 0 && (
             <div className="empty-state">
               <strong>{t("noActiveIntakes")}</strong>
-              <span>{t("addIntakesFromMenu")}</span>
             </div>
           )}
 
@@ -45,6 +48,9 @@ export default function Nutrition() {
             if (!meal) return null;
 
             const completed = isMealCompleted(selectedDay, mealType.key);
+            const isHidden = !shouldShowMeal(meal, foodAvoidances, otherFoodAvoidances);
+
+            if (isHidden) return null;
 
             return (
               <div
