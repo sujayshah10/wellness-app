@@ -2,6 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { AppDataContext } from "./app-data-context";
 import { APP_DATA_VERSION, DEFAULT_APP_DATA, DEFAULT_ABOUT, DEFAULT_INTAKE_SLOTS, DEFAULT_PROFILE, DEFAULT_SETTINGS, DEFAULT_TARGETS, DAYS } from "../data/defaultAppData";
 
+const DEFAULT_COMPLETION_TRACKER = {};
+const DEFAULT_STREAK_DATA = {
+  currentStreak: 0,
+  longestStreak: 0,
+  lastCompletedDate: null,
+  streakHistory: []
+};
+
 const STORAGE_KEY = "wellnessAppData";
 
 function clone(value) {
@@ -121,7 +129,9 @@ function normalizeAppData(data) {
       ...DEFAULT_SETTINGS,
       ...(data?.settings || {}),
       timezoneDisplay: data?.settings?.timezoneDisplay || data?.about?.timezoneDisplay || DEFAULT_SETTINGS.timezoneDisplay
-    }
+    },
+    completionTracker: data?.completionTracker || DEFAULT_COMPLETION_TRACKER,
+    streakData: data?.streakData || DEFAULT_STREAK_DATA
   };
 }
 
@@ -131,6 +141,64 @@ function isFirstTimeUser(profile) {
     (profile.heightCm === DEFAULT_PROFILE.heightCm && 
      profile.weightKg === DEFAULT_PROFILE.weightKg &&
      profile.activityLevel === DEFAULT_PROFILE.activityLevel);
+}
+
+function getTodayKey() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function calculateDailyCompletion(completionData, intakeSlots, hasWorkout) {
+  if (!completionData) return 0;
+  
+  const mealsCompleted = completionData.mealsCompleted?.length || 0;
+  const totalMeals = intakeSlots.filter(slot => slot.active !== false).length;
+  const mealCompletion = totalMeals > 0 ? mealsCompleted / totalMeals : 0;
+  
+  const workoutCompletion = completionData.workoutCompleted ? 1 : 0;
+  const workoutStepsCompletion = completionData.workoutSteps ? 
+    Object.values(completionData.workoutSteps).filter(Boolean).length / 3 : 0;
+  
+  // Weight: Meals 60%, Workout 40%
+  const overallCompletion = (mealCompletion * 0.6) + (workoutCompletion * 0.4);
+  
+  return Math.min(overallCompletion, 1);
+}
+
+function updateStreakData(currentStreakData, todayKey, completionPercentage) {
+  const newStreakData = { ...currentStreakData };
+  const today = new Date(todayKey);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayKey = yesterday.toISOString().split('T')[0];
+  
+  // Check if streak should continue
+  const isSuccessfulDay = completionPercentage >= 0.8;
+  const wasYesterdayCompleted = currentStreakData.lastCompletedDate === yesterdayKey;
+  
+  if (isSuccessfulDay) {
+    if (currentStreakData.lastCompletedDate === yesterdayKey) {
+      // Continue streak
+      newStreakData.currentStreak = currentStreakData.currentStreak + 1;
+    } else if (currentStreakData.lastCompletedDate !== todayKey) {
+      // Start new streak (not same day already completed)
+      newStreakData.currentStreak = 1;
+    }
+    newStreakData.lastCompletedDate = todayKey;
+    
+    // Update longest streak
+    if (newStreakData.currentStreak > newStreakData.longestStreak) {
+      newStreakData.longestStreak = newStreakData.currentStreak;
+    }
+  } else if (completionPercentage < 0.3 && currentStreakData.lastCompletedDate !== todayKey) {
+    // Reset streak if completely missed and not today
+    if (currentStreakData.lastCompletedDate !== yesterdayKey) {
+      newStreakData.currentStreak = 0;
+    }
+  }
+  
+  newStreakData.streakHistory = [...newStreakData.streakHistory, newStreakData.currentStreak].slice(-30);
+  
+  return newStreakData;
 }
 
 function loadAppData() {
@@ -166,13 +234,116 @@ export function AppDataProvider({ children }) {
     setAppDataState(next);
   };
 
+  const toggleMealCompletion = (day, mealSlotKey) => {
+    setAppData(prev => {
+      const todayKey = getTodayKey();
+      const completionData = prev.completionTracker[todayKey] || {
+        mealsCompleted: [],
+        workoutCompleted: false,
+        workoutSteps: { warmup: false, mainWorkout: false, afterWorkoutStretches: false },
+        overallCompletion: 0,
+        timestamp: new Date().toISOString()
+      };
+
+      const mealsCompleted = completionData.mealsCompleted.includes(mealSlotKey)
+        ? completionData.mealsCompleted.filter(key => key !== mealSlotKey)
+        : [...completionData.mealsCompleted, mealSlotKey];
+
+      const updatedCompletionData = {
+        ...completionData,
+        mealsCompleted,
+        overallCompletion: calculateDailyCompletion(
+          { ...completionData, mealsCompleted },
+          prev.intakeSlots,
+          prev.workouts[day]?.exercises?.length > 0
+        )
+      };
+
+      const updatedStreakData = updateStreakData(
+        prev.streakData,
+        todayKey,
+        updatedCompletionData.overallCompletion
+      );
+
+      return {
+        ...prev,
+        completionTracker: {
+          ...prev.completionTracker,
+          [todayKey]: updatedCompletionData
+        },
+        streakData: updatedStreakData
+      };
+    });
+  };
+
+  const toggleWorkoutCompletion = (day, step) => {
+    setAppData(prev => {
+      const todayKey = getTodayKey();
+      const completionData = prev.completionTracker[todayKey] || {
+        mealsCompleted: [],
+        workoutCompleted: false,
+        workoutSteps: { warmup: false, mainWorkout: false, afterWorkoutStretches: false },
+        overallCompletion: 0,
+        timestamp: new Date().toISOString()
+      };
+
+      let updatedCompletionData;
+      
+      if (step === 'main') {
+        // Toggle overall workout completion
+        updatedCompletionData = {
+          ...completionData,
+          workoutCompleted: !completionData.workoutCompleted
+        };
+      } else {
+        // Toggle specific workout step
+        updatedCompletionData = {
+          ...completionData,
+          workoutSteps: {
+            ...completionData.workoutSteps,
+            [step]: !completionData.workoutSteps[step]
+          }
+        };
+      }
+
+      updatedCompletionData.overallCompletion = calculateDailyCompletion(
+        updatedCompletionData,
+        prev.intakeSlots,
+        prev.workouts[day]?.exercises?.length > 0
+      );
+
+      const updatedStreakData = updateStreakData(
+        prev.streakData,
+        todayKey,
+        updatedCompletionData.overallCompletion
+      );
+
+      return {
+        ...prev,
+        completionTracker: {
+          ...prev.completionTracker,
+          [todayKey]: updatedCompletionData
+        },
+        streakData: updatedStreakData
+      };
+    });
+  };
+
+  const getDailyCompletion = (day) => {
+    const completionData = appData.completionTracker[day];
+    return completionData?.overallCompletion || 0;
+  };
+
   const isFirstTime = isFirstTimeUser(appData.profile);
 
   const value = useMemo(() => ({
     appData,
     setAppData,
     resetAppData,
-    isFirstTime
+    isFirstTime,
+    toggleMealCompletion,
+    toggleWorkoutCompletion,
+    getDailyCompletion
   }), [appData, isFirstTime]);
 
   return (

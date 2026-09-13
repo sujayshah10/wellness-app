@@ -1,0 +1,49 @@
+.completion-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.completion-ring-svg {
+  transform: rotate(-90deg);
+}
+
+.completion-ring-progress {
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.3));
+}
+
+.completion-ring-label {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.completion-percentage {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.completion-text {
+  font-size: 10px;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* Responsive sizes */
+@media (max-width: 480px) {
+  .completion-percentage {
+    font-size: 20px;
+  }
+  
+  .completion-text {
+    font-size: 8px;
+  }
+}

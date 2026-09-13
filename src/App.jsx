@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Menu from "./pages/Menu";
 import Workout from "./pages/Workout";
 import Nutrition from "./pages/Nutrition";
+import Progress from "./pages/Progress";
 import OnboardingWizard from "./components/OnboardingWizard";
 import { useAppData } from "./context/useAppData";
 import { useTranslation } from "./utils/useTranslation";
@@ -13,7 +14,8 @@ function NavIcon({ name, active }) {
   const paths = {
     home: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-4v-6H8v6H4a1 1 0 0 1-1-1z",
     workout: "M5 13.5 8 10l3 3 5-6 3 3",
-    nutrition: "M8 4h8l1 4-1 4H8L7 8zM7 12h10v6a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"
+    nutrition: "M8 4h8l1 4-1 4H8L7 8zM7 12h10v6a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z",
+    progress: "M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
   };
 
   return (
@@ -79,6 +81,7 @@ function App() {
             <Route path="/menu" element={<Menu />} />
             <Route path="/workout" element={<Workout />} />
             <Route path="/nutrition" element={<Nutrition />} />
+            <Route path="/progress" element={<Progress />} />
           </Routes>
         </div>
       )}
@@ -108,6 +111,15 @@ function App() {
             <>
               <NavIcon name="nutrition" active={isActive} />
               <span>{t("nutrition")}</span>
+            </>
+          )}
+        </NavLink>
+
+        <NavLink to="/progress" className={({ isActive }) => `bottom-nav__item${isActive ? " active" : ""}`}>
+          {({ isActive }) => (
+            <>
+              <NavIcon name="progress" active={isActive} />
+              <span>{t("progress")}</span>
             </>
           )}
         </NavLink>

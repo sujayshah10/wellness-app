@@ -1,0 +1,98 @@
+.streak-counter {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, #1F2937 0%, #111827 100%);
+  border-radius: 12px;
+  border: 1px solid #374151;
+}
+
+.streak-counter.compact {
+  display: inline-flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(31, 41, 55, 0.8);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.streak-icon-large {
+  font-size: 48px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.streak-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.streak-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.streak-current {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.streak-number {
+  font-size: 32px;
+  font-weight: 700;
+  color: #F59E0B;
+  line-height: 1;
+}
+
+.streak-label {
+  font-size: 14px;
+  color: #9CA3AF;
+  font-weight: 500;
+}
+
+.streak-message {
+  font-size: 14px;
+  color: #D1D5DB;
+  font-weight: 500;
+}
+
+.streak-best {
+  font-size: 12px;
+  color: #6B7280;
+}
+
+.streak-best-number {
+  color: #F59E0B;
+  font-weight: 600;
+}
+
+/* Compact mode specific styles */
+.streak-counter.compact .streak-count {
+  font-size: 16px;
+  font-weight: 700;
+  color: #F59E0B;
+}
+
+.streak-counter.compact .streak-label {
+  font-size: 12px;
+  color: #9CA3AF;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .streak-icon-large {
+    font-size: 36px;
+  }
+  
+  .streak-number {
+    font-size: 24px;
+  }
+  
+  .streak-message {
+    font-size: 12px;
+  }
+}

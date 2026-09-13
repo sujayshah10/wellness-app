@@ -4,6 +4,8 @@ import { useAppData } from "../context/useAppData";
 import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
 import SetupPrompt from "../components/SetupPrompt";
+import CompletionRing from "../components/CompletionRing";
+import StreakCounter from "../components/StreakCounter";
 import { findNextMeals } from "../utils/mealEngine";
 import { useTranslation } from "../utils/useTranslation";
 import { titleCase } from "../utils/textCase";
@@ -12,7 +14,7 @@ import { calculateBodyMetrics } from "../utils/healthCalculator";
 export default function Home() {
 
   const { selectedDay, setSelectedDay } = useDay();
-  const { appData, isFirstTime } = useAppData();
+  const { appData, isFirstTime, getDailyCompletion, toggleMealCompletion, toggleWorkoutCompletion } = useAppData();
   const { t, dayName } = useTranslation();
 
   const dietData = appData.dietPlan[selectedDay];
@@ -33,6 +35,20 @@ export default function Home() {
   const deficit = calorieTarget - totalCalories;
 
   const { nextMeals, nextPrepMeal } = findNextMeals(appData.dietPlan, selectedDay);
+  
+  // Get today's completion data
+  const todayKey = new Date().toISOString().split('T')[0];
+  const todayCompletion = getDailyCompletion(todayKey);
+  const todayCompletionData = appData.completionTracker[todayKey] || {
+    mealsCompleted: [],
+    workoutCompleted: false,
+    workoutSteps: { warmup: false, mainWorkout: false, afterWorkoutStretches: false }
+  };
+  
+  const streakData = appData.streakData || {
+    currentStreak: 0,
+    longestStreak: 0
+  };
 
   return (
     <div className="page">
@@ -118,6 +134,144 @@ export default function Home() {
           <p style={{margin:0,fontSize:"13px"}}>{t("deficit")}</p>
         </div>
 
+      </div>
+
+      {/* Completion Ring & Streak */}
+      
+      <div style={{
+        display: "flex",
+        gap: "16px",
+        marginBottom: "24px"
+      }}>
+        <div style={{
+          flex: 1,
+          background: "var(--app-surface)",
+          padding: "20px",
+          borderRadius: "14px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "12px",
+          border: "1px solid var(--app-border)",
+          boxShadow: "var(--app-shadow)"
+        }}>
+          <h3 style={{ margin: 0, color: "var(--app-text)", fontSize: "14px" }}>
+            Today's Progress
+          </h3>
+          <CompletionRing completion={todayCompletion} size={100} strokeWidth={10} />
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <StreakCounter 
+            currentStreak={streakData.currentStreak} 
+            longestStreak={streakData.longestStreak}
+          />
+        </div>
+      </div>
+
+      {/* Daily Checklist */}
+      
+      <div style={{
+        background: "var(--app-surface)",
+        color: "var(--app-text)",
+        padding: "20px",
+        borderRadius: "14px",
+        marginBottom: "20px",
+        border: "1px solid var(--app-border)",
+        boxShadow: "var(--app-shadow)"
+      }}>
+        <h3 style={{ color: "var(--app-primary)", marginTop: 0, marginBottom: "16px" }}>
+          Daily Checklist
+        </h3>
+
+        {/* Meals Checklist */}
+        <div style={{ marginBottom: "16px" }}>
+          <div style={{ fontSize: "12px", color: "var(--app-muted)", marginBottom: "8px" }}>
+            MEALS
+          </div>
+          {intakeSlots.map((slot) => {
+            const isCompleted = todayCompletionData.mealsCompleted?.includes(slot.key);
+            return (
+              <button
+                key={slot.key}
+                onClick={() => toggleMealCompletion(selectedDay, slot.key)}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  marginBottom: "8px",
+                  borderRadius: "8px",
+                  border: `1px solid ${isCompleted ? "#10B981" : "var(--app-border)"}`,
+                  background: isCompleted ? "rgba(16, 185, 129, 0.1)" : "var(--app-surface)",
+                  color: "var(--app-text)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <div style={{
+                  width: "24px",
+                  height: "24px",
+                  borderRadius: "50%",
+                  border: `2px solid ${isCompleted ? "#10B981" : "var(--app-muted)"}`,
+                  background: isCompleted ? "#10B981" : "transparent",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "14px",
+                  color: "white"
+                }}>
+                  {isCompleted ? "✓" : ""}
+                </div>
+                <span style={{ fontSize: "14px", fontWeight: "500" }}>
+                  {slot.label || titleCase(slot.key)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Workout Checklist */}
+        <div>
+          <div style={{ fontSize: "12px", color: "var(--app-muted)", marginBottom: "8px" }}>
+            WORKOUT
+          </div>
+          <button
+            onClick={() => toggleWorkoutCompletion(selectedDay, 'main')}
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: "8px",
+              border: `1px solid ${todayCompletionData.workoutCompleted ? "#10B981" : "var(--app-border)"}`,
+              background: todayCompletionData.workoutCompleted ? "rgba(16, 185, 129, 0.1)" : "var(--app-surface)",
+              color: "var(--app-text)",
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              cursor: "pointer",
+              transition: "all 0.2s ease"
+            }}
+          >
+            <div style={{
+              width: "24px",
+              height: "24px",
+              borderRadius: "50%",
+              border: `2px solid ${todayCompletionData.workoutCompleted ? "#10B981" : "var(--app-muted)"}`,
+              background: todayCompletionData.workoutCompleted ? "#10B981" : "transparent",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "14px",
+              color: "white"
+            }}>
+              {todayCompletionData.workoutCompleted ? "✓" : ""}
+            </div>
+            <span style={{ fontSize: "14px", fontWeight: "500" }}>
+              Complete Workout
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* Next Intakes */}
