@@ -22,10 +22,6 @@ export default function ScheduleSetup({ data, onNext, onBack, t }) {
     onNext(formData);
   };
 
-  const handleSubmit = () => {
-    onNext(formData);
-  };
-
   return (
     <div style={{ padding: "20px 0" }}>
       <h2 style={{
