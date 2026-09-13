@@ -1,0 +1,102 @@
+.progress-chart {
+  background: var(--app-surface);
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  margin-bottom: 20px;
+}
+
+.progress-chart.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+}
+
+.empty-message {
+  color: var(--app-muted);
+  font-size: 14px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.chart-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--app-text);
+}
+
+.chart-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--app-primary);
+}
+
+.chart-container {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 120px;
+  display: block;
+}
+
+.chart-point {
+  transition: r 0.2s ease;
+}
+
+.chart-point:hover {
+  r: 4;
+}
+
+.chart-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding: 0 2px;
+}
+
+.chart-x-label {
+  font-size: 10px;
+  color: var(--app-muted);
+  text-align: center;
+}
+
+.chart-stats {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--app-border);
+}
+
+.stat {
+  font-size: 12px;
+  color: var(--app-muted);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .progress-chart {
+    padding: 16px;
+  }
+  
+  .chart-label {
+    font-size: 13px;
+  }
+  
+  .chart-value {
+    font-size: 16px;
+  }
+  
+  .chart-svg {
+    height: 100px;
+  }
+}

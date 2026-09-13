@@ -2,6 +2,7 @@ import { useDay } from "../context/useDay";
 import { useAppData } from "../context/useAppData";
 import CompletionRing from "../components/CompletionRing";
 import StreakCounter from "../components/StreakCounter";
+import ProgressChart from "../components/ProgressChart";
 import { useTranslation } from "../utils/useTranslation";
 import { calculateBodyMetrics } from "../utils/healthCalculator";
 
@@ -90,6 +91,63 @@ export default function Progress() {
   };
 
   const adherence = getCalorieAdherence();
+
+  // Prepare chart data
+  const getWeightData = () => {
+    // In a real app, this would come from user weight tracking
+    // For now, using sample data based on profile
+    const baseWeight = appData.profile.weightKg || 80;
+    return weekData.map((day, index) => ({
+      label: day.dayName,
+      value: baseWeight - (index * 0.1) // Sample trend
+    }));
+  };
+
+  const getCalorieData = () => {
+    const metrics = calculateBodyMetrics(appData.profile, appData.targets);
+    const calorieTarget = metrics.calorieTarget || Number(appData.targets.calories) || 0;
+    
+    return weekData.map(day => {
+      const dietData = appData.dietPlan[day.dateKey];
+      if (dietData) {
+        const intakeSlots = appData.intakeSlots.filter(slot => slot.active !== false);
+        const totalCalories = intakeSlots.reduce((total, slot) => 
+          total + (Number(dietData[slot.key]?.calories) || 0), 0);
+        return { label: day.dayName, value: totalCalories };
+      }
+      return { label: day.dayName, value: calorieTarget };
+    });
+  };
+
+  const getProteinData = () => {
+    const proteinTarget = Number(appData.targets.protein) || 0;
+    
+    return weekData.map(day => {
+      const dietData = appData.dietPlan[day.dateKey];
+      if (dietData) {
+        const intakeSlots = appData.intakeSlots.filter(slot => slot.active !== false);
+        const totalProtein = intakeSlots.reduce((total, slot) => 
+          total + (Number(dietData[slot.key]?.protein) || 0), 0);
+        return { label: day.dayName, value: totalProtein };
+      }
+      return { label: day.dayName, value: proteinTarget };
+    });
+  };
+
+  const getWorkoutData = () => {
+    return weekData.map(day => {
+      const completionData = completionTracker[day.dateKey];
+      const workout = appData.workouts[day.dateKey];
+      const exerciseCount = workout?.exercises?.length || 0;
+      const completed = completionData?.workoutCompleted ? 1 : 0;
+      return { label: day.dayName, value: completed * exerciseCount };
+    });
+  };
+
+  const weightData = getWeightData();
+  const calorieData = getCalorieData();
+  const proteinData = getProteinData();
+  const workoutData = getWorkoutData();
 
   return (
     <div className="page">
@@ -288,7 +346,8 @@ export default function Progress() {
         padding: "20px",
         borderRadius: "14px",
         border: "1px solid #374151",
-        textAlign: "center"
+        textAlign: "center",
+        marginBottom: "20px"
       }}>
         <div style={{ fontSize: "16px", color: "#D1D5DB", fontWeight: "500" }}>
           {streakData.currentStreak >= 7 
@@ -298,6 +357,39 @@ export default function Progress() {
             : "✨ Every day counts. Start your streak today!"}
         </div>
       </div>
+
+      {/* Progress Charts */}
+      <h3 style={{ color: "var(--app-primary)", marginTop: 0, marginBottom: "16px" }}>
+        Progress Trends
+      </h3>
+
+      <ProgressChart 
+        data={weightData} 
+        label="Weight" 
+        color="#10B981" 
+        unit="kg" 
+      />
+
+      <ProgressChart 
+        data={calorieData} 
+        label="Calories" 
+        color="#3B82F6" 
+        unit=" kcal" 
+      />
+
+      <ProgressChart 
+        data={proteinData} 
+        label="Protein" 
+        color="#F59E0B" 
+        unit="g" 
+      />
+
+      <ProgressChart 
+        data={workoutData} 
+        label="Workouts Completed" 
+        color="#8B5CF6" 
+        unit="" 
+      />
     </div>
   );
 }
