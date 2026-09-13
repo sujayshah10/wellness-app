@@ -1023,6 +1023,11 @@ function SettingsSection({ appData, setAppData, t }) {
         <span>Theme, language, and time display all update instantly and stay saved offline.</span>
       </div>
 
+      <div className="empty-state compact" style={{ marginBottom: "12px", background: "rgba(59, 130, 246, 0.1)", border: "1px solid #3B82F6" }}>
+        <strong>💾 Backup Reminder</strong>
+        <span>Export your data regularly to keep your progress safe. You can import it anytime on any device.</span>
+      </div>
+
       <label style={{ display: "block", marginBottom: "12px", fontWeight: 600 }}>
         {t("language")}
         <select
@@ -1066,25 +1071,89 @@ function SettingsSection({ appData, setAppData, t }) {
 }
 
 function AppDataSection({ appData, setAppData, resetAppData, t }) {
+  const [importError, setImportError] = useState(null);
+  const [exportSuccess, setExportSuccess] = useState(false);
+
   const exportData = () => {
-    const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "wellness-app-backup.json";
-    link.click();
-    URL.revokeObjectURL(url);
+    try {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+      const filename = `wellness-app-backup-${timestamp}.json`;
+      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+      setExportSuccess(true);
+      setTimeout(() => setExportSuccess(false), 3000);
+    } catch (error) {
+      console.error("Export failed:", error);
+    }
   };
 
   const importData = async (file) => {
     if (!file) return;
-    const text = await file.text();
-    setAppData(JSON.parse(text));
+    setImportError(null);
+    
+    try {
+      const text = await file.text();
+      const importedData = JSON.parse(text);
+      
+      // Basic validation
+      if (!importedData || typeof importedData !== 'object') {
+        throw new Error("Invalid file format");
+      }
+      
+      // Validate required fields
+      if (!importedData.profile || !importedData.targets || !importedData.dietPlan) {
+        throw new Error("Missing required data fields");
+      }
+      
+      // Confirm before replacing data
+      if (confirm("This will replace all your current data. Are you sure you want to continue?")) {
+        setAppData(importedData);
+      }
+    } catch (error) {
+      setImportError(error.message || "Failed to import data");
+      console.error("Import failed:", error);
+    }
   };
 
   return (
     <div style={cardStyle()}>
       <h3 style={{ marginTop: 0 }}>{t("appData")}</h3>
+      
+      {/* Export success message */}
+      {exportSuccess && (
+        <div style={{
+          background: "rgba(16, 185, 129, 0.1)",
+          border: "1px solid #10B981",
+          color: "#10B981",
+          padding: "12px",
+          borderRadius: "8px",
+          fontSize: "13px",
+          marginBottom: "10px"
+        }}>
+          ✓ Backup exported successfully
+        </div>
+      )}
+      
+      {/* Import error message */}
+      {importError && (
+        <div style={{
+          background: "rgba(239, 68, 68, 0.1)",
+          border: "1px solid #EF4444",
+          color: "#EF4444",
+          padding: "12px",
+          borderRadius: "8px",
+          fontSize: "13px",
+          marginBottom: "10px"
+        }}>
+          ✗ {importError}
+        </div>
+      )}
+      
       <div style={{ display: "grid", gap: "10px" }}>
         <button type="button" onClick={exportData} style={buttonStyle()}>{t("exportBackup")}</button>
         <label style={{
