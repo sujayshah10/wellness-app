@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppData } from "../context/useAppData";
-import { DAYS, DEFAULT_APP_DATA, DEFAULT_INTAKE_SLOTS, DEFAULT_PROFILE, LANGUAGES, THEMES, TIMEZONE_OPTIONS, FONT_FAMILIES, FONT_SIZES } from "../data/defaultAppData";
+import { DAYS, DEFAULT_APP_DATA, DEFAULT_INTAKE_SLOTS, DEFAULT_PROFILE, LANGUAGES, THEMES, TIMEZONE_OPTIONS } from "../data/defaultAppData";
 import { useTranslation } from "../utils/useTranslation";
 import { titleCase } from "../utils/textCase";
 import { calculateBodyMetrics, cmToFeetInches, feetInchesToCm, kgToPounds, poundsToKg } from "../utils/healthCalculator";
+import * as store from "../data/store";
 
 const SECTIONS = [
   { key: "Profile", labelKey: "profile", descriptionKey: "descProfile", icon: "user", priority: "high" },
@@ -1004,6 +1005,8 @@ function ProfileSection({ appData, setAppData, t }) {
 }
 
 function SettingsSection({ appData, setAppData, t }) {
+  const { FONT_FAMILIES, FONT_SIZES } = store;
+  
   const updateSettings = (key, value) => {
     setAppData((current) => ({
       ...current,
@@ -1100,49 +1103,26 @@ function AppDataSection({ appData, setAppData, resetAppData, t }) {
   const [importError, setImportError] = useState(null);
   const [exportSuccess, setExportSuccess] = useState(false);
 
-  const exportData = () => {
-    try {
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-      const filename = `wellness-app-backup-${timestamp}.json`;
-      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-      link.click();
-      URL.revokeObjectURL(url);
+  const handleExport = () => {
+    const result = store.exportData();
+    if (result.success) {
       setExportSuccess(true);
       setTimeout(() => setExportSuccess(false), 3000);
-    } catch (error) {
-      console.error("Export failed:", error);
     }
   };
 
-  const importData = async (file) => {
+  const handleImport = async (file) => {
     if (!file) return;
     setImportError(null);
     
-    try {
-      const text = await file.text();
-      const importedData = JSON.parse(text);
-      
-      // Basic validation
-      if (!importedData || typeof importedData !== 'object') {
-        throw new Error("Invalid file format");
-      }
-      
-      // Validate required fields
-      if (!importedData.profile || !importedData.targets || !importedData.dietPlan) {
-        throw new Error("Missing required data fields");
-      }
-      
-      // Confirm before replacing data
-      if (confirm("This will replace all your current data. Are you sure you want to continue?")) {
-        setAppData(importedData);
-      }
-    } catch (error) {
-      setImportError(error.message || "Failed to import data");
-      console.error("Import failed:", error);
+    const result = await store.importData(file);
+    
+    if (result.success) {
+      // Reload data from store
+      const newData = store.loadAppData();
+      setAppData(newData);
+    } else {
+      setImportError(result.error);
     }
   };
 
@@ -1181,7 +1161,7 @@ function AppDataSection({ appData, setAppData, resetAppData, t }) {
       )}
       
       <div style={{ display: "grid", gap: "10px" }}>
-        <button type="button" onClick={exportData} style={buttonStyle()}>{t("exportBackup")}</button>
+        <button type="button" onClick={handleExport} style={buttonStyle()}>{t("exportBackup")}</button>
         <label style={{
           ...buttonStyle("soft"),
           display: "block",
@@ -1191,7 +1171,7 @@ function AppDataSection({ appData, setAppData, resetAppData, t }) {
           <input
             type="file"
             accept="application/json"
-            onChange={(event) => importData(event.target.files?.[0])}
+            onChange={(event) => handleImport(event.target.files?.[0])}
             style={{ display: "none" }}
           />
         </label>
