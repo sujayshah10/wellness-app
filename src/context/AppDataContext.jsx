@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AppDataContext } from "./app-data-context";
-import { APP_DATA_VERSION, DEFAULT_APP_DATA, DEFAULT_ABOUT, DEFAULT_INTAKE_SLOTS, DEFAULT_PROFILE, DEFAULT_SETTINGS, DEFAULT_TARGETS, DAYS } from "../data/defaultAppData";
+import { APP_DATA_VERSION, DEFAULT_APP_DATA, DEFAULT_ABOUT, DEFAULT_INTAKE_SLOTS, DEFAULT_PROFILE, DEFAULT_SETTINGS, DEFAULT_TARGETS, DAYS, FONT_FAMILIES, FONT_SIZES } from "../data/defaultAppData";
 
 const DEFAULT_COMPLETION_TRACKER = {};
 const DEFAULT_STREAK_DATA = {
@@ -343,7 +343,9 @@ export function AppDataProvider({ children }) {
     isFirstTime,
     toggleMealCompletion,
     toggleWorkoutCompletion,
-    getDailyCompletion
+    getDailyCompletion,
+    FONT_FAMILIES,
+    FONT_SIZES
   }), [appData, isFirstTime]);
 
   return (

@@ -102,36 +102,36 @@ export default function Home() {
           flex:1,
           background:"linear-gradient(145deg, var(--app-primary), #1D4ED8)",
           color:"white",
-          padding:"18px",
+          padding:"16px",
           borderRadius:"14px",
           textAlign:"center"
         }}>
-          <h2 style={{margin:0}}>{totalCalories}</h2>
-          <p style={{margin:0,fontSize:"13px"}}>{t("calories")}</p>
+          <h2 style={{margin:0,fontSize:"20px",fontWeight:"600"}}>{totalCalories}</h2>
+          <p style={{margin:0,fontSize:"11px",fontWeight:"500"}}>{t("calories")}</p>
         </div>
 
         <div style={{
           flex:1,
           background:"linear-gradient(145deg, var(--app-accent), #047857)",
           color:"white",
-          padding:"18px",
+          padding:"16px",
           borderRadius:"14px",
           textAlign:"center"
         }}>
-          <h2 style={{margin:0}}>{totalProtein}g</h2>
-          <p style={{margin:0,fontSize:"13px"}}>{t("protein")}</p>
+          <h2 style={{margin:0,fontSize:"20px",fontWeight:"600"}}>{totalProtein}g</h2>
+          <p style={{margin:0,fontSize:"11px",fontWeight:"500"}}>{t("protein")}</p>
         </div>
 
         <div style={{
           flex:1,
           background:"linear-gradient(145deg, #020617, #1E293B)",
           color:"white",
-          padding:"18px",
+          padding:"16px",
           borderRadius:"14px",
           textAlign:"center"
         }}>
-          <h2 style={{margin:0}}>{deficit > 0 ? `+${deficit}` : deficit}</h2>
-          <p style={{margin:0,fontSize:"13px"}}>{t("deficit")}</p>
+          <h2 style={{margin:0,fontSize:"20px",fontWeight:"600"}}>{deficit > 0 ? `+${deficit}` : deficit}</h2>
+          <p style={{margin:0,fontSize:"11px",fontWeight:"500"}}>{t("deficit")}</p>
         </div>
 
       </div>

@@ -18,8 +18,20 @@ function NavIcon({ name, active }) {
     progress: "M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
   };
 
+  const getIconColor = (active) => {
+    if (active) return "white";
+    // Use CSS variables for theme-aware colors
+    const colors = {
+      home: "var(--app-icon-home)",
+      workout: "var(--app-icon-workout)",
+      nutrition: "var(--app-icon-nutrition)",
+      progress: "var(--app-icon-progress)"
+    };
+    return colors[name] || "currentColor";
+  };
+
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" style={{ stroke: active ? "white" : "currentColor", fill: "none", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round" }}>
+    <svg viewBox="0 0 24 24" aria-hidden="true" style={{ stroke: getIconColor(active), fill: "none", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round" }}>
       <path d={paths[name]} />
     </svg>
   );
@@ -27,7 +39,7 @@ function NavIcon({ name, active }) {
 
 function App() {
   const { t } = useTranslation();
-  const { appData, isFirstTime } = useAppData();
+  const { appData, isFirstTime, FONT_FAMILIES, FONT_SIZES } = useAppData();
   const [loading, setLoading] = useState(true);
   const [online, setOnline] = useState(() => navigator.onLine !== false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -36,6 +48,22 @@ function App() {
     const timer = window.setTimeout(() => setLoading(false), 800);
     return () => window.clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const theme = appData.settings.theme;
+    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = theme === "system" ? (prefersDark ? "dark" : "light") : theme;
+  }, [appData.settings.theme]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const fontFamily = FONT_FAMILIES.find(f => f.key === appData.settings.fontFamily)?.value || FONT_FAMILIES[0].value;
+    const fontSize = FONT_SIZES.find(s => s.key === appData.settings.fontSize)?.value || FONT_SIZES[1].value;
+    
+    root.style.setProperty('--app-font-body', fontFamily);
+    root.style.setProperty('--app-font-size-base', fontSize);
+  }, [appData.settings.fontFamily, appData.settings.fontSize, FONT_FAMILIES, FONT_SIZES]);
 
   useEffect(() => {
     if (!loading && isFirstTime && !appData.settings?.onboardingCompleted) {

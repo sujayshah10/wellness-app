@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppData } from "../context/useAppData";
-import { DAYS, DEFAULT_APP_DATA, DEFAULT_INTAKE_SLOTS, DEFAULT_PROFILE, LANGUAGES, THEMES, TIMEZONE_OPTIONS } from "../data/defaultAppData";
+import { DAYS, DEFAULT_APP_DATA, DEFAULT_INTAKE_SLOTS, DEFAULT_PROFILE, LANGUAGES, THEMES, TIMEZONE_OPTIONS, FONT_FAMILIES, FONT_SIZES } from "../data/defaultAppData";
 import { useTranslation } from "../utils/useTranslation";
 import { titleCase } from "../utils/textCase";
 import { calculateBodyMetrics, cmToFeetInches, feetInchesToCm, kgToPounds, poundsToKg } from "../utils/healthCalculator";
@@ -168,8 +168,8 @@ function Field({ label, value, onChange, type = "text", textarea = false, disabl
       ) : (
         <input
           type={type}
-          value={value}
-          onChange={(event) => onChange(type === "number" ? Number(event.target.value) : event.target.value)}
+          value={type === "number" ? (value || '') : value}
+          onChange={(event) => onChange(type === "number" ? (event.target.value === '' ? 0 : Number(event.target.value)) : event.target.value)}
           disabled={disabled}
           style={{ ...fieldStyle(), opacity: disabled ? 0.72 : 1 }}
         />
@@ -214,7 +214,7 @@ function NumberStepper({ label, value, onChange, disabled = false, step = 1, min
       <span style={{ display: "block", marginBottom: "6px", fontWeight: 550 }}>{label}</span>
       <div style={numberStepperStyle()}>
         <button type="button" disabled={disabled} onClick={() => update(-step)} style={stepperButtonStyle()}>-</button>
-        <input disabled={disabled} type="number" value={nextValue} onChange={(event) => onChange(Math.max(min, Number(event.target.value) || 0))} style={{ ...fieldStyle(), textAlign: "center", fontWeight: 700 }} />
+        <input disabled={disabled} type="number" value={nextValue || ''} onChange={(event) => onChange(event.target.value === '' ? 0 : Math.max(min, Number(event.target.value)))} style={{ ...fieldStyle(), textAlign: "center", fontWeight: 700 }} />
         <button type="button" disabled={disabled} onClick={() => update(step)} style={stepperButtonStyle()}>+</button>
       </div>
     </label>
@@ -1004,6 +1004,8 @@ function ProfileSection({ appData, setAppData, t }) {
 }
 
 function SettingsSection({ appData, setAppData, t }) {
+  const { FONT_FAMILIES, FONT_SIZES } = useAppData();
+  
   const updateSettings = (key, value) => {
     setAppData((current) => ({
       ...current,
@@ -1063,6 +1065,32 @@ function SettingsSection({ appData, setAppData, t }) {
         >
           {THEMES.map((item) => (
             <option key={item.key} value={item.key}>{t(item.key)}</option>
+          ))}
+        </select>
+      </label>
+
+      <label style={{ display: "block", marginBottom: "12px", fontWeight: 600 }}>
+        Font Family
+        <select
+          value={appData.settings.fontFamily}
+          onChange={(event) => updateSettings("fontFamily", event.target.value)}
+          style={{ ...fieldStyle(), marginTop: "6px" }}
+        >
+          {FONT_FAMILIES.map((item) => (
+            <option key={item.key} value={item.key}>{item.label}</option>
+          ))}
+        </select>
+      </label>
+
+      <label style={{ display: "block", marginBottom: "12px", fontWeight: 600 }}>
+        Font Size
+        <select
+          value={appData.settings.fontSize}
+          onChange={(event) => updateSettings("fontSize", event.target.value)}
+          style={{ ...fieldStyle(), marginTop: "6px" }}
+        >
+          {FONT_SIZES.map((item) => (
+            <option key={item.key} value={item.key}>{item.label}</option>
           ))}
         </select>
       </label>

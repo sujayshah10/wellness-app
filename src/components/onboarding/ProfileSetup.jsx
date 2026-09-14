@@ -139,8 +139,8 @@ export default function ProfileSetup({ data, onNext, onBack, isFirstStep, t }) {
             </label>
             <input
               type="number"
-              value={formData.heightCm}
-              onChange={(e) => handleChange("heightCm", Number(e.target.value))}
+              value={formData.heightCm || ''}
+              onChange={(e) => handleChange("heightCm", e.target.value === '' ? 0 : Number(e.target.value))}
               style={{
                 width: "100%",
                 padding: "12px",
@@ -165,8 +165,8 @@ export default function ProfileSetup({ data, onNext, onBack, isFirstStep, t }) {
             </label>
             <input
               type="number"
-              value={formData.weightKg}
-              onChange={(e) => handleChange("weightKg", Number(e.target.value))}
+              value={formData.weightKg || ''}
+              onChange={(e) => handleChange("weightKg", e.target.value === '' ? 0 : Number(e.target.value))}
               style={{
                 width: "100%",
                 padding: "12px",
