@@ -120,7 +120,7 @@ export default function CircularTimePicker({ value, onChange, label }) {
             cy={centerY}
             r={8}
             fill="var(--app-primary)"
-          />
+          ></circle>
           
           {/* Current value indicator */}
           <text

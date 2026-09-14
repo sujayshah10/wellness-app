@@ -1004,8 +1004,6 @@ function ProfileSection({ appData, setAppData, t }) {
 }
 
 function SettingsSection({ appData, setAppData, t }) {
-  const { FONT_FAMILIES, FONT_SIZES } = useAppData();
-  
   const updateSettings = (key, value) => {
     setAppData((current) => ({
       ...current,
