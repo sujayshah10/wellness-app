@@ -6,6 +6,7 @@ import { useTranslation } from "../utils/useTranslation";
 import { titleCase } from "../utils/textCase";
 import { calculateBodyMetrics, cmToFeetInches, feetInchesToCm, kgToPounds, poundsToKg } from "../utils/healthCalculator";
 import * as store from "../data/store";
+import FoodSearch from "../components/FoodSearch";
 
 const SECTIONS = [
   { key: "Profile", labelKey: "profile", descriptionKey: "descProfile", icon: "user", priority: "high" },
@@ -323,6 +324,7 @@ function IntakesSection({ appData, setAppData, t }) {
   }));
   const [addDays, setAddDays] = useState(["Mon"]);
   const [validationMessage, setValidationMessage] = useState("");
+  const [showManualEntry, setShowManualEntry] = useState(false);
 
   const getIntakeDraft = (nextDay, nextSlot) => {
     const slotDefault = intakeSlots.find((item) => item.key === nextSlot);
@@ -502,6 +504,22 @@ function IntakesSection({ appData, setAppData, t }) {
     });
   };
 
+  const handleFoodSelect = (mealData) => {
+    if (mealData) {
+      // Auto-populate from food search and switch to manual entry for additional fields
+      setDraft(prev => ({
+        ...prev,
+        name: mealData.name,
+        calories: mealData.calories,
+        protein: mealData.protein
+      }));
+      setShowManualEntry(true); // Show manual fields for time, prep, tip
+    } else {
+      // User wants manual entry - show the manual fields
+      setShowManualEntry(true);
+    }
+  };
+
   const deleteIntake = () => {
     setAppData((current) => {
       const dayMeals = { ...current.dietPlan[day] };
@@ -609,12 +627,26 @@ function IntakesSection({ appData, setAppData, t }) {
 
         {validationMessage && <div className="inline-error">{validationMessage}</div>}
 
-        <Field label={t("dishName")} value={draft.name} onChange={(value) => updateDraft("name", value)} />
-        <Field label={t("time")} value={draft.time} onChange={(value) => updateDraft("time", value)} />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-          <Field label={t("calories")} type="number" value={draft.calories} onChange={(value) => updateDraft("calories", value)} />
-          <Field label={t("protein")} type="number" value={draft.protein} onChange={(value) => updateDraft("protein", value)} />
-        </div>
+        {!showManualEntry ? (
+          <FoodSearch onSelect={handleFoodSelect} />
+        ) : (
+          <>
+            <Field label={t("dishName")} value={draft.name} onChange={(value) => updateDraft("name", value)} />
+            <Field label={t("time")} value={draft.time} onChange={(value) => updateDraft("time", value)} />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              <Field label={t("calories")} type="number" value={draft.calories} onChange={(value) => updateDraft("calories", value)} />
+              <Field label={t("protein")} type="number" value={draft.protein} onChange={(value) => updateDraft("protein", value)} />
+            </div>
+            <button 
+              type="button" 
+              onClick={() => setShowManualEntry(false)}
+              style={{ ...buttonStyle("soft"), marginBottom: "12px", fontSize: "13px" }}
+            >
+              ← Back to food search
+            </button>
+          </>
+        )}
+        
         <Field label={t("prepInstructions")} textarea value={draft.prep} onChange={(value) => updateDraft("prep", value)} />
         <Field label={t("tip")} textarea value={draft.tip} onChange={(value) => updateDraft("tip", value)} />
 
