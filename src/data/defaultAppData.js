@@ -45,18 +45,6 @@ export const DEFAULT_ABOUT = {
   tagline: "Three daily meals, seasonal food, and full-body training."
 };
 
-export const FONT_FAMILIES = [
-  { key: "inter", label: "Inter", value: "'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" },
-  { key: "playfair", label: "Playfair Display", value: "'Playfair Display', Georgia, serif" },
-  { key: "system", label: "System", value: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }
-];
-
-export const FONT_SIZES = [
-  { key: "small", label: "Small", value: "13px" },
-  { key: "medium", label: "Medium", value: "14px" },
-  { key: "large", label: "Large", value: "16px" }
-];
-
 export const DEFAULT_SETTINGS = {
   language: "en",
   timezoneDisplay: "both",

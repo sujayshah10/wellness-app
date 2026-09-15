@@ -1,7 +1,20 @@
 // Data Access Layer - Single source of truth for all data operations
 // This abstraction allows easy swapping of storage backends (localStorage, API, etc.)
 
-import { APP_DATA_VERSION, DEFAULT_APP_DATA, DEFAULT_ABOUT, DEFAULT_INTAKE_SLOTS, DEFAULT_PROFILE, DEFAULT_SETTINGS, DEFAULT_TARGETS, DAYS, FONT_FAMILIES, FONT_SIZES } from "./defaultAppData";
+import { APP_DATA_VERSION, DEFAULT_APP_DATA, DEFAULT_ABOUT, DEFAULT_INTAKE_SLOTS, DEFAULT_PROFILE, DEFAULT_SETTINGS, DEFAULT_TARGETS, DAYS } from "./defaultAppData";
+
+// Font configuration constants (separated to avoid circular dependency)
+const FONT_FAMILIES = [
+  { key: "inter", label: "Inter", value: "'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" },
+  { key: "playfair", label: "Playfair Display", value: "'Playfair Display', Georgia, serif" },
+  { key: "system", label: "System", value: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }
+];
+
+const FONT_SIZES = [
+  { key: "small", label: "Small", value: "13px" },
+  { key: "medium", label: "Medium", value: "14px" },
+  { key: "large", label: "Large", value: "16px" }
+];
 
 const STORAGE_KEY = "wellnessAppData";
 const DEFAULT_COMPLETION_TRACKER = {};
