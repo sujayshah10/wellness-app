@@ -320,7 +320,7 @@ export default function OnboardingWizard() {
           <h2 style={{
             margin: 0,
             fontSize: "24px",
-            fontWeight: 600",
+            fontWeight: 600,
             color: "var(--app-text)"
           }}>
             {ALL_STEPS[currentStep].title}
