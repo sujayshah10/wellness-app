@@ -1862,10 +1862,10 @@ function ReviewStep({ data, onComplete, onBack, isLastStep, isDarkMode, primaryC
             <div style={{ marginBottom: "8px" }}>
               <strong>Daily Calories:</strong> {targetCalories} kcal
             </div>
-            <div style={{ marginBottom: 8px }}>
+            <div style={{ marginBottom: "8px" }}>
               <strong>Daily Protein:</strong> {targetProtein}g
             </div>
-            <div style={{ marginBottom: 8px }}>
+            <div style={{ marginBottom: "8px" }}>
               <strong>Workout Focus:</strong> {workoutFocus}
             </div>
             <div>
