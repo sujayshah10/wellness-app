@@ -1718,7 +1718,7 @@ function HabitsStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
                   border: "1px solid var(--app-border)",
                   borderRadius: "6px",
                   background: formData.habits?.drinking ? primaryColor : "var(--app-surface)",
-                  color: formData.habits?.drinking ? (isDarkMode ? "white" : "white) : "var(--app-text)",
+                  color: formData.habits?.drinking ? (isDarkMode ? "white" : "white") : "var(--app-text)",
                   fontSize: "14px",
                   fontWeight: 600,
                   cursor: "pointer"
