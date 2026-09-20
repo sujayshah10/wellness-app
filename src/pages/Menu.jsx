@@ -1127,6 +1127,43 @@ function SettingsSection({ appData, setAppData, t }) {
           ))}
         </select>
       </label>
+
+      <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid var(--app-border)" }}>
+        <button
+          onClick={() => {
+            if (window.confirm("This will reset the onboarding wizard so you can see it again. Your meal and workout data will be preserved. Continue?")) {
+              store.updateSettings({
+                onboardingCompleted: false,
+                onboardingCompletedAt: null,
+                onboardingSkipped: false
+              });
+              setAppData(prev => ({
+                ...prev,
+                settings: {
+                  ...prev.settings,
+                  onboardingCompleted: false,
+                  onboardingCompletedAt: null,
+                  onboardingSkipped: false
+                }
+              }));
+              window.location.reload();
+            }
+          }}
+          style={{
+            width: "100%",
+            padding: "12px",
+            background: "transparent",
+            color: "var(--app-primary)",
+            border: "1px solid var(--app-primary)",
+            borderRadius: "8px",
+            fontSize: "14px",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          Reset Onboarding Wizard
+        </button>
+      </div>
     </div>
   );
 }
