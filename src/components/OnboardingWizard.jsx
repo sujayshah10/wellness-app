@@ -1117,7 +1117,8 @@ function MealFrequencyStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
           Skip
         </button>
       </div>
-    </div  );
+    </div>
+  );
 }
 
 function LocationStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
@@ -1501,7 +1502,8 @@ function CookingTimeStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
           Skip
         </button>
       </div>
-    </div  );
+    </div>
+  );
 }
 
 function ExerciseExperienceStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
@@ -1578,7 +1580,8 @@ function ExerciseExperienceStep({ data, onNext, onSkip, isDarkMode, primaryColor
           Skip
         </button>
       </div>
-    </div  );
+    </div>
+  );
 }
 
 function LimitationsStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
@@ -1648,7 +1651,8 @@ function LimitationsStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
           Skip
         </button>
       </div>
-    </div  );
+    </div>
+  );
 }
 
 function HabitsStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
@@ -1779,7 +1783,8 @@ function HabitsStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
           Skip
         </button>
       </div>
-    </div  );
+    </div>
+  );
 }
 
 function ReviewStep({ data, onComplete, onBack, isLastStep, isDarkMode, primaryColor }) {
@@ -1906,5 +1911,6 @@ function ReviewStep({ data, onComplete, onBack, isLastStep, isDarkMode, primaryC
           {isLastStep ? "Complete & Start" : "Next"}
         </button>
       </div>
-    </div  );
+    </div>
+  );
 }
