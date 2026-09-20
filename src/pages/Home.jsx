@@ -32,7 +32,7 @@ export default function Home() {
 
   const metrics = calculateBodyMetrics(appData.profile, appData.targets);
   const calorieTarget = metrics.calorieTarget || Number(appData.targets.calories) || 0;
-  const deficit = calorieTarget - totalCalories;
+  const caloriesRemaining = calorieTarget - totalCalories;
 
   const { nextMeals, nextPrepMeal } = findNextMeals(appData.dietPlan, selectedDay);
   
@@ -130,8 +130,8 @@ export default function Home() {
           borderRadius:"14px",
           textAlign:"center"
         }}>
-          <h2 style={{margin:0,fontSize:"20px",fontWeight:"600"}}>{deficit > 0 ? `+${deficit}` : deficit}</h2>
-          <p style={{margin:0,fontSize:"11px",fontWeight:"500"}}>{t("deficit")}</p>
+          <h2 style={{margin:0,fontSize:"20px",fontWeight:"600"}}>{caloriesRemaining > 0 ? `+${caloriesRemaining}` : caloriesRemaining}</h2>
+          <p style={{margin:0,fontSize:"11px",fontWeight:"500"}}>{t("caloriesRemaining")}</p>
         </div>
 
       </div>

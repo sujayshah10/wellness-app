@@ -6,12 +6,12 @@ export default function SetupPrompt() {
 
   return (
     <div style={{
-      background: "linear-gradient(135deg, #2F80FF 0%, #1D4ED8 100%)",
+      background: "linear-gradient(135deg, var(--app-primary) 0%, var(--app-accent) 100%)",
       color: "white",
       padding: "20px",
       borderRadius: "16px",
       marginBottom: "20px",
-      boxShadow: "0 4px 12px rgba(47, 128, 255, 0.3)"
+      boxShadow: "0 4px 12px rgba(29, 158, 117, 0.3)"
     }}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
         <div style={{
@@ -36,7 +36,7 @@ export default function SetupPrompt() {
             style={{
               display: "inline-block",
               background: "white",
-              color: "#2F80FF",
+              color: "var(--app-primary)",
               padding: "10px 20px",
               borderRadius: "8px",
               textDecoration: "none",

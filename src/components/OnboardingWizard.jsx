@@ -40,6 +40,16 @@ const COOKING_TIME_OPTIONS = [
   { key: "enjoy", label: "Enjoy Cooking - Like cooking regularly" }
 ];
 
+// Cuisine preference options
+const CUISINE_OPTIONS = [
+  { key: "north_indian", label: "North Indian" },
+  { key: "south_indian", label: "South Indian" },
+  { key: "gujarati", label: "Gujarati" },
+  { key: "continental", label: "Continental" },
+  { key: "mixed", label: "Mixed" },
+  { key: "other", label: "Other" }
+];
+
 // Exercise experience options
 const EXERCISE_EXPERIENCE = [
   { key: "beginner", label: "Beginner - New to exercise" },
@@ -65,10 +75,11 @@ const OPTIONAL_STEPS = [
   { key: "goal_weight", title: "Goal Weight", required: false },
   { key: "meal_frequency", title: "Meal Frequency", required: false },
   { key: "location", title: "Location", required: false },
+  { key: "cuisine", title: "Cuisine Preference", required: false },
   { key: "allergies", title: "Allergies & Intolerances", required: false },
   { key: "dislikes", title: "Foods You Dislike", required: false },
   { key: "sleep_schedule", title: "Sleep Schedule", required: false },
-  { title: "Cooking Time", required: false },
+  { key: "cooking_time", title: "Cooking Time", required: false },
   { key: "exercise_experience", title: "Exercise Experience", required: false },
   { key: "limitations", title: "Injuries & Limitations", required: false },
   { key: "habits", title: "Habits", required: false }
@@ -98,6 +109,7 @@ export default function OnboardingWizard() {
     goalWeightKg: null,
     mealsPerDay: 3,
     country: "",
+    cuisine: "mixed",
     allergies: "",
     dislikes: "",
     wakeTime: "07:00",
@@ -205,6 +217,7 @@ export default function OnboardingWizard() {
       goalWeightKg: onboardingData.goalWeightKg,
       mealsPerDay: onboardingData.mealsPerDay,
       country: onboardingData.country,
+      cuisine: onboardingData.cuisine,
       allergies: onboardingData.allergies,
       dislikes: onboardingData.dislikes,
       wakeTime: onboardingData.wakeTime,
@@ -348,41 +361,43 @@ function renderStep(stepIndex, data, onNext, onBack, onSkip, onComplete, isDarkM
 
   switch (step.key) {
     case "profile":
-      return <ProfileStep data={data} onNext={onNext} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <ProfileStep data={data} onNext={onNext} onBack={onBack} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "goals":
-      return <GoalsStep data={data} onNext={onNext} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <GoalsStep data={data} onNext={onNext} onBack={onBack} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "activity":
-      return <ActivityStep data={data} onNext={onNext} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <ActivityStep data={data} onNext={onNext} onBack={onBack} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "diet":
-      return <DietStep data={data} onNext={onNext} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <DietStep data={data} onNext={onNext} onBack={onBack} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "workout_schedule":
-      return <WorkoutScheduleStep data={data} onNext={onNext} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <WorkoutScheduleStep data={data} onNext={onNext} onBack={onBack} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "equipment":
-      return <EquipmentStep data={data} onNext={onNext} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <EquipmentStep data={data} onNext={onNext} onBack={onBack} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "preferences":
-      return <PreferencesStep data={data} onNext={onNext} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <PreferencesStep data={data} onNext={onNext} onBack={onBack} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "health_safety":
-      return <HealthSafetyStep data={data} onNext={onNext} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <HealthSafetyStep data={data} onNext={onNext} onBack={onBack} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "goal_weight":
-      return <GoalWeightStep data={data} onNext={onNext} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <GoalWeightStep data={data} onNext={onNext} onBack={onBack} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "meal_frequency":
-      return <MealFrequencyStep data={data} onNext={onNext} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <MealFrequencyStep data={data} onNext={onNext} onBack={onBack} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "location":
-      return <LocationStep data={data} onNext={onNext} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <LocationStep data={data} onNext={onNext} onBack={onBack} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+    case "cuisine":
+      return <CuisineStep data={data} onNext={onNext} onBack={onBack} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "allergies":
-      return <AllergiesStep data={data} onNext={onNext} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <AllergiesStep data={data} onNext={onNext} onBack={onBack} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "dislikes":
-      return <DislikesStep data={data} onNext={onNext} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <DislikesStep data={data} onNext={onNext} onBack={onBack} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "sleep_schedule":
-      return <SleepScheduleStep data={data} onNext={onNext} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <SleepScheduleStep data={data} onNext={onNext} onBack={onBack} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "cooking_time":
-      return <CookingTimeStep data={data} onNext={onNext} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <CookingTimeStep data={data} onNext={onNext} onBack={onBack} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "exercise_experience":
-      return <ExerciseExperienceStep data={data} onNext={onNext} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <ExerciseExperienceStep data={data} onNext={onNext} onBack={onBack} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "limitations":
-      return <LimitationsStep data={data} onNext={onNext} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <LimitationsStep data={data} onNext={onNext} onBack={onBack} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "habits":
-      return <HabitsStep data={data} onNext={onNext} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
+      return <HabitsStep data={data} onNext={onNext} onBack={onBack} onSkip={onSkip} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "review":
       return <ReviewStep data={data} onComplete={onComplete} onBack={onBack} isLastStep={isLastStep} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     default:
@@ -390,8 +405,69 @@ function renderStep(stepIndex, data, onNext, onBack, onSkip, onComplete, isDarkM
   }
 }
 
+// Helper component for navigation buttons
+function NavigationButtons({ onBack, onNext, onSkip, isLastStep, isDarkMode, primaryColor, showSkip = false }) {
+  return (
+    <div style={{ display: "flex", gap: "12px" }}>
+      <button
+        type="button"
+        onClick={onBack}
+        style={{
+          flex: 1,
+          padding: "14px",
+          background: "var(--app-surface-soft)",
+          color: "var(--app-text)",
+          border: "1px solid var(--app-border)",
+          borderRadius: "8px",
+          fontSize: "16px",
+          fontWeight: 600,
+          cursor: "pointer"
+        }}
+      >
+        Back
+      </button>
+      {showSkip ? (
+        <button
+          type="button"
+          onClick={onSkip}
+          style={{
+            flex: 1,
+            padding: "14px",
+            background: "transparent",
+            color: "var(--app-muted)",
+            border: "none",
+            fontSize: "14px",
+            fontWeight: 500,
+            cursor: "pointer",
+            textDecoration: "underline"
+          }}
+        >
+          Skip
+        </button>
+      ) : null}
+      <button
+        type="button"
+        onClick={onNext}
+        style={{
+          flex: showSkip ? 1 : 2,
+          padding: "14px",
+          background: primaryColor,
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          fontSize: "16px",
+          fontWeight: 600,
+          cursor: "pointer"
+        }}
+      >
+        {isLastStep ? "Complete" : "Next"}
+      </button>
+    </div>
+  );
+}
+
 // Step Components
-function ProfileStep({ data, onNext, isDarkMode, primaryColor }) {
+function ProfileStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
   const [useImperial, setUseImperial] = useState(data.heightUnit === "ft" || data.weightUnit === "lbs");
 
@@ -531,30 +607,12 @@ function ProfileStep({ data, onNext, isDarkMode, primaryColor }) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function GoalsStep({ data, onNext, isDarkMode, primaryColor }) {
+function GoalsStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -592,30 +650,12 @@ function GoalsStep({ data, onNext, isDarkMode, primaryColor }) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function ActivityStep({ data, onNext, isDarkMode, primaryColor }) {
+function ActivityStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -656,30 +696,12 @@ function ActivityStep({ data, onNext, isDarkMode, primaryColor }) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function DietStep({ data, onNext, isDarkMode, primaryColor }) {
+function DietStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -717,30 +739,12 @@ function DietStep({ data, onNext, isDarkMode, primaryColor }) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function WorkoutScheduleStep({ data, onNext, isDarkMode, primaryColor }) {
+function WorkoutScheduleStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -766,30 +770,12 @@ function WorkoutScheduleStep({ data, onNext, isDarkMode, primaryColor }) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function EquipmentStep({ data, onNext, isDarkMode, primaryColor }) {
+function EquipmentStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -827,30 +813,12 @@ function EquipmentStep({ data, onNext, isDarkMode, primaryColor }) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function PreferencesStep({ data, onNext, isDarkMode, primaryColor }) {
+function PreferencesStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -883,30 +851,12 @@ function PreferencesStep({ data, onNext, isDarkMode, primaryColor }) {
         </select>
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function HealthSafetyStep({ data, onNext, isDarkMode, primaryColor }) {
+function HealthSafetyStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -949,31 +899,13 @@ function HealthSafetyStep({ data, onNext, isDarkMode, primaryColor }) {
         />
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
 // Optional Steps
-function GoalWeightStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
+function GoalWeightStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -1003,47 +935,12 @@ function GoalWeightStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
         />
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-        <button
-          type="button"
-          onClick={onSkip}
-          style={{
-            flex: 1,
-            padding: "14px",
-            background: "transparent",
-            color: "var(--app-muted)",
-            border: "none",
-            fontSize: "14px",
-            fontWeight: 500,
-            cursor: "pointer",
-            textDecoration: "underline"
-          }}
-        >
-          Skip
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} onSkip={onSkip} showSkip={true} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function MealFrequencyStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
+function MealFrequencyStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -1081,47 +978,12 @@ function MealFrequencyStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-        <button
-          type="button"
-          onClick={onSkip}
-          style={{
-            flex: 1,
-            padding: "14px",
-            background: "transparent",
-            color: "var(--app-muted)",
-            border: "none",
-            fontSize: "14px",
-            fontWeight: 500,
-            cursor: "pointer",
-            textDecoration: "underline"
-          }}
-        >
-          Skip
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} onSkip={onSkip} showSkip={true} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function LocationStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
+function LocationStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -1151,47 +1013,12 @@ function LocationStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
         />
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-        <button
-          type="button"
-          onClick={onSkip}
-          style={{
-            flex: 1,
-            padding: "14px",
-            background: "transparent",
-            color: "var(--app-muted)",
-            border: "none",
-            fontSize: "14px",
-            fontWeight: 500,
-            cursor: "pointer",
-            textDecoration: "underline"
-          }}
-        >
-          Skip
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} onSkip={onSkip} showSkip={true} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function AllergiesStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
+function AllergiesStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -1222,47 +1049,55 @@ function AllergiesStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
         />
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-        <button
-          type="button"
-          onClick={onSkip}
-          style={{
-            flex: 1,
-            padding: "14px",
-            background: "transparent",
-            color: "var(--app-muted)",
-            border: "none",
-            fontSize: "14px",
-            fontWeight: 500,
-            cursor: "pointer",
-            textDecoration: "underline"
-          }}
-        >
-          Skip
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} onSkip={onSkip} showSkip={true} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function DislikesStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
+function CuisineStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
+  const [formData, setFormData] = useState(data);
+
+  const handleSubmit = () => {
+    onNext(formData);
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div>
+        <label style={{ display: "block", marginBottom: "12px", fontWeight: 600, color: "var(--app-text)" }}>
+          What cuisine do you eat most often? (optional)
+        </label>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          {CUISINE_OPTIONS.map((cuisine) => (
+            <button
+              key={cuisine.key}
+              type="button"
+              onClick={() => setFormData(prev => ({ ...prev, cuisine: cuisine.key }))}
+              style={{
+                padding: "16px",
+                border: "1px solid var(--app-border)",
+                borderRadius: "8px",
+                background: formData.cuisine === cuisine.key ? primaryColor : "var(--app-surface)",
+                color: formData.cuisine === cuisine.key ? (isDarkMode ? "white" : "white") : "var(--app-text)",
+                fontSize: "15px",
+                fontWeight: 600,
+                cursor: "pointer",
+                textAlign: "left",
+                transition: "all 0.2s ease"
+              }}
+            >
+              {cuisine.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} onSkip={onSkip} showSkip={true} isDarkMode={isDarkMode} primaryColor={primaryColor} />
+    </div>
+  );
+}
+
+function DislikesStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -1293,47 +1128,12 @@ function DislikesStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
         />
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-        <button
-          type="button"
-          onClick={onSkip}
-          style={{
-            flex: 1,
-            padding: "14px",
-            background: "transparent",
-            color: "var(--app-muted)",
-            border: "none",
-            fontSize: "14px",
-            fontWeight: 500,
-            cursor: "pointer",
-            textDecoration: "underline"
-          }}
-        >
-          Skip
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} onSkip={onSkip} showSkip={true} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
 
-function SleepScheduleStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
+function SleepScheduleStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -1428,7 +1228,7 @@ function SleepScheduleStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
   );
 }
 
-function CookingTimeStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
+function CookingTimeStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -1506,7 +1306,7 @@ function CookingTimeStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
   );
 }
 
-function ExerciseExperienceStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
+function ExerciseExperienceStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -1584,7 +1384,7 @@ function ExerciseExperienceStep({ data, onNext, onSkip, isDarkMode, primaryColor
   );
 }
 
-function LimitationsStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
+function LimitationsStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {
@@ -1655,7 +1455,7 @@ function LimitationsStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
   );
 }
 
-function HabitsStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
+function HabitsStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
 
   const handleSubmit = () => {

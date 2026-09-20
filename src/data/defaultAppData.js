@@ -73,7 +73,6 @@ export const LANGUAGES = [
 export const THEMES = [
   { key: "light", label: "Light" },
   { key: "dark", label: "Dark" },
-  { key: "black", label: "Black" },
   { key: "system", label: "System" }
 ];
 
