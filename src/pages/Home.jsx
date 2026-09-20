@@ -100,7 +100,7 @@ export default function Home() {
 
         <div style={{
           flex:1,
-          background:"linear-gradient(145deg, var(--app-primary), #1D4ED8)",
+          background:"linear-gradient(145deg, var(--app-primary), var(--app-accent))",
           color:"white",
           padding:"16px",
           borderRadius:"14px",

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAppData } from "../context/useAppData";
 import { useTranslation } from "../utils/useTranslation";
 import * as store from "../data/store";
@@ -57,6 +57,9 @@ const EXERCISE_EXPERIENCE = [
   { key: "advanced", label: "Advanced - Experienced lifter" }
 ];
 
+// Welcome step (first step)
+const WELCOME_STEP = { key: "welcome", title: "Welcome", required: true };
+
 // Required steps (no skip)
 const REQUIRED_STEPS = [
   { key: "profile", title: "Your Profile", required: true },
@@ -65,9 +68,7 @@ const REQUIRED_STEPS = [
   { key: "diet", title: "Dietary Type", required: true },
   { key: "workout_schedule", title: "Workout Schedule", required: true },
   { key: "equipment", title: "Equipment Access", required: true },
-  { key: "preferences", title: "Preferences", required: true },
-  { key: "health_safety", title: "Health & Safety", required: true },
-  { key: "review", title: "Review & Complete", required: true }
+  { key: "health_safety", title: "Health & Safety", required: true }
 ];
 
 // Optional steps (with skip)
@@ -76,6 +77,7 @@ const OPTIONAL_STEPS = [
   { key: "meal_frequency", title: "Meal Frequency", required: false },
   { key: "location", title: "Location", required: false },
   { key: "cuisine", title: "Cuisine Preference", required: false },
+  { key: "preferences", title: "Preferences", required: false },
   { key: "allergies", title: "Allergies & Intolerances", required: false },
   { key: "dislikes", title: "Foods You Dislike", required: false },
   { key: "sleep_schedule", title: "Sleep Schedule", required: false },
@@ -85,7 +87,10 @@ const OPTIONAL_STEPS = [
   { key: "habits", title: "Habits", required: false }
 ];
 
-const ALL_STEPS = [...REQUIRED_STEPS, ...OPTIONAL_STEPS];
+// Review step (always last)
+const REVIEW_STEP = { key: "review", title: "Review & Complete", required: true };
+
+const ALL_STEPS = [WELCOME_STEP, ...REQUIRED_STEPS, ...OPTIONAL_STEPS, REVIEW_STEP];
 
 export default function OnboardingWizard() {
   const { appData, setAppData } = useAppData();
@@ -121,9 +126,30 @@ export default function OnboardingWizard() {
   });
 
   const [skippedSteps, setSkippedSteps] = useState(new Set());
+  const [savedTheme, setSavedTheme] = useState(null);
+
+  // Force dark theme during onboarding
+  useEffect(() => {
+    const root = document.documentElement;
+    setSavedTheme(root.dataset.theme);
+    root.dataset.theme = "dark";
+
+    // Restore theme on unmount
+    return () => {
+      if (savedTheme) {
+        root.dataset.theme = savedTheme;
+      }
+    };
+  }, []);
 
   const handleNext = (data) => {
     if (data?.skipOnboarding) {
+      // Restore user's theme preference
+      const root = document.documentElement;
+      if (savedTheme) {
+        root.dataset.theme = savedTheme;
+      }
+      
       // Skip onboarding entirely
       setAppData(prev => ({
         ...prev,
@@ -163,6 +189,12 @@ export default function OnboardingWizard() {
   };
 
   const handleComplete = () => {
+    // Restore user's theme preference
+    const root = document.documentElement;
+    if (savedTheme) {
+      root.dataset.theme = savedTheme;
+    }
+
     // Calculate targets using Mifflin-St Jeor formula
     const weightKg = onboardingData.weightUnit === "lbs" 
       ? onboardingData.weightKg * 0.453592 
@@ -360,6 +392,8 @@ function renderStep(stepIndex, data, onNext, onBack, onSkip, onComplete, isDarkM
   const isLastStep = stepIndex === ALL_STEPS.length - 1;
 
   switch (step.key) {
+    case "welcome":
+      return <WelcomeStep data={data} onNext={onNext} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "profile":
       return <ProfileStep data={data} onNext={onNext} onBack={onBack} isDarkMode={isDarkMode} primaryColor={primaryColor} />;
     case "goals":
@@ -466,17 +500,103 @@ function NavigationButtons({ onBack, onNext, onSkip, isLastStep, isDarkMode, pri
   );
 }
 
+// Welcome Step Component
+function WelcomeStep({ data, onNext, isDarkMode, primaryColor }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px", alignItems: "center", textAlign: "center" }}>
+      <div style={{
+        fontSize: "64px",
+        marginBottom: "16px"
+      }}>
+        🌟
+      </div>
+      
+      <h2 style={{
+        margin: 0,
+        fontSize: "28px",
+        fontWeight: 600,
+        color: "var(--app-text)"
+      }}>
+        Let's build your plan together
+      </h2>
+      
+      <p style={{
+        margin: 0,
+        fontSize: "16px",
+        lineHeight: 1.6,
+        color: "var(--app-muted)",
+        maxWidth: "400px"
+      }}>
+        This will take just a couple of minutes. We'll personalize your meals, workouts, and daily targets to help you reach your goals.
+      </p>
+      
+      <div style={{
+        padding: "20px",
+        background: "var(--app-surface-soft)",
+        borderRadius: "12px",
+        border: "1px solid var(--app-border)",
+        maxWidth: "400px"
+      }}>
+        <div style={{ fontSize: "14px", color: "var(--app-text)", lineHeight: 1.6 }}>
+          <div style={{ marginBottom: "8px" }}>✓ Personalized calorie & protein targets</div>
+          <div style={{ marginBottom: "8px" }}>✓ Meal timing that fits your schedule</div>
+          <div style={{ marginBottom: "8px" }}>✓ Workout plan based on your equipment</div>
+          <div>✓ Progress tracking & weekly summaries</div>
+        </div>
+      </div>
+      
+      <button
+        onClick={() => onNext(data)}
+        style={{
+          padding: "16px 32px",
+          background: primaryColor,
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          fontSize: "18px",
+          fontWeight: 600,
+          cursor: "pointer",
+          minWidth: "200px"
+        }}
+      >
+        Let's begin
+      </button>
+    </div>
+  );
+}
+
 // Step Components
 function ProfileStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
   const [useImperial, setUseImperial] = useState(data.heightUnit === "ft" || data.weightUnit === "lbs");
+  
+  // Split height into feet and inches for imperial display
+  const [feet, setFeet] = useState(() => {
+    if (data.heightUnit === "ft") {
+      return Math.floor(data.heightCm / 30.48);
+    }
+    return 5;
+  });
+  const [inches, setInches] = useState(() => {
+    if (data.heightUnit === "ft") {
+      return Math.round((data.heightCm % 30.48) / 2.54);
+    }
+    return 9;
+  });
 
   const handleSubmit = () => {
     if (!formData.age || formData.age < 16 || formData.age > 100) {
       alert("Please enter a valid age (16-100)");
       return;
     }
-    onNext(formData);
+    
+    // Convert imperial to metric if needed
+    let finalHeightCm = formData.heightCm;
+    if (useImperial) {
+      finalHeightCm = (feet * 30.48) + (inches * 2.54);
+    }
+    
+    onNext({ ...formData, heightCm: finalHeightCm, heightUnit: useImperial ? "ft" : "cm" });
   };
 
   return (
@@ -536,21 +656,56 @@ function ProfileStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
           Height *
         </label>
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          <input
-            type="number"
-            value={formData.heightCm || ''}
-            onChange={(e) => setFormData(prev => ({ ...prev, heightCm: e.target.value === '' ? 0 : Number(e.target.value) }))}
-            placeholder={useImperial ? "Height (ft)" : "Height (cm)"}
-            style={{
-              flex: 1,
-              padding: "14px",
-              border: "1px solid var(--app-border)",
-              borderRadius: "8px",
-              background: "var(--app-surface)",
-              color: "var(--app-text)",
-              fontSize: "16px"
-            }}
-          />
+          {useImperial ? (
+            <>
+              <input
+                type="number"
+                value={feet || ''}
+                onChange={(e) => setFeet(e.target.value === '' ? 0 : Number(e.target.value))}
+                placeholder="ft"
+                style={{
+                  flex: 1,
+                  padding: "14px",
+                  border: "1px solid var(--app-border)",
+                  borderRadius: "8px",
+                  background: "var(--app-surface)",
+                  color: "var(--app-text)",
+                  fontSize: "16px"
+                }}
+              />
+              <input
+                type="number"
+                value={inches || ''}
+                onChange={(e) => setInches(e.target.value === '' ? 0 : Number(e.target.value))}
+                placeholder="in"
+                style={{
+                  flex: 1,
+                  padding: "14px",
+                  border: "1px solid var(--app-border)",
+                  borderRadius: "8px",
+                  background: "var(--app-surface)",
+                  color: "var(--app-text)",
+                  fontSize: "16px"
+                }}
+              />
+            </>
+          ) : (
+            <input
+              type="number"
+              value={formData.heightCm || ''}
+              onChange={(e) => setFormData(prev => ({ ...prev, heightCm: e.target.value === '' ? 0 : Number(e.target.value) }))}
+              placeholder="Height (cm)"
+              style={{
+                flex: 1,
+                padding: "14px",
+                border: "1px solid var(--app-border)",
+                borderRadius: "8px",
+                background: "var(--app-surface)",
+                color: "var(--app-text)",
+                fontSize: "16px"
+              }}
+            />
+          )}
           <button
             type="button"
             onClick={() => setUseImperial(!useImperial)}
@@ -848,6 +1003,7 @@ function PreferencesStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
           <option value="early">Early Riser (Breakfast, Lunch, Early Dinner)</option>
           <option value="late">Night Owl (Brunch, Lunch, Late Dinner)</option>
           <option value="intermittent">Intermittent Fasting (2 main meals)</option>
+          <option value="shift_worker">Shift Worker / Rotating Schedule (flexible meal times)</option>
         </select>
       </div>
 
