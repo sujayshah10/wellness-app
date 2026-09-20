@@ -1132,20 +1132,23 @@ function SettingsSection({ appData, setAppData, t }) {
         <button
           onClick={() => {
             if (window.confirm("This will reset the onboarding wizard so you can see it again. Your meal and workout data will be preserved. Continue?")) {
-              store.updateSettings({
-                onboardingCompleted: false,
-                onboardingCompletedAt: null,
-                onboardingSkipped: false
-              });
-              setAppData(prev => ({
-                ...prev,
+              // Reset in store first
+              const currentData = store.loadAppData();
+              const updatedData = {
+                ...currentData,
                 settings: {
-                  ...prev.settings,
+                  ...currentData.settings,
                   onboardingCompleted: false,
                   onboardingCompletedAt: null,
                   onboardingSkipped: false
                 }
-              }));
+              };
+              store.saveAppData(updatedData);
+              
+              // Then update local state
+              setAppData(updatedData);
+              
+              // Reload to trigger onboarding
               window.location.reload();
             }
           }}
