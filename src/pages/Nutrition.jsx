@@ -1,5 +1,4 @@
 import { useDay } from "../context/useDay";
-import { useMeals } from "../context/useMeals";
 import { useAppData } from "../context/useAppData";
 import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
@@ -10,8 +9,7 @@ import { shouldShowMeal } from "../utils/recommendationFilter";
 export default function Nutrition() {
 
   const { selectedDay, setSelectedDay } = useDay();
-  const { toggleMealCompletion, isMealCompleted } = useMeals();
-  const { appData } = useAppData();
+  const { appData, toggleMealCompletion } = useAppData();
   const { t } = useTranslation();
 
   const dietData = appData.dietPlan[selectedDay];
@@ -47,10 +45,15 @@ export default function Nutrition() {
             const meal = dietData[mealType.key];
             if (!meal) return null;
 
-            const completed = isMealCompleted(selectedDay, mealType.key);
+            const completionData = appData.completionTracker[selectedDay] || { mealsCompleted: [] };
+            const completed = completionData.mealsCompleted.includes(mealType.key);
             const isHidden = !shouldShowMeal(meal, foodAvoidances, otherFoodAvoidances);
 
             if (isHidden) return null;
+
+            const handleToggle = () => {
+              toggleMealCompletion(selectedDay, mealType.key);
+            };
 
             return (
               <div
@@ -138,7 +141,7 @@ export default function Nutrition() {
                   <input
                     type="checkbox"
                     checked={completed}
-                    onChange={() => toggleMealCompletion(selectedDay, mealType.key)}
+                    onChange={handleToggle}
                     style={{
                       width: "24px",
                       height: "24px",

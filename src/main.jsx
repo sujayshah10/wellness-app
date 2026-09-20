@@ -6,7 +6,6 @@ import "./index.css";
 import "./App.css";
 import { AppDataProvider } from "./context/AppDataContext.jsx";
 import { DayProvider } from "./context/DayContext.jsx";
-import { MealProvider } from "./context/MealContext.jsx";
 
 const rootElement = document.getElementById("root");
 
@@ -34,9 +33,7 @@ try {
       <HashRouter>
         <AppDataProvider>
           <DayProvider>
-            <MealProvider>
-              <App />
-            </MealProvider>
+            <App />
           </DayProvider>
         </AppDataProvider>
       </HashRouter>
