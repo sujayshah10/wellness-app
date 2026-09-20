@@ -705,7 +705,7 @@ function DietStep({ data, onNext, isDarkMode, primaryColor }) {
                 background: formData.dietType === diet.key ? primaryColor : "var(--app-surface)",
                 color: formData.dietType === diet.key ? (isDarkMode ? "white" : "white") : "var(--app-text)",
                 fontSize: "15px",
-                fontWeight: 600",
+                fontWeight: 600,
                 cursor: "pointer",
                 textAlign: "left",
                 transition: "all 0.2s ease"
@@ -815,7 +815,7 @@ function EquipmentStep({ data, onNext, isDarkMode, primaryColor }) {
                 background: formData.equipment === equipment.key ? primaryColor : "var(--app-surface)",
                 color: formData.equipment === equipment.key ? (isDarkMode ? "white" : "white") : "var(--app-text)",
                 fontSize: "15px",
-                fontWeight: 600",
+                fontWeight: 600,
                 cursor: "pointer",
                 textAlign: "left",
                 transition: "all 0.2s ease"
@@ -1899,7 +1899,7 @@ function ReviewStep({ data, onComplete, onBack, isLastStep, isDarkMode, primaryC
             border: "none",
             borderRadius: "8px",
             fontSize: "16px",
-            fontWeight: 600",
+            fontWeight: 600,
             cursor: "pointer"
           }}
         >
