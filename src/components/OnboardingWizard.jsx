@@ -131,13 +131,14 @@ export default function OnboardingWizard() {
   // Force dark theme during onboarding
   useEffect(() => {
     const root = document.documentElement;
-    setSavedTheme(root.dataset.theme);
+    const currentTheme = root.dataset.theme;
+    setSavedTheme(currentTheme);
     root.dataset.theme = "dark";
 
     // Restore theme on unmount
     return () => {
-      if (savedTheme) {
-        root.dataset.theme = savedTheme;
+      if (currentTheme) {
+        root.dataset.theme = currentTheme;
       }
     };
   }, []);
