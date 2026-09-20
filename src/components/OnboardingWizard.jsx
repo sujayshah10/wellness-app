@@ -1707,7 +1707,7 @@ function HabitsStep({ data, onNext, onSkip, isDarkMode, primaryColor }) {
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: center", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <span style={{ fontSize: "14px", color: "var(--app-text)" }}>Do you drink alcohol?</span>
             <div style={{ display: "flex", gap: "8px" }}>
               <button
