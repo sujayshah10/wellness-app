@@ -1832,19 +1832,19 @@ function ReviewStep({ data, onComplete, onBack, isLastStep, isDarkMode, primaryC
           <div style={{ marginBottom: "12px" }}>
             <strong>Profile:</strong> {data.gender === "male" ? "Male" : "Female"}, {data.age} years old, {Math.round(weightKg)}kg, {Math.round(heightCm)}cm
           </div>
-          <div style={{ marginBottom: 12px }}>
+          <div style={{ marginBottom: "12px" }}>
             <strong>Goal:</strong> {GOALS.find(g => g.key === data.goal)?.label}
           </div>
-          <div style={{ marginBottom: 12px }}>
+          <div style={{ marginBottom: "12px" }}>
             <strong>Activity:</strong> {ACTIVITY_LEVELS.find(a => a.key === data.activityLevel)?.label}
           </div>
-          <div style={{ marginBottom: 12px }}>
+          <div style={{ marginBottom: "12px" }}>
             <strong>Diet:</strong> {DIET_TYPES.find(d => d.key === data.dietType)?.label}
           </div>
-          <div style={{ marginBottom: 12px }}>
+          <div style={{ marginBottom: "12px" }}>
             <strong>Workout:</strong> {data.workoutDaysPerWeek} days/week
           </div>
-          <div style={{ marginBottom: 12px }}>
+          <div style={{ marginBottom: "12px" }}>
             <strong>Equipment:</strong> {EQUIPMENT_OPTIONS.find(e => e.key === data.equipment)?.label}
           </div>
         </div>
