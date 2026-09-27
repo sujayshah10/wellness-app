@@ -131,26 +131,18 @@ export default function OnboardingWizard() {
   // Force dark theme during onboarding
   useEffect(() => {
     const root = document.documentElement;
-    const currentTheme = root.dataset.theme;
+    const currentTheme = root.dataset.theme || "light";
     setSavedTheme(currentTheme);
     root.dataset.theme = "dark";
 
     // Restore theme on unmount
     return () => {
-      if (currentTheme) {
-        root.dataset.theme = currentTheme;
-      }
+      root.dataset.theme = currentTheme;
     };
   }, []);
 
   const handleNext = (data) => {
     if (data?.skipOnboarding) {
-      // Restore user's theme preference
-      const root = document.documentElement;
-      if (savedTheme) {
-        root.dataset.theme = savedTheme;
-      }
-      
       // Skip onboarding entirely
       setAppData(prev => ({
         ...prev,
@@ -192,9 +184,7 @@ export default function OnboardingWizard() {
   const handleComplete = () => {
     // Restore user's theme preference
     const root = document.documentElement;
-    if (savedTheme) {
-      root.dataset.theme = savedTheme;
-    }
+    root.dataset.theme = savedTheme || "light";
 
     // Calculate targets using Mifflin-St Jeor formula
     const weightKg = onboardingData.weightUnit === "lbs" 
