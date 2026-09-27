@@ -1131,12 +1131,9 @@ function SettingsSection({ appData, setAppData, t }) {
       <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid var(--app-border)" }}>
         <button
           onClick={() => {
-            console.log("Reset onboarding button clicked");
             if (window.confirm("This will reset the onboarding wizard so you can see it again. Your meal and workout data will be preserved. Continue?")) {
-              console.log("User confirmed reset");
               // Reset in store first
               const currentData = store.loadAppData();
-              console.log("Current data:", currentData.settings);
               const updatedData = {
                 ...currentData,
                 settings: {
@@ -1146,23 +1143,10 @@ function SettingsSection({ appData, setAppData, t }) {
                   onboardingSkipped: false
                 }
               };
-              console.log("Updated data:", updatedData.settings);
               store.saveAppData(updatedData);
-              console.log("Data saved to localStorage");
               
-              // Verify it was saved
-              const verification = store.loadAppData();
-              console.log("Verification after save:", verification.settings);
-              
-              // Then update local state
-              setAppData(updatedData);
-              console.log("Local state updated");
-              
-              // Reload to trigger onboarding
-              console.log("Reloading page...");
-              window.location.reload();
-            } else {
-              console.log("User cancelled reset");
+              // Force immediate reload
+              window.location.href = window.location.href;
             }
           }}
           style={{
