@@ -66,7 +66,7 @@ function App() {
   }, [appData.settings.fontFamily, appData.settings.fontSize, FONT_FAMILIES, FONT_SIZES]);
 
   useEffect(() => {
-    if (!loading && (!appData.settings?.onboardingCompleted || isFirstTime)) {
+    if (!loading && (!appData.settings?.onboardingCompleted || isFirstTime())) {
       setShowOnboarding(true);
     } else {
       setShowOnboarding(false);

@@ -50,7 +50,7 @@ export function AppDataProvider({ children }) {
     return completionData?.overallCompletion || 0;
   };
 
-  const isFirstTime = store.isFirstTimeUser();
+  const isFirstTime = () => store.isFirstTimeUser();
 
   const value = useMemo(() => ({
     appData,
@@ -62,7 +62,7 @@ export function AppDataProvider({ children }) {
     getDailyCompletion,
     FONT_FAMILIES,
     FONT_SIZES
-  }), [appData, isFirstTime]);
+  }), [appData]);
 
   return (
     <AppDataContext.Provider value={value}>
