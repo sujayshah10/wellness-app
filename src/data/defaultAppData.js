@@ -29,7 +29,7 @@ export const DEFAULT_PROFILE = {
   weightKg: 80,
   weightUnit: "kg",
   activityLevel: "light",
-  goal: "fatLoss",
+  goals: ["lose_fat"], // Changed to array to support multiple goals
   deficitTarget: 400,
   sugar: false,
   bloodPressure: false,

@@ -133,7 +133,9 @@ function normalizeAppData(data) {
     },
     profile: {
       ...DEFAULT_PROFILE,
-      ...(data?.profile || {})
+      ...(data?.profile || {}),
+      // Ensure goals is always an array
+      goals: Array.isArray(data?.profile?.goals) ? data.profile.goals : DEFAULT_PROFILE.goals
     },
     about: {
       ...DEFAULT_ABOUT,

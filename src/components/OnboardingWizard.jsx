@@ -11,7 +11,7 @@ const ACTIVITY_LEVELS = [
   { key: "very_active", label: "Very Active", description: "Hard exercise 6-7 days/week", multiplier: 1.725 }
 ];
 
-// Goal options
+// Goal options (can select multiple)
 const GOALS = [
   { key: "lose_fat", label: "Lose Fat", calorieAdjustment: -500, proteinPerKg: 2.0 },
   { key: "maintain", label: "Maintain", calorieAdjustment: 0, proteinPerKg: 1.6 },
@@ -104,7 +104,7 @@ export default function OnboardingWizard() {
     heightUnit: "cm",
     weightKg: 80,
     weightUnit: "kg",
-    goal: "lose_fat",
+    goals: ["lose_fat"], // Changed to array to support multiple goals
     activityLevel: "sedentary",
     dietType: "non_vegetarian",
     workoutDaysPerWeek: 3,
@@ -205,13 +205,26 @@ export default function OnboardingWizard() {
     // TDEE calculation
     const activityMultiplier = ACTIVITY_LEVELS.find(a => a.key === onboardingData.activityLevel)?.multiplier || 1.2;
     const tdee = bmr * activityMultiplier;
-    
-    // Target calories based on goal
-    const goalConfig = GOALS.find(g => g.key === onboardingData.goal) || GOALS[0];
-    const targetCalories = Math.round(tdee + goalConfig.calorieAdjustment);
-    
-    // Target protein based on goal
-    const targetProtein = Math.round(weightKg * goalConfig.proteinPerKg);
+
+    // Target calories based on goals (handle multiple selections)
+    const selectedGoals = onboardingData.goals || ["lose_fat"];
+    let targetCalories = tdee;
+    let targetProtein = Math.round(weightKg * 1.6); // Default to maintain protein
+
+    if (selectedGoals.includes("lose_fat") && selectedGoals.includes("build_muscle")) {
+      // Body recomposition: maintain calories, higher protein
+      targetCalories = Math.round(tdee);
+      targetProtein = Math.round(weightKg * 2.2); // Higher protein for recomp
+    } else if (selectedGoals.includes("lose_fat")) {
+      targetCalories = Math.round(tdee - 500);
+      targetProtein = Math.round(weightKg * 2.0);
+    } else if (selectedGoals.includes("build_muscle")) {
+      targetCalories = Math.round(tdee + 300);
+      targetProtein = Math.round(weightKg * 2.0);
+    } else if (selectedGoals.includes("maintain")) {
+      targetCalories = Math.round(tdee);
+      targetProtein = Math.round(weightKg * 1.6);
+    }
     
     // Workout split suggestion
     let workoutFocus = "Full Body";
@@ -233,7 +246,7 @@ export default function OnboardingWizard() {
       weightKg: weightKg,
       weightUnit: "kg",
       activityLevel: onboardingData.activityLevel,
-      goal: onboardingData.goal,
+      goals: onboardingData.goals, // Changed to array
       dietType: onboardingData.dietType,
       workoutDaysPerWeek: onboardingData.workoutDaysPerWeek,
       equipment: onboardingData.equipment,
@@ -765,34 +778,56 @@ function GoalsStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
     onNext(formData);
   };
 
+  const toggleGoal = (goalKey) => {
+    setFormData(prev => {
+      const currentGoals = prev.goals || [];
+      if (currentGoals.includes(goalKey)) {
+        // Don't allow deselecting all goals - keep at least one
+        if (currentGoals.length > 1) {
+          return { ...prev, goals: currentGoals.filter(g => g !== goalKey) };
+        }
+        return prev;
+      } else {
+        return { ...prev, goals: [...currentGoals, goalKey] };
+      }
+    });
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
         <label style={{ display: "block", marginBottom: "12px", fontWeight: 600, color: "var(--app-text)" }}>
-          What's your primary goal? *
+          What are your goals? (Select all that apply) *
         </label>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {GOALS.map((goal) => (
-            <button
-              key={goal.key}
-              type="button"
-              onClick={() => setFormData(prev => ({ ...prev, goal: goal.key }))}
-              style={{
-                padding: "16px",
-                border: "1px solid var(--app-border)",
-                borderRadius: "8px",
-                background: formData.goal === goal.key ? primaryColor : "var(--app-surface)",
-                color: formData.goal === goal.key ? (isDarkMode ? "white" : "white") : "var(--app-text)",
-                fontSize: "15px",
-                fontWeight: "600",
-                cursor: "pointer",
-                textAlign: "left",
-                transition: "all 0.2s ease"
-              }}
-            >
-              {goal.label}
-            </button>
-          ))}
+          {GOALS.map((goal) => {
+            const isSelected = (formData.goals || []).includes(goal.key);
+            return (
+              <button
+                key={goal.key}
+                type="button"
+                onClick={() => toggleGoal(goal.key)}
+                style={{
+                  padding: "16px",
+                  border: "1px solid var(--app-border)",
+                  borderRadius: "8px",
+                  background: isSelected ? primaryColor : "var(--app-surface)",
+                  color: isSelected ? (isDarkMode ? "white" : "white") : "var(--app-text)",
+                  fontSize: "15px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  transition: "all 0.2s ease",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between"
+                }}
+              >
+                <span>{goal.label}</span>
+                {isSelected && <span>✓</span>}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -1101,7 +1136,7 @@ function MealFrequencyStep({ data, onNext, onBack, onSkip, isDarkMode, primaryCo
           How many meals per day? (optional)
         </label>
         <div style={{ display: "flex", gap: "12px" }}>
-          {[2, 3, 4, 5].map((num) => (
+          {[1, 2, 3, 4, 5].map((num) => (
             <button
               key={num}
               type="button"
@@ -1365,7 +1400,7 @@ function SleepScheduleStep({ data, onNext, onBack, onSkip, isDarkMode, primaryCo
             fontSize: "14px",
             fontWeight: 500,
             cursor: "pointer",
-            textDecoration: underline
+            textDecoration: "underline"
           }}
         >
           Skip
@@ -1443,7 +1478,7 @@ function CookingTimeStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColo
             fontSize: "14px",
             fontWeight: 500,
             cursor: "pointer",
-            textDecoration: underline
+            textDecoration: "underline"
           }}
         >
           Skip
@@ -1521,7 +1556,7 @@ function ExerciseExperienceStep({ data, onNext, onBack, onSkip, isDarkMode, prim
             fontSize: "14px",
             fontWeight: 500,
             cursor: "pointer",
-            textDecoration: underline
+            textDecoration: "underline"
           }}
         >
           Skip
@@ -1592,7 +1627,7 @@ function LimitationsStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColo
             fontSize: "14px",
             fontWeight: 500,
             cursor: "pointer",
-            textDecoration: underline
+            textDecoration: "underline"
           }}
         >
           Skip
@@ -1724,7 +1759,7 @@ function HabitsStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) 
             fontSize: "14px",
             fontWeight: 500,
             cursor: "pointer",
-            textDecoration: underline
+            textDecoration: "underline"
           }}
         >
           Skip
@@ -1737,20 +1772,36 @@ function HabitsStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) 
 function ReviewStep({ data, onComplete, onBack, isLastStep, isDarkMode, primaryColor }) {
   const weightKg = data.weightUnit === "lbs" ? data.weightKg * 0.3527 : data.weightKg;
   const heightCm = data.heightUnit === "ft" ? data.heightCm * 30.48 : data.heightCm;
-  
-  const goalConfig = GOALS.find(g => g.key === data.goal) || GOALS[0];
+
+  const selectedGoals = data.goals || ["lose_fat"];
   const activityMultiplier = ACTIVITY_LEVELS.find(a => a.key === data.activityLevel)?.multiplier || 1.2;
-  
+
   let bmr;
   if (data.gender === "male") {
     bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * data.age) + 5;
   } else {
     bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * data.age) - 161;
   }
-  
+
   const tdee = bmr * activityMultiplier;
-  const targetCalories = Math.round(tdee + goalConfig.calorieAdjustment);
-  const targetProtein = Math.round(weightKg * goalConfig.proteinPerKg);
+
+  // Calculate targets based on multiple goals
+  let targetCalories = tdee;
+  let targetProtein = Math.round(weightKg * 1.6);
+
+  if (selectedGoals.includes("lose_fat") && selectedGoals.includes("build_muscle")) {
+    targetCalories = Math.round(tdee);
+    targetProtein = Math.round(weightKg * 2.2);
+  } else if (selectedGoals.includes("lose_fat")) {
+    targetCalories = Math.round(tdee - 500);
+    targetProtein = Math.round(weightKg * 2.0);
+  } else if (selectedGoals.includes("build_muscle")) {
+    targetCalories = Math.round(tdee + 300);
+    targetProtein = Math.round(weightKg * 2.0);
+  } else if (selectedGoals.includes("maintain")) {
+    targetCalories = Math.round(tdee);
+    targetProtein = Math.round(weightKg * 1.6);
+  }
 
   let workoutFocus = "Full Body";
   if (data.workoutDaysPerWeek >= 5) {
@@ -1780,7 +1831,7 @@ function ReviewStep({ data, onComplete, onBack, isLastStep, isDarkMode, primaryC
             <strong>Profile:</strong> {data.gender === "male" ? "Male" : "Female"}, {data.age} years old, {Math.round(weightKg)}kg, {Math.round(heightCm)}cm
           </div>
           <div style={{ marginBottom: "12px" }}>
-            <strong>Goal:</strong> {GOALS.find(g => g.key === data.goal)?.label}
+            <strong>Goals:</strong> {selectedGoals.map(g => GOALS.find(goal => goal.key === g)?.label).join(", ")}
           </div>
           <div style={{ marginBottom: "12px" }}>
             <strong>Activity:</strong> {ACTIVITY_LEVELS.find(a => a.key === data.activityLevel)?.label}

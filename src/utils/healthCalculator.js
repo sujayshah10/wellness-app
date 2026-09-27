@@ -56,6 +56,9 @@ export function calculateBodyMetrics(profile = {}, targets = {}) {
   const weightKg = Number(profile.weightKg) || 0;
   const gender = profile.gender || "male";
   const activityLevel = profile.activityLevel || "light";
+
+  // Handle new goals array format (for backward compatibility)
+  const goals = Array.isArray(profile.goals) ? profile.goals : [];
   const deficitTarget = Number(profile.deficitTarget) || 400;
 
   const hasRequiredData = age > 0 && heightCm > 0 && weightKg > 0;
@@ -67,10 +70,33 @@ export function calculateBodyMetrics(profile = {}, targets = {}) {
     ? roundToNearest(bmr * (activityMultipliers[activityLevel] || activityMultipliers.light))
     : 0;
 
-  const autoCalories = tdee ? Math.max(1200, roundToNearest(tdee - deficitTarget)) : Number(targets.calories) || 0;
+  // Calculate calorie adjustment based on goals
+  let calorieAdjustment = 0;
+  let proteinMultiplier = 1.6;
+
+  if (goals.includes("lose_fat") && goals.includes("build_muscle")) {
+    // Body recomposition: maintain calories, higher protein
+    calorieAdjustment = 0;
+    proteinMultiplier = 2.2;
+  } else if (goals.includes("lose_fat")) {
+    calorieAdjustment = -500;
+    proteinMultiplier = 2.0;
+  } else if (goals.includes("build_muscle")) {
+    calorieAdjustment = 300;
+    proteinMultiplier = 2.0;
+  } else if (goals.includes("maintain")) {
+    calorieAdjustment = 0;
+    proteinMultiplier = 1.6;
+  } else {
+    // Fallback to old deficitTarget for backward compatibility
+    calorieAdjustment = -deficitTarget;
+    proteinMultiplier = 1.6;
+  }
+
+  const autoCalories = tdee ? Math.max(1200, roundToNearest(tdee + calorieAdjustment)) : Number(targets.calories) || 0;
   const manualCalories = Number(targets.calories) || autoCalories;
   const calorieTarget = targets.deficitMode === "manual" ? manualCalories : autoCalories;
-  const proteinTarget = weightKg ? roundToNearest(weightKg * 1.6, 5) : Number(targets.protein) || 0;
+  const proteinTarget = weightKg ? roundToNearest(weightKg * proteinMultiplier, 5) : Number(targets.protein) || 0;
 
   return {
     bmr,
