@@ -745,6 +745,13 @@ export function getFoodLibrary() {
  * Check if user is first-time user
  */
 export function isFirstTimeUser() {
+  const settings = getSettings();
+  // Check if onboarding has been completed
+  if (settings?.onboardingCompleted) {
+    return false;
+  }
+  
+  // Fallback to profile check
   const profile = getProfile();
   return !profile || 
     !profile.name || 
