@@ -1144,7 +1144,7 @@ function SettingsSection({ appData, setAppData, t }) {
                 }
               };
               store.saveAppData(updatedData);
-              
+
               // Force immediate reload
               window.location.href = window.location.href;
             }
@@ -1158,10 +1158,35 @@ function SettingsSection({ appData, setAppData, t }) {
             borderRadius: "8px",
             fontSize: "14px",
             fontWeight: 600,
-            cursor: "pointer"
+            cursor: "pointer",
+            marginBottom: "12px"
           }}
         >
           Reset Onboarding Wizard
+        </button>
+
+        <button
+          onClick={() => {
+            if (window.confirm("This will force the app to update to the latest version by clearing the cache. Continue?")) {
+              // Clear version storage to trigger version check
+              localStorage.removeItem("wellnessAppLastVersion");
+              // Force reload from server
+              window.location.reload(true);
+            }
+          }}
+          style={{
+            width: "100%",
+            padding: "12px",
+            background: "transparent",
+            color: "var(--app-accent)",
+            border: "1px solid var(--app-accent)",
+            borderRadius: "8px",
+            fontSize: "14px",
+            fontWeight: 600,
+            cursor: "pointer"
+          }}
+        >
+          Force App Update
         </button>
       </div>
     </div>

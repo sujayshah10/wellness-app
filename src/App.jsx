@@ -83,6 +83,23 @@ function App() {
     };
   }, []);
 
+  // Version check to force cache refresh when deployed version changes
+  useEffect(() => {
+    const currentVersion = appData.about.version;
+    const storageKey = "wellnessAppLastVersion";
+    const lastVersion = localStorage.getItem(storageKey);
+
+    if (lastVersion && lastVersion !== currentVersion) {
+      // Version changed - force reload to clear cache
+      console.log(`App updated from ${lastVersion} to ${currentVersion} - refreshing cache`);
+      localStorage.setItem(storageKey, currentVersion);
+      window.location.reload(true); // Force reload from server
+    } else if (!lastVersion) {
+      // First visit - store version
+      localStorage.setItem(storageKey, currentVersion);
+    }
+  }, [appData.about.version]);
+
   return (
     <div className="app-shell">
       {loading && (
