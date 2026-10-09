@@ -115,11 +115,11 @@ const REQUIRED_STEPS = [
 const OPTIONAL_STEPS = [
   { key: "goal_weight", title: "Goal Weight", required: false },
   { key: "meal_frequency", title: "Meal Frequency", required: false },
+  { key: "preferences", title: "Meal Timing", required: false }, // Moved after meal_frequency
   { key: "location", title: "Location", required: false },
   { key: "cuisine", title: "Cuisine Preference", required: false },
   { key: "allergies", title: "Allergies & Intolerances", required: false },
   { key: "dislikes", title: "Foods You Dislike", required: false },
-  { key: "preferences", title: "Preferences", required: false },
   { key: "sleep_schedule", title: "Sleep Schedule", required: false },
   { key: "cooking_time", title: "Cooking Time", required: false },
   { key: "exercise_experience", title: "Exercise Experience", required: false },
@@ -153,6 +153,7 @@ export default function OnboardingWizard() {
     // Optional fields (with defaults)
     goalWeightKg: null,
     mealsPerDay: 3,
+    mealTimes: ["08:00", "13:00", "20:00"], // Default 3 meal times
     country: "",
     cuisine: "mixed",
     allergies: "",
@@ -292,6 +293,7 @@ export default function OnboardingWizard() {
       equipment: onboardingData.equipment,
       goalWeightKg: onboardingData.goalWeightKg,
       mealsPerDay: onboardingData.mealsPerDay,
+      mealTimes: onboardingData.mealTimes,
       country: onboardingData.country,
       cuisine: onboardingData.cuisine,
       allergies: onboardingData.allergies,
@@ -1043,82 +1045,60 @@ function PreferencesStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
   const mealsPerDay = data.mealsPerDay || 3;
 
-  const getMealTimingOptions = () => {
-    const baseOptions = [
-      { value: "shift_worker", label: "Shift Worker / Rotating Schedule (flexible meal times)" }
-    ];
+  // Initialize meal times if not set
+  const mealTimes = formData.mealTimes || Array(mealsPerDay).fill("12:00");
 
-    if (mealsPerDay === 1) {
-      return [
-        ...baseOptions,
-        { value: "single_evening", label: "One Meal in Evening" },
-        { value: "single_noon", label: "One Meal at Noon" },
-        { value: "single_morning", label: "One Meal in Morning" }
-      ];
-    } else if (mealsPerDay === 2) {
-      return [
-        ...baseOptions,
-        { value: "brunch_dinner", label: "Brunch + Dinner" },
-        { value: "breakfast_late", label: "Breakfast + Late Dinner" },
-        { value: "early_late", label: "Early Breakfast + Late Dinner" },
-        { value: "intermittent", label: "Intermittent Fasting (2 main meals)" }
-      ];
-    } else if (mealsPerDay === 3) {
-      return [
-        ...baseOptions,
-        { value: "standard", label: "Standard (Breakfast, Lunch, Dinner)" },
-        { value: "early", label: "Early Riser (Breakfast, Lunch, Early Dinner)" },
-        { value: "late", label: "Night Owl (Brunch, Lunch, Late Dinner)" }
-      ];
-    } else if (mealsPerDay === 4) {
-      return [
-        ...baseOptions,
-        { value: "four_standard", label: "4 Meals (Breakfast, Snack, Lunch, Dinner)" },
-        { value: "four_small", label: "4 Small Meals Throughout Day" },
-        { value: "four_early", label: "4 Meals Starting Early" }
-      ];
-    } else if (mealsPerDay === 5) {
-      return [
-        ...baseOptions,
-        { value: "five_standard", label: "5 Meals (Breakfast, Snack, Lunch, Snack, Dinner)" },
-        { value: "five_small", label: "5 Small Meals Every 2-3 Hours" },
-        { value: "five_early", label: "5 Meals Starting Early" }
-      ];
-    }
-    return baseOptions;
+  const handleMealTimeChange = (index, time) => {
+    const newMealTimes = [...mealTimes];
+    newMealTimes[index] = time;
+    setFormData(prev => ({ ...prev, mealTimes: newMealTimes }));
+  };
+
+  const getMealLabel = (index) => {
+    const labels = {
+      1: ["Meal"],
+      2: ["First Meal", "Second Meal"],
+      3: ["Breakfast", "Lunch", "Dinner"],
+      4: ["Breakfast", "Morning Snack", "Lunch", "Dinner"],
+      5: ["Breakfast", "Morning Snack", "Lunch", "Afternoon Snack", "Dinner"]
+    };
+    return labels[mealsPerDay]?.[index] || `Meal ${index + 1}`;
   };
 
   const handleSubmit = () => {
+    setFormData(prev => ({ ...prev, mealTimes }));
     onNext(formData);
   };
-
-  const timingOptions = getMealTimingOptions();
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
-        <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, color: "var(--app-text)" }}>
-          Preferred meal timing ({mealsPerDay} meals/day) *
+        <label style={{ display: "block", marginBottom: "12px", fontWeight: 600, color: "var(--app-text)" }}>
+          Set your meal times ({mealsPerDay} meals/day) *
         </label>
-        <select
-          value={formData.mealTiming || timingOptions[0]?.value}
-          onChange={(e) => setFormData(prev => ({ ...prev, mealTiming: e.target.value }))}
-          style={{
-            width: "100%",
-            padding: "14px",
-            border: "1px solid var(--app-border)",
-            borderRadius: "8px",
-            background: "var(--app-surface)",
-            color: "var(--app-text)",
-            fontSize: "16px"
-          }}
-        >
-          {timingOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {Array.from({ length: mealsPerDay }).map((_, index) => (
+            <div key={index}>
+              <label style={{ display: "block", marginBottom: "4px", fontSize: "13px", color: "var(--app-muted)" }}>
+                {getMealLabel(index)}
+              </label>
+              <input
+                type="time"
+                value={mealTimes[index]}
+                onChange={(e) => handleMealTimeChange(index, e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  border: "1px solid var(--app-border)",
+                  borderRadius: "8px",
+                  background: "var(--app-surface)",
+                  color: "var(--app-text)",
+                  fontSize: "16px"
+                }}
+              />
+            </div>
           ))}
-        </select>
+        </div>
       </div>
 
       <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
@@ -1270,6 +1250,9 @@ function LocationStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }
     try {
       // Using countries.dev free API for city/region search
       const response = await fetch(`https://countries.dev/cities?q=${encodeURIComponent(query)}`);
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
       const data = await response.json();
       const cities = data.cities || [];
       setSuggestions(cities.slice(0, 10)); // Limit to 10 suggestions
@@ -1277,6 +1260,7 @@ function LocationStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }
     } catch (error) {
       console.error("Error fetching location suggestions:", error);
       setSuggestions([]);
+      setShowSuggestions(false);
     }
   };
 
@@ -1381,8 +1365,9 @@ function AllergiesStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor 
   };
 
   const handleSubmit = () => {
-    setFormData(prev => ({ ...prev, allergies: selectedAllergies.join(", ") }));
-    onNext(formData);
+    const updatedData = { ...formData, allergies: selectedAllergies.join(", ") };
+    setFormData(updatedData);
+    onNext(updatedData);
   };
 
   return (
@@ -1552,8 +1537,9 @@ function DislikesStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }
   };
 
   const handleSubmit = () => {
-    setFormData(prev => ({ ...prev, dislikes: selectedDislikes.join(", ") }));
-    onNext(formData);
+    const updatedData = { ...formData, dislikes: selectedDislikes.join(", ") };
+    setFormData(updatedData);
+    onNext(updatedData);
   };
 
   return (
@@ -2129,19 +2115,24 @@ function ReviewStep({ data, onComplete, onBack, isLastStep, isDarkMode, primaryC
   // Calculate targets based on multiple goals
   let targetCalories = tdee;
   let targetProtein = Math.round(weightKg * 1.6);
+  let calorieAdjustment = 0;
 
   if (selectedGoals.includes("lose_fat") && selectedGoals.includes("build_muscle")) {
     targetCalories = Math.round(tdee);
     targetProtein = Math.round(weightKg * 2.2);
+    calorieAdjustment = 0;
   } else if (selectedGoals.includes("lose_fat")) {
     targetCalories = Math.round(tdee - 500);
     targetProtein = Math.round(weightKg * 2.0);
+    calorieAdjustment = -500;
   } else if (selectedGoals.includes("build_muscle")) {
     targetCalories = Math.round(tdee + 300);
     targetProtein = Math.round(weightKg * 2.0);
+    calorieAdjustment = 300;
   } else if (selectedGoals.includes("maintain")) {
     targetCalories = Math.round(tdee);
     targetProtein = Math.round(weightKg * 1.6);
+    calorieAdjustment = 0;
   }
 
   let workoutFocus = "Full Body";
@@ -2208,7 +2199,7 @@ function ReviewStep({ data, onComplete, onBack, isLastStep, isDarkMode, primaryC
               <strong>Workout Focus:</strong> {workoutFocus}
             </div>
             <div>
-              <strong>Calorie Deficit:</strong> {goalConfig.calorieAdjustment > 0 ? `+${goalConfig.calorieAdjustment}` : goalConfig.calorieAdjustment} kcal
+              <strong>Calorie Adjustment:</strong> {calorieAdjustment > 0 ? `+${calorieAdjustment}` : calorieAdjustment} kcal
             </div>
           </div>
         </div>
