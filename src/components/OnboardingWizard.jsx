@@ -1125,13 +1125,6 @@ function PreferencesStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
     </div>
   );
 }
-        </select>
-      </div>
-
-      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
-    </div>
-  );
-}
 
 function HealthSafetyStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
