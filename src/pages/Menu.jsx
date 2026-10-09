@@ -1387,7 +1387,7 @@ export default function Menu() {
         )}
       </div>
 
-      {!section && <MenuList onOpen={setSection} t={t} isFirstTime={isFirstTime} />}
+      {!section && <MenuList onOpen={setSection} t={t} isFirstTime={isFirstTime()} />}
       {section === "Intakes" && <IntakesSection appData={appData} setAppData={setAppData} t={t} />}
       {section === "Exercises" && <ExercisesSection appData={appData} setAppData={setAppData} t={t} />}
       {section === "Profile" && <ProfileSection appData={appData} setAppData={setAppData} t={t} />}

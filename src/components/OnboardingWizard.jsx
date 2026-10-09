@@ -139,7 +139,6 @@ const OPTIONAL_STEPS = [
   { key: "sleep_schedule", title: "Sleep Schedule", required: false },
   { key: "cooking_time", title: "Cooking Time", required: false },
   { key: "exercise_experience", title: "Exercise Experience", required: false },
-  { key: "limitations", title: "Injuries & Limitations", required: false },
   { key: "habits", title: "Habits", required: false }
 ];
 
@@ -276,6 +275,7 @@ export default function OnboardingWizard() {
       const profileData = {
         name: "User", // Could add name field later
         birthDate: "",
+        age: Number(onboardingData.age) || 0,
         gender: onboardingData.gender,
         heightCm: heightCm,
         heightUnit: "cm",
@@ -1103,8 +1103,10 @@ function PreferencesStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
 }
 
 function HealthSafetyStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
+  const [formData, setFormData] = useState(data);
+
   const handleSubmit = () => {
-    onNext(data);
+    onNext(formData);
   };
 
   return (
@@ -1121,10 +1123,11 @@ function HealthSafetyStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
         </div>
       </div>
 
-      <div style={{ padding: "14px", border: "1px solid var(--app-border)", borderRadius: "8px", background: "var(--app-surface)" }}>
-        <strong>Injuries & movement limitations</strong>
-        <p style={{ marginBottom: 0, color: "var(--app-muted)", lineHeight: 1.5 }}>The next optional step lets you search and select injuries, symptoms, movement restrictions, and any clinician guidance. You can also skip it.</p>
-      </div>
+      <InjuryLimitationsForm
+        value={formData.injuryLimitations}
+        onChange={(injuryLimitations) => setFormData((current) => ({ ...current, injuryLimitations, limitations: injuryLimitations.notes }))}
+        primaryColor={primaryColor}
+      />
 
       <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>

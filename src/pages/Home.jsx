@@ -84,7 +84,7 @@ export default function Home() {
       <TimeHeader />
 
       {/* Setup Prompt for First-Time Users */}
-      {isFirstTime && <SetupPrompt />}
+      {isFirstTime() && <SetupPrompt />}
 
       {/* Day Selector */}
 
