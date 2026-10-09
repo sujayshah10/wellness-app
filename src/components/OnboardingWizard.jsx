@@ -223,118 +223,113 @@ export default function OnboardingWizard() {
   };
 
   const handleComplete = () => {
-    // Restore user's theme preference
-    const root = document.documentElement;
-    root.dataset.theme = savedTheme || "light";
+    try {
+      // Restore user's theme preference
+      const root = document.documentElement;
+      root.dataset.theme = savedTheme || "light";
 
-    // Calculate targets using Mifflin-St Jeor formula
-    const weightKg = onboardingData.weightUnit === "lbs" 
-      ? onboardingData.weightKg * 0.453592 
-      : onboardingData.weightKg;
-    const heightCm = onboardingData.heightUnit === "ft" 
-      ? onboardingData.heightCm * 30.48 
-      : onboardingData.heightCm;
-    
-    // BMR calculation (Mifflin-St Jeor)
-    let bmr;
-    if (onboardingData.gender === "male") {
-      bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * onboardingData.age) + 5;
-    } else {
-      bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * onboardingData.age) - 161;
-    }
-    
-    // TDEE calculation
-    const activityMultiplier = ACTIVITY_LEVELS.find(a => a.key === onboardingData.activityLevel)?.multiplier || 1.2;
-    const tdee = bmr * activityMultiplier;
+      // Calculate targets using Mifflin-St Jeor formula
+      const weightKg = onboardingData.weightUnit === "lbs"
+        ? onboardingData.weightKg * 0.453592
+        : onboardingData.weightKg;
+      const heightCm = onboardingData.heightUnit === "ft"
+        ? onboardingData.heightCm * 30.48
+        : onboardingData.heightCm;
 
-    // Target calories based on goals (handle multiple selections)
-    const selectedGoals = onboardingData.goals || ["lose_fat"];
-    let targetCalories = tdee;
-    let targetProtein = Math.round(weightKg * 1.6); // Default to maintain protein
+      // BMR calculation (Mifflin-St Jeor)
+      let bmr;
+      if (onboardingData.gender === "male") {
+        bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * onboardingData.age) + 5;
+      } else {
+        bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * onboardingData.age) - 161;
+      }
 
-    if (selectedGoals.includes("lose_fat") && selectedGoals.includes("build_muscle")) {
-      // Body recomposition: maintain calories, higher protein
-      targetCalories = Math.round(tdee);
-      targetProtein = Math.round(weightKg * 2.2); // Higher protein for recomp
-    } else if (selectedGoals.includes("lose_fat")) {
-      targetCalories = Math.round(tdee - 500);
-      targetProtein = Math.round(weightKg * 2.0);
-    } else if (selectedGoals.includes("build_muscle")) {
-      targetCalories = Math.round(tdee + 300);
-      targetProtein = Math.round(weightKg * 2.0);
-    } else if (selectedGoals.includes("maintain")) {
-      targetCalories = Math.round(tdee);
-      targetProtein = Math.round(weightKg * 1.6);
-    }
-    
-    // Workout split suggestion
-    let workoutFocus = "Full Body";
-    if (onboardingData.workoutDaysPerWeek >= 5) {
-      workoutFocus = "Push/Pull/Legs Split";
-    } else if (onboardingData.workoutDaysPerWeek >= 3) {
-      workoutFocus = "Upper/Lower Split";
-    } else {
-      workoutFocus = "Full Body";
-    }
+      // TDEE calculation
+      const activityMultiplier = ACTIVITY_LEVELS.find(a => a.key === onboardingData.activityLevel)?.multiplier || 1.2;
+      const tdee = bmr * activityMultiplier;
 
-    // Update profile using store functions
-    const profileData = {
-      name: "User", // Could add name field later
-      birthDate: "",
-      gender: onboardingData.gender,
-      heightCm: heightCm,
-      heightUnit: "cm",
-      weightKg: weightKg,
-      weightUnit: "kg",
-      activityLevel: onboardingData.activityLevel,
-      goals: onboardingData.goals, // Changed to array
-      dietType: onboardingData.dietType,
-      workoutDaysPerWeek: onboardingData.workoutDaysPerWeek,
-      equipment: onboardingData.equipment,
-      goalWeightKg: onboardingData.goalWeightKg,
-      mealsPerDay: onboardingData.mealsPerDay,
-      mealTimes: onboardingData.mealTimes,
-      country: onboardingData.country,
-      cuisine: onboardingData.cuisine,
-      allergies: onboardingData.allergies,
-      dislikes: onboardingData.dislikes,
-      wakeTime: onboardingData.wakeTime,
-      sleepTime: onboardingData.sleepTime,
-      cookingTime: onboardingData.cookingTime,
-      exerciseExperience: onboardingData.exerciseExperience,
-      limitations: onboardingData.limitations,
-      habits: onboardingData.habits
-    };
+      // Target calories based on goals (handle multiple selections)
+      const selectedGoals = onboardingData.goals || ["lose_fat"];
+      let targetCalories = tdee;
+      let targetProtein = Math.round(weightKg * 1.6); // Default to maintain protein
 
-    // Update targets using store functions
-    const targetsData = {
-      calories: targetCalories,
-      protein: targetProtein,
-      deficitMode: "auto",
-      deficitOverride: targetCalories - tdee
-    };
+      if (selectedGoals.includes("lose_fat") && selectedGoals.includes("build_muscle")) {
+        // Body recomposition: maintain calories, higher protein
+        targetCalories = Math.round(tdee);
+        targetProtein = Math.round(weightKg * 2.2); // Higher protein for recomp
+      } else if (selectedGoals.includes("lose_fat")) {
+        targetCalories = Math.round(tdee - 500);
+        targetProtein = Math.round(weightKg * 2.0);
+      } else if (selectedGoals.includes("build_muscle")) {
+        targetCalories = Math.round(tdee + 300);
+        targetProtein = Math.round(weightKg * 2.0);
+      } else if (selectedGoals.includes("maintain")) {
+        targetCalories = Math.round(tdee);
+        targetProtein = Math.round(weightKg * 1.6);
+      }
 
-    // Save everything via store functions
-    store.updateProfile(profileData);
-    store.updateTargets(targetsData);
-    store.updateSettings({
-      onboardingCompleted: true,
-      onboardingCompletedAt: new Date().toISOString(),
-      onboardingSkipped: false
-    });
+      // Workout split suggestion
+      let workoutFocus = "Full Body";
+      if (onboardingData.workoutDaysPerWeek >= 5) {
+        workoutFocus = "Push/Pull/Legs Split";
+      } else if (onboardingData.workoutDaysPerWeek >= 3) {
+        workoutFocus = "Upper/Lower Split";
+      } else {
+        workoutFocus = "Full Body";
+      }
 
-    // Update local state to trigger re-render
-    setAppData(prev => ({
-      ...prev,
-      profile: { ...prev.profile, ...profileData },
-      targets: { ...prev.targets, ...targetsData },
-      settings: {
-        ...prev.settings,
+      // Update profile using store functions
+      const profileData = {
+        name: "User", // Could add name field later
+        birthDate: "",
+        gender: onboardingData.gender,
+        heightCm: heightCm,
+        heightUnit: "cm",
+        weightKg: weightKg,
+        weightUnit: "kg",
+        activityLevel: onboardingData.activityLevel,
+        goals: onboardingData.goals, // Changed to array
+        dietType: onboardingData.dietType,
+        workoutDaysPerWeek: onboardingData.workoutDaysPerWeek,
+        equipment: onboardingData.equipment,
+        goalWeightKg: onboardingData.goalWeightKg,
+        mealsPerDay: onboardingData.mealsPerDay,
+        mealTimes: onboardingData.mealTimes,
+        country: onboardingData.country,
+        cuisine: onboardingData.cuisine,
+        allergies: onboardingData.allergies,
+        dislikes: onboardingData.dislikes,
+        wakeTime: onboardingData.wakeTime,
+        sleepTime: onboardingData.sleepTime,
+        cookingTime: onboardingData.cookingTime,
+        exerciseExperience: onboardingData.exerciseExperience,
+        limitations: onboardingData.limitations,
+        habits: onboardingData.habits
+      };
+
+      // Update targets using store functions
+      const targetsData = {
+        calories: targetCalories,
+        protein: targetProtein,
+        deficitMode: "auto",
+        deficitOverride: targetCalories - tdee
+      };
+
+      // Save everything via store functions
+      store.updateProfile(profileData);
+      store.updateTargets(targetsData);
+      store.updateSettings({
         onboardingCompleted: true,
         onboardingCompletedAt: new Date().toISOString(),
         onboardingSkipped: false
-      }
-    }));
+      });
+
+      // Call onComplete to signal parent to unmount wizard
+      onComplete();
+    } catch (error) {
+      console.error("Error completing onboarding:", error);
+      alert("There was an error saving your data. Please try again.");
+    }
   };
 
   const progress = ((currentStep + 1) / ALL_STEPS.length) * 100;

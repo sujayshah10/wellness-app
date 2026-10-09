@@ -66,10 +66,10 @@ function App() {
   }, [appData.settings.fontFamily, appData.settings.fontSize, FONT_FAMILIES, FONT_SIZES]);
 
   useEffect(() => {
-    if (!loading && (!appData.settings?.onboardingCompleted || isFirstTime())) {
-      setShowOnboarding(true);
-    } else {
-      setShowOnboarding(false);
+    if (!loading) {
+      // Check if onboarding is needed
+      const needsOnboarding = !appData.settings?.onboardingCompleted || isFirstTime();
+      setShowOnboarding(needsOnboarding);
     }
   }, [loading, isFirstTime, appData.settings?.onboardingCompleted]);
 
