@@ -36,7 +36,13 @@ export const DEFAULT_PROFILE = {
   foodAvoidanceTags: [],
   workoutLimitationTags: [],
   foodAvoidances: "",
-  workoutLimitations: ""
+  workoutLimitations: "",
+  injuryLimitations: {
+    injuries: [],
+    movementLimitations: [],
+    details: {},
+    notes: ""
+  }
 };
 
 export const DEFAULT_ABOUT = {

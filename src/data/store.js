@@ -610,7 +610,7 @@ export function getStreakData() {
 }
 
 // Helper functions for completion tracking
-function calculateDailyCompletion(completionData, intakeSlots, hasWorkout) {
+function calculateDailyCompletion(completionData, intakeSlots) {
   if (!completionData) return 0;
   
   const mealsCompleted = completionData.mealsCompleted?.length || 0;

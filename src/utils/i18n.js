@@ -111,8 +111,6 @@ export const translations = {
     time: "Time",
     timeDisplay: "Time Display",
     tip: "Tip",
-    restoreDefaultIntakes: "Restore Default Intake Setup",
-    confirmRestoreDefaultIntakes: "Restore the 3-intake default setup? This will hide any extra intake slots.",
     watchForm: "Watch Demo",
     strengthRecoveryTracker: "Workout Checklist",
     stepsCompleted: "Complete",

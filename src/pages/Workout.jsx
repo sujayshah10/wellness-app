@@ -4,7 +4,7 @@ import TimeHeader from "../components/TimeHeader";
 import DaySelector from "../components/DaySelector";
 import { useTranslation } from "../utils/useTranslation";
 import { titleCase } from "../utils/textCase";
-import { shouldShowExercise } from "../utils/recommendationFilter";
+import { getExerciseSafetyFlags, shouldShowExercise } from "../utils/recommendationFilter";
 
 export default function Workout() {
 
@@ -96,9 +96,7 @@ export default function Workout() {
   const openMedia = (exercise) => {
     const url = mediaUrlFor(exercise);
     const opened = window.open(url, "_blank", "noopener,noreferrer");
-    if (!opened) {
-      window.location.href = url;
-    }
+    if (!opened) window.alert("Please allow pop-ups to view exercise form guidance.");
   };
 
   const renderExercise = (ex, index) => (
@@ -115,6 +113,12 @@ export default function Workout() {
       }}
     >
       <strong>{titleCase(ex.name)}</strong>
+
+      {getExerciseSafetyFlags(ex, profile.injuryLimitations).map((flag) => (
+        <div key={flag} style={{ marginTop: "8px", padding: "8px", borderRadius: "8px", background: "rgba(217,119,6,.12)", color: "var(--app-text)", fontSize: "13px" }}>
+          ⚠ {flag}. Consider a modification or professional guidance.
+        </div>
+      ))}
 
       <p style={{ color: "var(--app-muted)", marginTop: "6px" }}>
         {ex.sets} {t("sets")} X {titleCase(ex.reps)}

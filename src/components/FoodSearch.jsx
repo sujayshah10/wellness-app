@@ -1,12 +1,24 @@
 import { useState, useEffect } from "react";
 import "./FoodSearch.css";
 
-export default function FoodSearch({ onSelect, manualEntryFallback }) {
+export default function FoodSearch({ onSelect }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showManual, setShowManual] = useState(false);
+
+  async function searchFood(searchQuery) {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(searchQuery)}&json=1&page_size=10`);
+      const data = await response.json();
+      setResults((data.products || []).filter(product => product.nutriments && product.product_name).map(product => ({ id: product.code, name: product.product_name, brand: product.brands || "", calories: product.nutriments["energy-kcal_100g"] || product.nutriments["energy-kcal"] || 0, protein: product.nutriments.proteins_100g || 0, carbs: product.nutriments.carbohydrates_100g || 0, fat: product.nutriments.fat_100g || 0, servingSize: product.serving_size || "100g", image: product.image_front_small_url || null })));
+    } catch {
+      setError("Failed to search. Please try manual entry.");
+      setResults([]);
+    } finally { setLoading(false); }
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -21,42 +33,6 @@ export default function FoodSearch({ onSelect, manualEntryFallback }) {
     return () => clearTimeout(timer);
   }, [query]);
 
-  const searchFood = async (searchQuery) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch(
-        `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(searchQuery)}&json=1&page_size=10`
-      );
-      const data = await response.json();
-      
-      if (data.products && data.products.length > 0) {
-        const processedResults = data.products
-          .filter(product => product.nutriments && product.product_name)
-          .map(product => ({
-            id: product.code,
-            name: product.product_name,
-            brand: product.brands || "",
-            calories: product.nutriments["energy-kcal_100g"] || product.nutriments["energy-kcal"] || 0,
-            protein: product.nutriments.proteins_100g || 0,
-            carbs: product.nutriments.carbohydrates_100g || 0,
-            fat: product.nutriments.fat_100g || 0,
-            servingSize: product.serving_size || "100g",
-            image: product.image_front_small_url || null
-          }));
-        
-        setResults(processedResults);
-      } else {
-        setResults([]);
-      }
-    } catch (err) {
-      setError("Failed to search. Please try manual entry.");
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSelect = (result) => {
     const mealData = {
@@ -72,7 +48,6 @@ export default function FoodSearch({ onSelect, manualEntryFallback }) {
   };
 
   const handleManualEntry = () => {
-    setShowManual(true);
     onSelect(null); // Signal that manual entry is needed
   };
 

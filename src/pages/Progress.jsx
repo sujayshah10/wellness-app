@@ -1,4 +1,3 @@
-import { useDay } from "../context/useDay";
 import { useAppData } from "../context/useAppData";
 import CompletionRing from "../components/CompletionRing";
 import StreakCounter from "../components/StreakCounter";
@@ -7,8 +6,7 @@ import { useTranslation } from "../utils/useTranslation";
 import { calculateBodyMetrics } from "../utils/healthCalculator";
 
 export default function Progress() {
-  const { selectedDay } = useDay();
-  const { appData, getDailyCompletion } = useAppData();
+  const { appData } = useAppData();
   const { t } = useTranslation();
 
   const completionTracker = appData.completionTracker || {};
@@ -300,8 +298,6 @@ export default function Progress() {
 
         {weekData.map((day) => {
           const isToday = day.dateKey === new Date().toISOString().split('T')[0];
-          const completionData = completionTracker[day.dateKey];
-          
           return (
             <div
               key={day.dateKey}

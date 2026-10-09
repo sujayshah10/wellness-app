@@ -1,9 +1,6 @@
 import { Link } from "react-router-dom";
-import { useTranslation } from "../utils/useTranslation";
 
 export default function SetupPrompt() {
-  const { t } = useTranslation();
-
   return (
     <div style={{
       background: "linear-gradient(135deg, var(--app-primary) 0%, var(--app-accent) 100%)",

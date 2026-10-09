@@ -7,6 +7,7 @@ import { titleCase } from "../utils/textCase";
 import { calculateBodyMetrics, cmToFeetInches, feetInchesToCm, kgToPounds, poundsToKg } from "../utils/healthCalculator";
 import * as store from "../data/store";
 import FoodSearch from "../components/FoodSearch";
+import InjuryLimitationsForm from "../components/InjuryLimitationsForm";
 
 const SECTIONS = [
   { key: "Profile", labelKey: "profile", descriptionKey: "descProfile", icon: "user", priority: "high" },
@@ -1031,6 +1032,16 @@ function ProfileSection({ appData, setAppData, t }) {
         />
 
         <Field label={t("otherWorkoutLimitations")} textarea value={draft.workoutLimitations || ""} disabled={!isEditing} onChange={(value) => updateDraft("workoutLimitations", value)} />
+
+        <details style={{ marginTop: "18px" }}>
+          <summary style={{ cursor: "pointer", fontWeight: 650 }}>Injuries & physical limitations</summary>
+          <p style={{ color: "var(--app-muted)", fontSize: "14px" }}>Keep these details current so workout guidance can highlight where extra care may be needed.</p>
+          <InjuryLimitationsForm
+            value={draft.injuryLimitations}
+            onChange={(injuryLimitations) => updateDraft("injuryLimitations", injuryLimitations)}
+            disabled={!isEditing}
+          />
+        </details>
       </div>
     </div>
   );
@@ -1146,7 +1157,7 @@ function SettingsSection({ appData, setAppData, t }) {
               store.saveAppData(updatedData);
 
               // Force immediate reload
-              window.location.href = window.location.href;
+              window.location.reload();
             }
           }}
           style={{
@@ -1193,7 +1204,7 @@ function SettingsSection({ appData, setAppData, t }) {
   );
 }
 
-function AppDataSection({ appData, setAppData, resetAppData, t }) {
+function AppDataSection({ setAppData, resetAppData, t }) {
   const [importError, setImportError] = useState(null);
   const [exportSuccess, setExportSuccess] = useState(false);
 

@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAppData } from "../context/useAppData";
-import { useTranslation } from "../utils/useTranslation";
-import * as store from "../data/store";
+import InjuryLimitationsForm from "./InjuryLimitationsForm";
 
 // Activity level options with descriptions
 const ACTIVITY_LEVELS = [
@@ -57,7 +56,16 @@ const ALLERGIES_LIST = [
   "Sesame seeds", "Mustard", "Sulfites", "Latex", "Corn", "Nightshades (tomatoes, potatoes, eggplant)",
   "FODMAPs", "Histamine intolerance", "Fructose intolerance", "Lactose intolerance",
   "Coconut", "Avocado", "Banana", "Kiwi", "Mango", "Pineapple", "Strawberries",
-  "Citrus fruits", "Chocolate", "Caffeine", "Alcohol", "None"
+  "Citrus fruits", "Chocolate", "Caffeine", "Alcohol",
+  "Almond", "Brazil nut", "Cashew", "Hazelnut", "Macadamia", "Pecan", "Pistachio", "Walnut",
+  "Buckwheat", "Oat", "Rye", "Spelt", "Millet", "Corn", "Rice", "Quinoa", "Barley",
+  "Chickpea", "Lentil", "Pea", "Lupin", "Bean", "Mustard seed", "Celery", "Garlic", "Onion",
+  "Tomato", "Potato", "Carrot", "Cucumber", "Mushroom", "Spinach", "Bell pepper", "Eggplant",
+  "Apple", "Pear", "Peach", "Plum", "Cherry", "Grape", "Melon", "Watermelon", "Pomegranate",
+  "Beef", "Pork", "Lamb", "Chicken", "Turkey", "Gelatin", "Red meat", "Shellfish", "Molluscs",
+  "Sunflower seed", "Poppy seed", "Flaxseed", "Chia seed", "Pumpkin seed", "Psyllium",
+  "Yeast", "Mold", "Food colouring", "Sulfites", "Benzoates", "MSG", "Artificial sweeteners",
+  "Salicylates", "Nickel in foods", "Alpha-gal (red meat)", "Other / not listed", "None"
 ];
 
 // Comprehensive food dislikes list (categorized)
@@ -86,8 +94,16 @@ const FOOD_DISLIKES_LIST = [
   // Legumes & Pulses
   "Lentils (Dal)", "Chickpeas (Chana)", "Kidney beans (Rajma)", "Black gram (Urad)",
   "Green peas", "Soybeans", "Mung beans", "Split peas",
+  // More vegetables, fruits, grains, proteins and common dishes
+  "Asparagus", "Artichoke", "Arugula", "Celery", "Leek", "Scallion", "Fennel", "Kale", "Swiss chard", "Collard greens", "Pak choi", "Turnip", "Parsnip", "Sweet potato", "Yam", "Pumpkin", "Squash", "Cucumber", "Tomato", "Corn", "Green beans", "Snow peas", "Sweet peas", "Sprouts", "Water chestnut", "Olives",
+  "Apple", "Orange", "Lemon", "Lime", "Grapefruit", "Grapes", "Kiwi", "Pineapple", "Coconut", "Dates", "Figs", "Raisins", "Berries", "Blueberries", "Raspberries", "Blackberries", "Cherries", "Peaches", "Plums", "Apricots", "Lychee", "Dragon fruit", "Passion fruit", "Star fruit",
+  "Whole wheat", "White bread", "Sourdough", "Pasta", "Noodles", "Vermicelli", "Couscous", "Bulgur", "Millet", "Amaranth", "Buckwheat", "Tapioca", "Semolina (suji)", "Poha", "Dalia", "Besan", "Maida", "Sattu",
+  "Yogurt", "Curd", "Ghee", "Butter", "Cheese", "Cream", "Whey", "Buttermilk", "Mayonnaise", "Ice cream", "Chicken", "Turkey", "Beef", "Pork", "Mutton", "Lamb", "Fish", "Tuna", "Salmon", "Sardines", "Prawns", "Crab", "Tofu", "Tempeh", "Seitan",
+  "Almonds", "Cashews", "Walnuts", "Pistachios", "Peanuts", "Sesame", "Chia seeds", "Flaxseed", "Pumpkin seeds", "Sunflower seeds", "Tahini", "Peanut butter",
+  "Pizza", "Burger", "Sandwich", "Pasta dishes", "Biryani", "Pulao", "Khichdi", "Upma", "Idli", "Dosa", "Uttapam", "Vada", "Sambar", "Chole", "Paneer curry", "Butter chicken", "Tandoori dishes", "Kebab", "Paratha", "Roti", "Naan", "Thepla", "Dhokla", "Handvo", "Kadhi", "Pav bhaji", "Vada pav", "Samosa", "Pakora", "Chaat", "Dal makhani", "Rasam", "Poha dishes",
+  "Coffee", "Tea", "Soft drinks", "Energy drinks", "Juice", "Alcohol", "Chocolate", "Honey", "Jaggery", "Sugar", "Artificial sweeteners", "Pickles", "Sauces", "Ketchup", "Soy sauce", "Vinegar",
   // Other
-  "None"
+  "Other food, ingredient, or dish", "None"
 ];
 
 // Exercise experience options
@@ -133,8 +149,7 @@ const REVIEW_STEP = { key: "review", title: "Review & Complete", required: true 
 const ALL_STEPS = [WELCOME_STEP, ...REQUIRED_STEPS, ...OPTIONAL_STEPS, REVIEW_STEP];
 
 export default function OnboardingWizard() {
-  const { appData, setAppData } = useAppData();
-  const { t } = useTranslation();
+  const { setAppData } = useAppData();
   const [currentStep, setCurrentStep] = useState(0);
   const [onboardingData, setOnboardingData] = useState({
     // Required fields
@@ -163,17 +178,17 @@ export default function OnboardingWizard() {
     cookingTime: "moderate",
     exerciseExperience: "beginner",
     limitations: "",
+    injuryLimitations: { injuries: [], movementLimitations: [], details: {}, notes: "" },
     habits: { smoking: null, drinking: null }
   });
 
-  const [skippedSteps, setSkippedSteps] = useState(new Set());
-  const [savedTheme, setSavedTheme] = useState(null);
+  const savedTheme = useRef("light");
 
   // Force dark theme during onboarding
   useEffect(() => {
     const root = document.documentElement;
     const currentTheme = root.dataset.theme || "light";
-    setSavedTheme(currentTheme);
+    savedTheme.current = currentTheme;
     root.dataset.theme = "dark";
 
     // Restore theme on unmount
@@ -204,7 +219,6 @@ export default function OnboardingWizard() {
   };
 
   const handleSkip = () => {
-    setSkippedSteps(prev => new Set([...prev, ALL_STEPS[currentStep].key]));
     if (currentStep < ALL_STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
     }
@@ -213,21 +227,11 @@ export default function OnboardingWizard() {
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
-      // Remove current step from skipped if going back
-      setSkippedSteps(prev => {
-        const newSkipped = new Set(prev);
-        newSkipped.delete(ALL_STEPS[currentStep].key);
-        return newSkipped;
-      });
     }
   };
 
   const handleComplete = () => {
     try {
-      // Restore user's theme preference
-      const root = document.documentElement;
-      root.dataset.theme = savedTheme || "light";
-
       // Calculate targets using Mifflin-St Jeor formula
       const weightKg = onboardingData.weightUnit === "lbs"
         ? onboardingData.weightKg * 0.453592
@@ -268,16 +272,6 @@ export default function OnboardingWizard() {
         targetProtein = Math.round(weightKg * 1.6);
       }
 
-      // Workout split suggestion
-      let workoutFocus = "Full Body";
-      if (onboardingData.workoutDaysPerWeek >= 5) {
-        workoutFocus = "Push/Pull/Legs Split";
-      } else if (onboardingData.workoutDaysPerWeek >= 3) {
-        workoutFocus = "Upper/Lower Split";
-      } else {
-        workoutFocus = "Full Body";
-      }
-
       // Update profile using store functions
       const profileData = {
         name: "User", // Could add name field later
@@ -304,6 +298,7 @@ export default function OnboardingWizard() {
         cookingTime: onboardingData.cookingTime,
         exerciseExperience: onboardingData.exerciseExperience,
         limitations: onboardingData.limitations,
+        injuryLimitations: onboardingData.injuryLimitations,
         habits: onboardingData.habits
       };
 
@@ -315,17 +310,19 @@ export default function OnboardingWizard() {
         deficitOverride: targetCalories - tdee
       };
 
-      // Save everything via store functions
-      store.updateProfile(profileData);
-      store.updateTargets(targetsData);
-      store.updateSettings({
-        onboardingCompleted: true,
-        onboardingCompletedAt: new Date().toISOString(),
-        onboardingSkipped: false
-      });
-
-      // Call onComplete to signal parent to unmount wizard
-      onComplete();
+      // Save through context so browser storage and the live application state stay in sync.
+      // The App component will then close the wizard when onboardingCompleted changes.
+      setAppData((current) => ({
+        ...current,
+        profile: { ...current.profile, ...profileData },
+        targets: { ...current.targets, ...targetsData },
+        settings: {
+          ...current.settings,
+          onboardingCompleted: true,
+          onboardingCompletedAt: new Date().toISOString(),
+          onboardingSkipped: false
+        }
+      }));
     } catch (error) {
       console.error("Error completing onboarding:", error);
       alert("There was an error saving your data. Please try again.");
@@ -1039,9 +1036,13 @@ function EquipmentStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
 function PreferencesStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
   const mealsPerDay = data.mealsPerDay || 3;
+  const suggestedMealTimes = {
+    1: ["12:00"], 2: ["10:00", "19:00"], 3: ["08:00", "13:00", "20:00"],
+    4: ["08:00", "11:00", "14:00", "20:00"], 5: ["08:00", "10:30", "13:00", "16:30", "20:00"]
+  };
 
-  // Initialize meal times if not set
-  const mealTimes = formData.mealTimes || Array(mealsPerDay).fill("12:00");
+  // Match the selected meal count and start with editable suggested times.
+  const mealTimes = (formData.mealTimes || suggestedMealTimes[mealsPerDay]).slice(0, mealsPerDay);
 
   const handleMealTimeChange = (index, time) => {
     const newMealTimes = [...mealTimes];
@@ -1061,8 +1062,7 @@ function PreferencesStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   };
 
   const handleSubmit = () => {
-    setFormData(prev => ({ ...prev, mealTimes }));
-    onNext(formData);
+    onNext({ ...formData, mealTimes });
   };
 
   return (
@@ -1071,6 +1071,7 @@ function PreferencesStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
         <label style={{ display: "block", marginBottom: "12px", fontWeight: 600, color: "var(--app-text)" }}>
           Set your meal times ({mealsPerDay} meals/day) *
         </label>
+        <p style={{ margin: "-4px 0 12px", color: "var(--app-muted)", fontSize: "14px" }}>We suggested a schedule for {mealsPerDay} meals. Adjust any time to match your day.</p>
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {Array.from({ length: mealsPerDay }).map((_, index) => (
             <div key={index}>
@@ -1102,10 +1103,8 @@ function PreferencesStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
 }
 
 function HealthSafetyStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
-  const [formData, setFormData] = useState(data);
-
   const handleSubmit = () => {
-    onNext(formData);
+    onNext(data);
   };
 
   return (
@@ -1122,26 +1121,9 @@ function HealthSafetyStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
         </div>
       </div>
 
-      <div>
-        <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, color: "var(--app-text)" }}>
-          Any injuries or physical limitations? *
-        </label>
-        <textarea
-          value={formData.limitations || ""}
-          onChange={(e) => setFormData(prev => ({ ...prev, limitations: e.target.value }))}
-          placeholder="e.g., 'Lower back pain, knee issues, shoulder impingement'"
-          rows={3}
-          style={{
-            width: "100%",
-            padding: "14px",
-            border: "1px solid var(--app-border)",
-            borderRadius: "8px",
-            background: "var(--app-surface)",
-            color: "var(--app-text)",
-            fontSize: "16px",
-            resize: "vertical"
-          }}
-        />
+      <div style={{ padding: "14px", border: "1px solid var(--app-border)", borderRadius: "8px", background: "var(--app-surface)" }}>
+        <strong>Injuries & movement limitations</strong>
+        <p style={{ marginBottom: 0, color: "var(--app-muted)", lineHeight: 1.5 }}>The next optional step lets you search and select injuries, symptoms, movement restrictions, and any clinician guidance. You can also skip it.</p>
       </div>
 
       <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
@@ -1243,14 +1225,16 @@ function LocationStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }
     }
 
     try {
-      // Using countries.dev free API for city/region search
-      const response = await fetch(`https://countries.dev/cities?q=${encodeURIComponent(query)}`);
+      // Open-Meteo uses GeoNames place data and needs no API key.
+      const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=10&language=en&format=json`);
       if (!response.ok) {
         throw new Error('API request failed');
       }
       const data = await response.json();
-      const cities = data.cities || [];
-      setSuggestions(cities.slice(0, 10)); // Limit to 10 suggestions
+      const cities = (data.results || []).map((place) => ({
+        name: [place.name, place.admin1, place.country].filter(Boolean).join(", ")
+      }));
+      setSuggestions(cities);
       setShowSuggestions(true);
     } catch (error) {
       console.error("Error fetching location suggestions:", error);
@@ -1274,14 +1258,14 @@ function LocationStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
         <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, color: "var(--app-text)" }}>
-          City/Location (optional)
+          City, town, or village (optional)
         </label>
         <div style={{ position: "relative" }}>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Type to search your city..."
+            placeholder="Type at least 2 letters to search your city, town, or village..."
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             style={{
               width: "100%",
@@ -1897,64 +1881,12 @@ function LimitationsStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColo
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      <div>
-        <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, color: "var(--app-text)" }}>
-          Additional Injuries or Limitations (optional)
-        </label>
-        <textarea
-          value={formData.limitations || ""}
-          onChange={(e) => setFormData(prev => ({ ...prev, limitations: e.target.value }))}
-          placeholder="Any other injuries or physical limitations we should know about?"
-          rows={3}
-          style={{
-            width: "100%",
-            padding: "14px",
-            border: "1px solid var(--app-border)",
-            borderRadius: "8px",
-            background: "var(--app-surface)",
-            color: "var(--app-text)",
-            fontSize: "16px",
-            resize: "vertical"
-          }}
-        />
-      </div>
-
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-        <button
-          type="button"
-          onClick={onSkip}
-          style={{
-            flex: 1,
-            padding: "14px",
-            background: "transparent",
-            color: "var(--app-muted)",
-            border: "none",
-            fontSize: "14px",
-            fontWeight: 500,
-            cursor: "pointer",
-            textDecoration: "underline"
-          }}
-        >
-          Skip
-        </button>
-      </div>
+      <InjuryLimitationsForm
+        value={formData.injuryLimitations}
+        onChange={(injuryLimitations) => setFormData(prev => ({ ...prev, injuryLimitations, limitations: injuryLimitations.notes }))}
+        primaryColor={primaryColor}
+      />
+      <NavigationButtons onBack={onBack} onNext={handleSubmit} onSkip={onSkip} showSkip={true} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }
@@ -2051,42 +1983,7 @@ function HabitsStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) 
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            background: primaryColor,
-            color: "white",
-            border: "none",
-          borderRadius: "8px",
-            fontSize: "16px",
-            fontWeight: 600,
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
-        <button
-          type="button"
-          onClick={onSkip}
-          style={{
-            flex: 1,
-            padding: "14px",
-            background: "transparent",
-            color: "var(--app-muted)",
-            border: "none",
-            fontSize: "14px",
-            fontWeight: 500,
-            cursor: "pointer",
-            textDecoration: "underline"
-          }}
-        >
-          Skip
-        </button>
-      </div>
+      <NavigationButtons onBack={onBack} onNext={handleSubmit} onSkip={onSkip} showSkip={true} isDarkMode={isDarkMode} primaryColor={primaryColor} />
     </div>
   );
 }

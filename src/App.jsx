@@ -42,7 +42,7 @@ function App() {
   const { appData, isFirstTime, FONT_FAMILIES, FONT_SIZES } = useAppData();
   const [loading, setLoading] = useState(true);
   const [online, setOnline] = useState(() => navigator.onLine !== false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const showOnboarding = !loading && (!appData.settings?.onboardingCompleted || isFirstTime());
 
   useEffect(() => {
     const timer = window.setTimeout(() => setLoading(false), 800);
@@ -64,14 +64,6 @@ function App() {
     root.style.setProperty('--app-font-body', fontFamily);
     root.style.setProperty('--app-font-size-base', fontSize);
   }, [appData.settings.fontFamily, appData.settings.fontSize, FONT_FAMILIES, FONT_SIZES]);
-
-  useEffect(() => {
-    if (!loading) {
-      // Check if onboarding is needed
-      const needsOnboarding = !appData.settings?.onboardingCompleted || isFirstTime();
-      setShowOnboarding(needsOnboarding);
-    }
-  }, [loading, isFirstTime, appData.settings?.onboardingCompleted]);
 
   useEffect(() => {
     const updateStatus = () => setOnline(window.navigator.onLine !== false);

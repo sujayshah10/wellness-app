@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AppDataContext } from "./app-data-context";
 import * as store from "../data/store";
 
@@ -52,7 +52,7 @@ export function AppDataProvider({ children }) {
 
   const isFirstTime = () => store.isFirstTimeUser();
 
-  const value = useMemo(() => ({
+  const value = {
     appData,
     setAppData,
     resetAppData,
@@ -62,7 +62,7 @@ export function AppDataProvider({ children }) {
     getDailyCompletion,
     FONT_FAMILIES,
     FONT_SIZES
-  }), [appData]);
+  };
 
   return (
     <AppDataContext.Provider value={value}>

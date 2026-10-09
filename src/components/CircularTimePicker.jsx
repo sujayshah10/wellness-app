@@ -5,14 +5,14 @@ export default function CircularTimePicker({ value, onChange, label }) {
   const [isOpen, setIsOpen] = useState(false);
   const [hours, setHours] = useState(() => {
     if (value) {
-      const [h, m] = value.split(':');
+      const [h] = value.split(':');
       return parseInt(h, 10);
     }
     return 12;
   });
   const [minutes, setMinutes] = useState(() => {
     if (value) {
-      const [h, m] = value.split(':');
+      const [, m] = value.split(':');
       return parseInt(m, 10);
     }
     return 0;

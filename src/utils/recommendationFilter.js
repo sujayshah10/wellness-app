@@ -64,6 +64,34 @@ export function shouldShowExercise(exercise, limitations = [], otherLimitations 
 }
 
 /**
+ * Returns caution flags for the structured onboarding responses. These flags are
+ * deliberately advisory: a diagnosis alone cannot determine whether an exercise
+ * is safe for an individual user.
+ */
+export function getExerciseSafetyFlags(exercise, injuryLimitations = {}) {
+  const name = (exercise?.name || "").toLowerCase();
+  const injuries = injuryLimitations.injuries || [];
+  const movements = injuryLimitations.movementLimitations || [];
+  const flags = [];
+  const movementKeywords = {
+    "Squatting": ["squat"], "Lunging": ["lunge"], "Bending forward": ["deadlift", "row", "good morning"],
+    "Twisting the torso": ["twist", "rotation"], "Raising arms overhead": ["overhead", "shoulder press"],
+    "Pushing movements (push-ups / bench press)": ["push-up", "pushup", "bench", "press", "dip"],
+    "Pulling movements (rows / pull-ups)": ["row", "pull-up", "pullup"], "Lifting weights from the floor": ["deadlift", "clean"],
+    "Running / sprinting": ["run", "sprint"], "Jumping / high-impact exercise": ["jump", "burpee", "skip"],
+    "Kneeling / getting down to the floor": ["kneel", "plank", "push-up", "pushup"], "Balancing on one leg": ["single leg", "split squat"],
+    "Walking / climbing stairs": ["walk", "step"], "Holding weights / gripping equipment": ["grip", "carry", "curl"],
+    "Standing for long periods": ["standing", "walk", "run"]
+  };
+  for (const movement of movements) {
+    if ((movementKeywords[movement] || []).some(keyword => name.includes(keyword))) flags.push(`May involve: ${movement}`);
+  }
+  const hasSeriousRestriction = injuries.some(item => ["Recent surgery / medical procedure", "Unhealed / recovering injury", "Heart condition with exercise restrictions", "Doctor-prescribed movement restriction", "Doctor-prescribed heart-rate / exercise-intensity limits"].includes(item));
+  if (hasSeriousRestriction) flags.push("Professional clearance may be needed");
+  return [...new Set(flags)];
+}
+
+/**
  * Filters a diet plan based on food avoidances
  * @param {Object} dietPlan - The full diet plan object
  * @param {Array} avoidances - Array of food avoidance tags
