@@ -177,9 +177,15 @@ export function loadAppData() {
  * Save all app data to storage
  */
 export function saveAppData(data) {
-  const normalized = normalizeAppData(data);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
-  return normalized;
+  try {
+    const normalized = normalizeAppData(data);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+    return normalized;
+  } catch (error) {
+    console.error("Failed to save app data:", error);
+    // Return current data to prevent data loss
+    return loadAppData();
+  }
 }
 
 /**
@@ -683,23 +689,24 @@ export function exportData() {
  */
 export async function importData(file) {
   if (!file) return { success: false, error: "No file provided" };
-  
+
   try {
     const text = await file.text();
     const importedData = JSON.parse(text);
-    
+
     // Basic validation
     if (!importedData || typeof importedData !== 'object') {
       return { success: false, error: "Invalid file format" };
     }
-    
+
     if (!importedData.profile || !importedData.targets || !importedData.dietPlan) {
       return { success: false, error: "Missing required data fields" };
     }
-    
+
     saveAppData(importedData);
     return { success: true };
   } catch (error) {
+    console.error("Import error:", error);
     return { success: false, error: error.message || "Failed to import data" };
   }
 }
