@@ -50,6 +50,46 @@ const CUISINE_OPTIONS = [
   { key: "other", label: "Other" }
 ];
 
+// Comprehensive allergies list
+const ALLERGIES_LIST = [
+  "Peanuts", "Tree nuts (almonds, walnuts, cashews, etc.)", "Dairy/Milk", "Eggs",
+  "Soy", "Wheat/Gluten", "Fish", "Shellfish (shrimp, crab, lobster, etc.)",
+  "Sesame seeds", "Mustard", "Sulfites", "Latex", "Corn", "Nightshades (tomatoes, potatoes, eggplant)",
+  "FODMAPs", "Histamine intolerance", "Fructose intolerance", "Lactose intolerance",
+  "Coconut", "Avocado", "Banana", "Kiwi", "Mango", "Pineapple", "Strawberries",
+  "Citrus fruits", "Chocolate", "Caffeine", "Alcohol", "None"
+];
+
+// Comprehensive food dislikes list (categorized)
+const FOOD_DISLIKES_LIST = [
+  // Vegetables
+  "Bitter gourd (Karela)", "Okra (Bhindi)", "Bottle gourd (Lauki)", "Ridge gourd (Turai)",
+  "Spinach (Palak)", "Broccoli", "Cauliflower", "Cabbage", "Brussels sprouts",
+  "Eggplant (Baingan)", "Zucchini", "Mushrooms", "Bell peppers", "Onions",
+  "Garlic", "Ginger", "Carrots", "Beets", "Radishes", "Turnips",
+  "Leafy greens (methi, sarson, etc.)", "Bamboo shoots", "Lotus stem",
+  // Fruits
+  "Papaya", "Watermelon", "Muskmelon", "Banana", "Guava", "Pomegranate",
+  "Jackfruit", "Raw mango", "Pear", "Peach", "Plum", "Apricot",
+  // Herbs & Spices
+  "Cilantro (Coriander)", "Curry leaves", "Mint", "Parsley", "Basil",
+  "Rosemary", "Thyme", "Oregano", "Chili peppers", "Black pepper",
+  "Turmeric", "Cumin", "Coriander seeds", "Fenugreek (Methi)", "Asafoetida (Hing)",
+  // Proteins
+  "Fish", "Shellfish", "Prawns", "Crab", "Lobster", "Chicken", "Mutton/Lamb",
+  "Beef", "Pork", "Eggs", "Tofu", "Paneer", "Soy chunks",
+  // Dairy alternatives
+  "Soy milk", "Almond milk", "Coconut milk", "Oat milk",
+  // Grains & Cereals
+  "Rice", "Brown rice", "Quinoa", "Oats", "Barley", "Ragi (Finger millet)",
+  "Bajra (Pearl millet)", "Jowar (Sorghum)", "Corn/Maize",
+  // Legumes & Pulses
+  "Lentils (Dal)", "Chickpeas (Chana)", "Kidney beans (Rajma)", "Black gram (Urad)",
+  "Green peas", "Soybeans", "Mung beans", "Split peas",
+  // Other
+  "None"
+];
+
 // Exercise experience options
 const EXERCISE_EXPERIENCE = [
   { key: "beginner", label: "Beginner - New to exercise" },
@@ -269,7 +309,7 @@ export default function OnboardingWizard() {
       calories: targetCalories,
       protein: targetProtein,
       deficitMode: "auto",
-      deficitOverride: goalConfig.calorieAdjustment
+      deficitOverride: targetCalories - tdee
     };
 
     // Save everything via store functions
@@ -1001,19 +1041,67 @@ function EquipmentStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
 
 function PreferencesStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
+  const mealsPerDay = data.mealsPerDay || 3;
+
+  const getMealTimingOptions = () => {
+    const baseOptions = [
+      { value: "shift_worker", label: "Shift Worker / Rotating Schedule (flexible meal times)" }
+    ];
+
+    if (mealsPerDay === 1) {
+      return [
+        ...baseOptions,
+        { value: "single_evening", label: "One Meal in Evening" },
+        { value: "single_noon", label: "One Meal at Noon" },
+        { value: "single_morning", label: "One Meal in Morning" }
+      ];
+    } else if (mealsPerDay === 2) {
+      return [
+        ...baseOptions,
+        { value: "brunch_dinner", label: "Brunch + Dinner" },
+        { value: "breakfast_late", label: "Breakfast + Late Dinner" },
+        { value: "early_late", label: "Early Breakfast + Late Dinner" },
+        { value: "intermittent", label: "Intermittent Fasting (2 main meals)" }
+      ];
+    } else if (mealsPerDay === 3) {
+      return [
+        ...baseOptions,
+        { value: "standard", label: "Standard (Breakfast, Lunch, Dinner)" },
+        { value: "early", label: "Early Riser (Breakfast, Lunch, Early Dinner)" },
+        { value: "late", label: "Night Owl (Brunch, Lunch, Late Dinner)" }
+      ];
+    } else if (mealsPerDay === 4) {
+      return [
+        ...baseOptions,
+        { value: "four_standard", label: "4 Meals (Breakfast, Snack, Lunch, Dinner)" },
+        { value: "four_small", label: "4 Small Meals Throughout Day" },
+        { value: "four_early", label: "4 Meals Starting Early" }
+      ];
+    } else if (mealsPerDay === 5) {
+      return [
+        ...baseOptions,
+        { value: "five_standard", label: "5 Meals (Breakfast, Snack, Lunch, Snack, Dinner)" },
+        { value: "five_small", label: "5 Small Meals Every 2-3 Hours" },
+        { value: "five_early", label: "5 Meals Starting Early" }
+      ];
+    }
+    return baseOptions;
+  };
 
   const handleSubmit = () => {
     onNext(formData);
   };
 
+  const timingOptions = getMealTimingOptions();
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
         <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, color: "var(--app-text)" }}>
-          Preferred meal timing *
+          Preferred meal timing ({mealsPerDay} meals/day) *
         </label>
         <select
-          value={formData.mealTiming || "standard"}
+          value={formData.mealTiming || timingOptions[0]?.value}
           onChange={(e) => setFormData(prev => ({ ...prev, mealTiming: e.target.value }))}
           style={{
             width: "100%",
@@ -1025,11 +1113,18 @@ function PreferencesStep({ data, onNext, onBack, isDarkMode, primaryColor }) {
             fontSize: "16px"
           }}
         >
-          <option value="standard">Standard (Breakfast, Lunch, Dinner)</option>
-          <option value="early">Early Riser (Breakfast, Lunch, Early Dinner)</option>
-          <option value="late">Night Owl (Brunch, Lunch, Late Dinner)</option>
-          <option value="intermittent">Intermittent Fasting (2 main meals)</option>
-          <option value="shift_worker">Shift Worker / Rotating Schedule (flexible meal times)</option>
+          {timingOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} isDarkMode={isDarkMode} primaryColor={primaryColor} />
+    </div>
+  );
+}
         </select>
       </div>
 
@@ -1167,8 +1262,39 @@ function MealFrequencyStep({ data, onNext, onBack, onSkip, isDarkMode, primaryCo
 
 function LocationStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
+  const [searchQuery, setSearchQuery] = useState(formData.country || "");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    if (query.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      // Using countries.dev free API for city/region search
+      const response = await fetch(`https://countries.dev/cities?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      const cities = data.cities || [];
+      setSuggestions(cities.slice(0, 10)); // Limit to 10 suggestions
+      setShowSuggestions(true);
+    } catch (error) {
+      console.error("Error fetching location suggestions:", error);
+      setSuggestions([]);
+    }
+  };
+
+  const selectLocation = (location) => {
+    setFormData(prev => ({ ...prev, country: location }));
+    setSearchQuery(location);
+    setShowSuggestions(false);
+  };
 
   const handleSubmit = () => {
+    setFormData(prev => ({ ...prev, country: searchQuery }));
     onNext(formData);
   };
 
@@ -1176,23 +1302,60 @@ function LocationStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <div>
         <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, color: "var(--app-text)" }}>
-          Country/Region (optional)
+          City/Location (optional)
         </label>
-        <input
-          type="text"
-          value={formData.country || ""}
-          onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
-          placeholder="e.g., 'India', 'United States', 'United Kingdom'"
-          style={{
-            width: "100%",
-            padding: "14px",
-            border: "1px solid var(--app-border)",
-            borderRadius: "8px",
-            background: "var(--app-surface)",
-            color: "var(--app-text)",
-            fontSize: "16px"
-          }}
-        />
+        <div style={{ position: "relative" }}>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="Type to search your city..."
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            style={{
+              width: "100%",
+              padding: "14px",
+              border: "1px solid var(--app-border)",
+              borderRadius: "8px",
+              background: "var(--app-surface)",
+              color: "var(--app-text)",
+              fontSize: "16px"
+            }}
+          />
+          {showSuggestions && suggestions.length > 0 && (
+            <div style={{
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              right: 0,
+              maxHeight: "200px",
+              overflowY: "auto",
+              background: "var(--app-surface)",
+              border: "1px solid var(--app-border)",
+              borderRadius: "8px",
+              marginTop: "4px",
+              zIndex: 1000,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+            }}>
+              {suggestions.map((city, index) => (
+                <div
+                  key={index}
+                  onClick={() => selectLocation(city.name)}
+                  style={{
+                    padding: "12px 14px",
+                    cursor: "pointer",
+                    borderBottom: index < suggestions.length - 1 ? "1px solid var(--app-border)" : "none",
+                    fontSize: "14px",
+                    color: "var(--app-text)"
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = "var(--app-surface-soft)"}
+                  onMouseLeave={(e) => e.target.style.background = "var(--app-surface)"}
+                >
+                  {city.name}{city.country ? `, ${city.country}` : ""}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} onSkip={onSkip} showSkip={true} isDarkMode={isDarkMode} primaryColor={primaryColor} />
@@ -1202,8 +1365,30 @@ function LocationStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }
 
 function AllergiesStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
+  const [selectedAllergies, setSelectedAllergies] = useState(() => {
+    // Parse existing allergies string into array
+    const existing = formData.allergies || "";
+    return existing ? existing.split(", ").filter(a => a.trim()) : [];
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const filteredAllergies = ALLERGIES_LIST.filter(allergy =>
+    allergy.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const toggleAllergy = (allergy) => {
+    setSelectedAllergies(prev => {
+      if (prev.includes(allergy)) {
+        return prev.filter(a => a !== allergy);
+      } else {
+        return [...prev, allergy];
+      }
+    });
+  };
 
   const handleSubmit = () => {
+    setFormData(prev => ({ ...prev, allergies: selectedAllergies.join(", ") }));
     onNext(formData);
   };
 
@@ -1213,22 +1398,93 @@ function AllergiesStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor 
         <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, color: "var(--app-text)" }}>
           Any allergies or food intolerances? (optional)
         </label>
-        <textarea
-          value={formData.allergies || ""}
-          onChange={(e) => setFormData(prev => ({ ...prev, allergies: e.target.value }))}
-          placeholder="e.g., 'Peanuts, gluten, dairy, shellfish'"
-          rows={3}
-          style={{
-            width: "100%",
-            padding: "14px",
-            border: "1px solid var(--app-border)",
-            borderRadius: "8px",
-            background: "var(--app-surface)",
-            color: "var(--app-text)",
-            fontSize: "16px",
-            resize: "vertical"
-          }}
-        />
+        <div style={{ position: "relative" }}>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowDropdown(true);
+            }}
+            onFocus={() => setShowDropdown(true)}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+            placeholder="Search or select allergies..."
+            style={{
+              width: "100%",
+              padding: "14px",
+              border: "1px solid var(--app-border)",
+              borderRadius: "8px",
+              background: "var(--app-surface)",
+              color: "var(--app-text)",
+              fontSize: "16px"
+            }}
+          />
+          {showDropdown && (
+            <div style={{
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              right: 0,
+              maxHeight: "250px",
+              overflowY: "auto",
+              background: "var(--app-surface)",
+              border: "1px solid var(--app-border)",
+              borderRadius: "8px",
+              marginTop: "4px",
+              zIndex: 1000,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+            }}>
+              {filteredAllergies.map((allergy, index) => {
+                const isSelected = selectedAllergies.includes(allergy);
+                return (
+                  <div
+                    key={index}
+                    onClick={() => toggleAllergy(allergy)}
+                    style={{
+                      padding: "12px 14px",
+                      cursor: "pointer",
+                      borderBottom: index < filteredAllergies.length - 1 ? "1px solid var(--app-border)" : "none",
+                      fontSize: "14px",
+                      color: "var(--app-text)",
+                      background: isSelected ? "var(--app-surface-soft)" : "var(--app-surface)",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center"
+                    }}
+                    onMouseEnter={(e) => e.target.style.background = isSelected ? "var(--app-surface-soft)" : "var(--app-surface-soft)"}
+                    onMouseLeave={(e) => e.target.style.background = isSelected ? "var(--app-surface-soft)" : "var(--app-surface)"}
+                  >
+                    <span>{allergy}</span>
+                    {isSelected && <span>✓</span>}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        {selectedAllergies.length > 0 && (
+          <div style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            {selectedAllergies.map((allergy, index) => (
+              <span
+                key={index}
+                onClick={() => toggleAllergy(allergy)}
+                style={{
+                  padding: "6px 12px",
+                  background: primaryColor,
+                  color: "white",
+                  borderRadius: "16px",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px"
+                }}
+              >
+                {allergy} ×
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} onSkip={onSkip} showSkip={true} isDarkMode={isDarkMode} primaryColor={primaryColor} />
@@ -1281,8 +1537,29 @@ function CuisineStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor })
 
 function DislikesStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }) {
   const [formData, setFormData] = useState(data);
+  const [selectedDislikes, setSelectedDislikes] = useState(() => {
+    const existing = formData.dislikes || "";
+    return existing ? existing.split(", ").filter(d => d.trim()) : [];
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const filteredFoods = FOOD_DISLIKES_LIST.filter(food =>
+    food.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const toggleDislike = (food) => {
+    setSelectedDislikes(prev => {
+      if (prev.includes(food)) {
+        return prev.filter(d => d !== food);
+      } else {
+        return [...prev, food];
+      }
+    });
+  };
 
   const handleSubmit = () => {
+    setFormData(prev => ({ ...prev, dislikes: selectedDislikes.join(", ") }));
     onNext(formData);
   };
 
@@ -1292,22 +1569,93 @@ function DislikesStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }
         <label style={{ display: "block", marginBottom: "8px", fontWeight: 600, color: "var(--app-text)" }}>
           Foods you dislike (optional)
         </label>
-        <textarea
-          value={formData.dislikes || ""}
-          onChange={(e) => setFormData(prev => ({ ...prev, dislikes: e.target.value }))}
-          placeholder="e.g., 'okra, bitter gourd, cilantro'"
-          rows={3}
-          style={{
-            width: "100%",
-            padding: "14px",
-            border: "1px solid var(--app-border)",
-            borderRadius: "8px",
-            background: "var(--app-surface)",
-            color: "var(--app-text)",
-            fontSize: "16px",
-            resize: "vertical"
-          }}
-        />
+        <div style={{ position: "relative" }}>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowDropdown(true);
+            }}
+            onFocus={() => setShowDropdown(true)}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+            placeholder="Search or select foods you dislike..."
+            style={{
+              width: "100%",
+              padding: "14px",
+              border: "1px solid var(--app-border)",
+              borderRadius: "8px",
+              background: "var(--app-surface)",
+              color: "var(--app-text)",
+              fontSize: "16px"
+            }}
+          />
+          {showDropdown && (
+            <div style={{
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              right: 0",
+              maxHeight: "300px",
+              overflowY: "auto",
+              background: "var(--app-surface)",
+              border: "1px solid var(--app-border)",
+              borderRadius: "8px",
+              marginTop: "4px",
+              zIndex: 1000,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+            }}>
+              {filteredFoods.map((food, index) => {
+                const isSelected = selectedDislikes.includes(food);
+                return (
+                  <div
+                    key={index}
+                    onClick={() => toggleDislike(food)}
+                    style={{
+                      padding: "12px 14px",
+                      cursor: "pointer",
+                      borderBottom: index < filteredFoods.length - 1 ? "1px solid var(--app-border)" : "none",
+                      fontSize: "14px",
+                      color: "var(--app-text)",
+                      background: isSelected ? "var(--app-surface-soft)" : "var(--app-surface)",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center"
+                    }}
+                    onMouseEnter={(e) => e.target.style.background = isSelected ? "var(--app-surface-soft)" : "var(--app-surface-soft)"}
+                    onMouseLeave={(e) => e.target.style.background = isSelected ? "var(--app-surface-soft)" : "var(--app-surface)"}
+                  >
+                    <span>{food}</span>
+                    {isSelected && <span>✓</span>}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        {selectedDislikes.length > 0 && (
+          <div style={{ marginTop: "12px", display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            {selectedDislikes.map((food, index) => (
+              <span
+                key={index}
+                onClick={() => toggleDislike(food)}
+                style={{
+                  padding: "6px 12px",
+                  background: primaryColor,
+                  color: "white",
+                  borderRadius: "16px",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px"
+                }}
+              >
+                {food} ×
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <NavigationButtons onBack={onBack} onNext={() => handleSubmit()} onSkip={onSkip} showSkip={true} isDarkMode={isDarkMode} primaryColor={primaryColor} />

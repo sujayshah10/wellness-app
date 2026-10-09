@@ -85,6 +85,8 @@ function App() {
 
   // Version check to force cache refresh when deployed version changes
   useEffect(() => {
+    if (loading) return; // Don't check version while loading
+
     const currentVersion = appData.about.version;
     const storageKey = "wellnessAppLastVersion";
     const lastVersion = localStorage.getItem(storageKey);
@@ -98,7 +100,7 @@ function App() {
       // First visit - store version
       localStorage.setItem(storageKey, currentVersion);
     }
-  }, [appData.about.version]);
+  }, [loading, appData.about.version]);
 
   return (
     <div className="app-shell">
