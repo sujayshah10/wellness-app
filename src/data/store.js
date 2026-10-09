@@ -139,7 +139,9 @@ function normalizeAppData(data) {
     },
     about: {
       ...DEFAULT_ABOUT,
-      ...(data?.about || {})
+      ...(data?.about || {}),
+      // App version is release metadata, not user-customizable persisted data.
+      version: DEFAULT_ABOUT.version
     },
     settings: {
       ...DEFAULT_SETTINGS,
