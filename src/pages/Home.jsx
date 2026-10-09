@@ -84,7 +84,8 @@ export default function Home() {
       <TimeHeader />
 
       {/* Setup Prompt for First-Time Users */}
-      {isFirstTime() && <SetupPrompt />}
+      {/* Only show if onboarding has not been completed */}
+      {(!appData.settings?.onboardingCompleted) && <SetupPrompt />}
 
       {/* Day Selector */}
 

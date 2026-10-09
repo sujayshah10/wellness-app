@@ -9,6 +9,21 @@ const activityMultipliers = {
   veryActive: 1.9
 };
 
+// Helper to normalize activity level keys
+function normalizeActivityLevel(level) {
+  const mapping = {
+    "sedentary": "sedentary",
+    "lightly_active": "lightly_active",
+    "moderately_active": "moderately_active",
+    "very_active": "very_active",
+    // Legacy keys
+    "light": "lightly_active",
+    "moderate": "moderately_active",
+    "active": "very_active"
+  };
+  return mapping[level] || level || "sedentary";
+}
+
 export function poundsToKg(value) {
   return (Number(value) || 0) / 2.20462;
 }
@@ -58,7 +73,7 @@ export function calculateBodyMetrics(profile = {}, targets = {}) {
   const heightCm = Number(profile.heightCm) || 0;
   const weightKg = Number(profile.weightKg) || 0;
   const gender = profile.gender || "male";
-  const activityLevel = profile.activityLevel || "light";
+  const activityLevel = normalizeActivityLevel(profile.activityLevel);
 
   // Handle new goals array format (for backward compatibility)
   const goals = Array.isArray(profile.goals) ? profile.goals : [];
@@ -70,7 +85,7 @@ export function calculateBodyMetrics(profile = {}, targets = {}) {
     ? roundToNearest((10 * weightKg) + (6.25 * heightCm) - (5 * age) + genderOffset)
     : 0;
   const tdee = bmr
-    ? roundToNearest(bmr * (activityMultipliers[activityLevel] || activityMultipliers.light))
+    ? roundToNearest(bmr * (activityMultipliers[activityLevel] || activityMultipliers.sedentary))
     : 0;
 
   // Calculate calorie adjustment based on goals
