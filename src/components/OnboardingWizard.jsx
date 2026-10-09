@@ -1588,7 +1588,7 @@ function DislikesStep({ data, onNext, onBack, onSkip, isDarkMode, primaryColor }
               position: "absolute",
               top: "100%",
               left: 0,
-              right: 0",
+              right: 0,
               maxHeight: "300px",
               overflowY: "auto",
               background: "var(--app-surface)",
