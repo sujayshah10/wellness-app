@@ -44,7 +44,13 @@ export default function InjuryLimitationsForm({ value = {}, onChange, disabled =
   const details = value.details || {};
   const normalizedQuery = query.trim().toLowerCase();
   const visibleCategories = useMemo(() => INJURY_CATEGORIES.map(([title, options]) => [title, options.filter(option => !normalizedQuery || option.toLowerCase().includes(normalizedQuery) || title.toLowerCase().includes(normalizedQuery))]).filter(([, options]) => options.length), [normalizedQuery]);
-  const update = (patch) => onChange({ injuries, movementLimitations: movements, details, notes: "", ...value, ...patch });
+  const update = (patch) => {
+    try {
+      onChange({ injuries, movementLimitations: movements, details, notes: "", ...value, ...patch });
+    } catch (error) {
+      console.error("Error updating injury limitations:", error);
+    }
+  };
   const changeInjury = (item) => update({ injuries: toggle(injuries, item) });
   const changeMovement = (item) => update({ movementLimitations: toggle(movements, item) });
   const updateDetail = (item, field, fieldValue) => update({ details: { ...details, [item]: { ...(details[item] || {}), [field]: fieldValue } } });
@@ -57,7 +63,15 @@ export default function InjuryLimitationsForm({ value = {}, onChange, disabled =
       <input id="injury-search" disabled={disabled} value={query} onChange={event => setQuery(event.target.value)} placeholder="Search injuries or limitations" style={inputStyle} />
       <div style={{ marginTop: "10px", display: "grid", gap: "8px" }}>
         <button type="button" disabled={disabled} onClick={() => changeInjury(NONE)} aria-pressed={injuries.includes(NONE)} style={{ ...inputStyle, textAlign: "left", cursor: "pointer", background: injuries.includes(NONE) ? "color-mix(in srgb, var(--app-primary) 18%, var(--app-surface))" : "var(--app-surface)" }}>{injuries.includes(NONE) ? "✓ " : ""}{NONE}</button>
-        {visibleCategories.map(([title, options]) => <details key={title} open={normalizedQuery || openCategories.has(title)} onToggle={event => setOpenCategories(previous => { const next = new Set(previous); event.currentTarget.open ? next.add(title) : next.delete(title); return next; })} style={{ border: "1px solid var(--app-border)", borderRadius: "8px", padding: "10px" }}>
+        {visibleCategories.map(([title, options]) => <details key={title} open={normalizedQuery || openCategories.has(title)} onToggle={event => {
+          if (event.currentTarget) {
+            setOpenCategories(previous => {
+              const next = new Set(previous);
+              event.currentTarget.open ? next.add(title) : next.delete(title);
+              return next;
+            });
+          }
+        }} style={{ border: "1px solid var(--app-border)", borderRadius: "8px", padding: "10px" }}>
           <summary style={{ cursor: "pointer", fontWeight: 650 }}>{title} <span style={{ color: "var(--app-muted)", fontWeight: 400 }}>({options.length})</span></summary>
           <div style={{ display: "grid", gap: "6px", marginTop: "10px" }}>
             {options.map(option => <label key={option} style={{ display: "flex", gap: "9px", alignItems: "flex-start", cursor: disabled ? "default" : "pointer" }}><input type="checkbox" disabled={disabled || injuries.includes(NONE)} checked={injuries.includes(option)} onChange={() => changeInjury(option)} /> <span>{option}</span></label>)}
